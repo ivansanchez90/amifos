@@ -17,7 +17,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { useNavigate } from 'react-router-dom'
 import type { User } from '@supabase/supabase-js'
+import type { FormEvent } from 'react'
 
 // ═══════════════════════════════════════════════════════════════
 //  SUPABASE CLIENT
@@ -465,17 +467,36 @@ function LoginScreen() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error: err } = await supabase.auth.signInWithPassword({
+    const { data, error: err } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
-    if (err)
+    if (err) {
       setError('Credenciales incorrectas. Verificá tu email y contraseña.')
+      setLoading(false)
+      return
+    }
+
+    // Verificar el rol del usuario después del login exitoso
+    if (data.user) {
+      const { data: userData } = await supabase
+        .from('usuarios')
+        .select('rol')
+        .eq('id_usuario', data.user.id)
+        .single()
+
+      // Si es admin, Directivo o Docente, redirigir al panel administrativo
+      if (userData?.rol === 'Admin' || userData?.rol === 'Directivo' || userData?.rol === 'Docente') {
+        navigate('/admin')
+      }
+      // Si es Alumna, permanecer en el portal (el comportamiento por defecto)
+    }
     setLoading(false)
   }
 

@@ -807,7 +807,6 @@ function GestionUsuarios() {
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
-    uuid: '',
     email: '',
     password: '',
     nombre: '',
@@ -833,33 +832,24 @@ function GestionUsuarios() {
     setLoading(true)
     setMsg('')
 
-    // Insertar directamente en la tabla usuarios con el UUID que pegás a mano
-    const { error: dbErr } = await supabase.from('usuarios').insert([
-      {
-        id_usuario: form.uuid, // UUID copiado de Authentication → Users
+    const { error } = await supabase.functions.invoke('crear-usuario', {
+      body: {
         email: form.email,
+        password: form.password,
         nombre: form.nombre,
         apellido: form.apellido,
         rol: form.rol,
       },
-    ])
+    })
 
-    if (dbErr) {
-      setMsg('Error: ' + dbErr.message)
+    if (error) {
+      setMsg('Error: ' + error.message)
       setLoading(false)
       return
     }
 
-    // Si es Docente, crear registro en tabla docentes
-    if (form.rol === 'Docente') {
-      await supabase
-        .from('docentes')
-        .insert([{ id_usuario: form.uuid, dni: '' }])
-    }
-
-    setMsg('✅ Usuario registrado correctamente.')
+    setMsg('✅ Usuario creado correctamente.')
     setForm({
-      uuid: '',
       email: '',
       password: '',
       nombre: '',
@@ -924,20 +914,6 @@ function GestionUsuarios() {
                 value={form.apellido}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, apellido: e.target.value }))
-                }
-              />
-            </div>
-            <div style={{ gridColumn: '1/-1' }}>
-              <span style={label}>
-                UUID (copialo de Supabase → Authentication → Users → UID)
-              </span>
-              <input
-                style={input}
-                required
-                value={form.uuid}
-                placeholder='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, uuid: e.target.value }))
                 }
               />
             </div>

@@ -108,7 +108,11 @@ const CAROUSEL_ITEMS = [
 ]
 
 const INFO_CARDS = [
-  { label: 'Perfil de los alumnos', color: C.pink, img: PLACEHOLDERS.alumnos },
+  {
+    label: 'Perfil de los alumnos',
+    color: C.pink,
+    img: 'https://images.ecestaticos.com/CKUfRzWT3KFUBKN7Ho1h4N9P9io=/189x5:2202x1515/1200x900/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2Fa3d%2F216%2F63b%2Fa3d21663bc3dc3a57cf5f0dfb50a2d18.jpg',
+  },
   { label: 'Planta docente', color: C.green, img: PLACEHOLDERS.docentes },
   { label: 'Niveles educativos', color: C.orange, img: PLACEHOLDERS.niveles },
 ]
@@ -133,7 +137,9 @@ export default function Home() {
   // Verificar el rol del usuario para redirección correcta
   useEffect(() => {
     const checkUserRole = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (session?.user) {
         const { data } = await supabase
           .from('usuarios')
@@ -178,7 +184,11 @@ export default function Home() {
 
   // Determinar la ruta correcta según el rol del usuario
   const getCorrectRoute = () => {
-    if (userRole === 'Admin' || userRole === 'Directivo') {
+    if (
+      userRole === 'Admin' ||
+      userRole === 'Directivo' ||
+      userRole === 'Docente'
+    ) {
       return '/admin'
     }
     return '/portal'
@@ -279,7 +289,11 @@ export default function Home() {
               { label: 'Ingresantes', href: '#ingresantes' },
               { label: 'Novedades', href: '#novedades' },
               { label: 'Galerías', href: '#galeria' },
-              { label: 'Campus Virtual', href: getCorrectRoute(), isRoute: true },
+              {
+                label: 'Campus Virtual',
+                href: getCorrectRoute(),
+                isRoute: true,
+              },
               { label: 'Contacto', href: '#contacto' },
             ].map((item) => (
               <a
@@ -501,13 +515,13 @@ export default function Home() {
                 const el = e.currentTarget.querySelector(
                   '.overlay',
                 ) as HTMLElement
-                if (el) el.style.opacity = '0.85'
+                if (el) el.style.opacity = '0.45'
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget.querySelector(
                   '.overlay',
                 ) as HTMLElement
-                if (el) el.style.opacity = '0.65'
+                if (el) el.style.opacity = '0.15'
               }}
             >
               <img
@@ -526,7 +540,7 @@ export default function Home() {
                   position: 'absolute',
                   inset: 0,
                   background: card.color,
-                  opacity: 0.65,
+                  opacity: 0.15,
                   transition: 'opacity 0.3s',
                 }}
               />
@@ -1285,7 +1299,11 @@ export default function Home() {
                 <img
                   src='/logo.png'
                   alt='Logo'
-                  style={{ height: 44, filter: 'brightness(0) invert(1)' }}
+                  style={{
+                    width: 'auto',
+                    height: 44,
+                    filter: 'brightness(0) invert(1)',
+                  }}
                   onError={(e) => {
                     ;(e.target as HTMLImageElement).style.display = 'none'
                   }}
