@@ -1,0 +1,1 @@
+{"root":["./eslint.config.js","./postcss.config.js","./tailwind.config.js","./vite.config.ts","./src/AdminPanel-tailwind.tsx","./src/AdminPanel.tsx","./src/App.tsx","./src/Home.tsx","./src/StudentPortal.tsx","./src/main.tsx","./src/vite-env.d.ts"],"errors":true,"version":"6.0.3"}
