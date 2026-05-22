@@ -6,7 +6,6 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "jsxFactory": "createElement",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
