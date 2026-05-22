@@ -87,14 +87,93 @@ interface Cuota {
   mes: number
   anio: number
   monto_base: number
+  descuento: number
   estado: string
   fecha_vencimiento: string
   alumnos: { nombre: string; apellido: string } | null
 }
 
+interface ActividadEx {
+  id_actividad: number
+  nombre: string
+  tipo: string
+  descripcion: string | null
+  cupo_maximo: number
+  activo: boolean
+}
+
+interface DocumentoAlumno {
+  id_documento: number
+  id_alumno: number
+  nombre: string
+  tipo: string | null
+  url_archivo: string
+  fecha_carga: string
+}
+
+interface Beca {
+  id_beca: number
+  id_alumno: number
+  porcentaje: number
+  motivo: string | null
+  activo: boolean
+  fecha_otorgamiento: string
+  alumnos: { nombre: string; apellido: string } | null
+}
+
+interface Sueldo {
+  id_sueldo: number
+  id_usuario: string | null
+  mes: number
+  anio: number
+  monto: number
+  estado: string
+  fecha_pago: string | null
+  usuarios: { nombre: string; apellido: string; rol: string } | null
+}
+
+interface Compra {
+  id_compra: number
+  descripcion: string
+  destino: string
+  cantidad: number
+  monto: number
+  proveedor: string | null
+  fecha_compra: string
+}
+
+interface Instalacion {
+  id_instalacion: number
+  nombre: string
+  tipo: string | null
+  activo: boolean
+}
+
+interface Reserva {
+  id_reserva: number
+  id_instalacion: number
+  fecha: string
+  hora_inicio: string
+  hora_fin: string
+  motivo: string | null
+  instalaciones: { nombre: string } | null
+  usuarios: { nombre: string; apellido: string } | null
+}
+
+interface MensajeContacto {
+  id_mensaje: number
+  nombre: string
+  email: string
+  mensaje: string
+  leido: boolean
+  fecha_envio: string
+}
+
 interface Inscripcion {
   id_inscripcion: number
   nombre_aspirante: string
+  apellido_aspirante: string | null
+  fecha_nacimiento_aspirante: string | null
   dni_aspirante: string
   nombre_tutor: string
   email_tutor: string
@@ -252,7 +331,13 @@ const NAV_ADMIN = [
   { key: 'materias', icon: '📚', label: 'Materias' },
   { key: 'asignaciones', icon: '🔗', label: 'Asignaciones' },
   { key: 'cuotas', icon: '💳', label: 'Cuotas' },
+  { key: 'becas', icon: '🎟️', label: 'Becas' },
+  { key: 'sueldos', icon: '💼', label: 'Sueldos' },
+  { key: 'compras', icon: '🧪', label: 'Compras insumos' },
   { key: 'inscripciones', icon: '📋', label: 'Inscripciones' },
+  { key: 'actividades', icon: '🎨', label: 'Extracurriculares' },
+  { key: 'reservas', icon: '🏟️', label: 'Reservas' },
+  { key: 'mensajes', icon: '✉️', label: 'Mensajes' },
   { key: 'noticias', icon: '📰', label: 'Noticias' },
   { key: 'galeria', icon: '🖼️', label: 'Galería' },
 ]
@@ -262,6 +347,7 @@ const NAV_DOCENTE = [
   { key: 'asistencia', icon: '📅', label: 'Tomar asistencia' },
   { key: 'calificaciones', icon: '📝', label: 'Calificaciones' },
   { key: 'amonestaciones', icon: '⚠️', label: 'Amonestaciones' },
+  { key: 'reservas', icon: '🏟️', label: 'Reservas' },
 ]
 
 // ═══════════════════════════════════════════════════════════════
@@ -482,7 +568,13 @@ export default function AdminPanel() {
           {activeNav === 'materias' && esAdmin && <GestionMaterias />}
           {activeNav === 'asignaciones' && esAdmin && <GestionAsignaciones />}
           {activeNav === 'cuotas' && esAdmin && <GestionCuotas />}
+          {activeNav === 'becas' && esAdmin && <GestionBecas />}
+          {activeNav === 'sueldos' && esAdmin && <GestionSueldos />}
+          {activeNav === 'compras' && esAdmin && <GestionCompras />}
           {activeNav === 'inscripciones' && esAdmin && <GestionInscripciones />}
+          {activeNav === 'mensajes' && esAdmin && <GestionMensajes />}
+          {activeNav === 'actividades' && esAdmin && <GestionActividades />}
+          {activeNav === 'reservas' && <GestionReservas userId={user.id} />}
           {activeNav === 'noticias' && esAdmin && (
             <GestionNoticias userId={user.id} />
           )}
@@ -1058,6 +1150,7 @@ function GestionAlumnos() {
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
+  const [legajoId, setLegajoId] = useState<number | null>(null)
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
@@ -1113,6 +1206,12 @@ function GestionAlumnos() {
       load()
     }
     setLoading(false)
+  }
+
+  if (legajoId !== null) {
+    return (
+      <LegajoAlumno idAlumno={legajoId} onClose={() => setLegajoId(null)} />
+    )
   }
 
   return (
@@ -1259,6 +1358,7 @@ function GestionAlumnos() {
               <th style={th}>DNI</th>
               <th style={th}>Curso</th>
               <th style={th}>Estado</th>
+              <th style={th}>Legajo</th>
             </tr>
           </thead>
           <tbody>
@@ -1280,8 +1380,476 @@ function GestionAlumnos() {
                     {a.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
+                <td style={td}>
+                  <button
+                    style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                    onClick={() => setLegajoId(a.id_alumno)}
+                  >
+                    Ver legajo
+                  </button>
+                </td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LEGAJO DEL ALUMNO — historial consolidado + documentación (R1/R3)
+// ═══════════════════════════════════════════════════════════════
+interface AlumnoLegajo {
+  id_alumno: number
+  nombre: string
+  apellido: string
+  dni: string
+  fecha_nacimiento: string | null
+  obra_social: string | null
+  activo: boolean
+  cursos: { nivel: string; grado_anio: string; division: string } | null
+}
+
+const TIPOS_DOC = [
+  'DNI',
+  'Partida de nacimiento',
+  'Certificado médico',
+  'Boletín / certificado de estudios',
+  'Ficha de inscripción',
+  'Otro',
+]
+
+function LegajoAlumno({
+  idAlumno,
+  onClose,
+}: {
+  idAlumno: number
+  onClose: () => void
+}) {
+  const [alumno, setAlumno] = useState<AlumnoLegajo | null>(null)
+  const [califs, setCalifs] = useState<Calificacion[]>([])
+  const [asist, setAsist] = useState<{ estado: string }[]>([])
+  const [amonest, setAmonest] = useState<
+    { id_amonestacion: number; tipo: string; descripcion: string; fecha: string }[]
+  >([])
+  const [documentos, setDocumentos] = useState<DocumentoAlumno[]>([])
+  const [file, setFile] = useState<File | null>(null)
+  const [docNombre, setDocNombre] = useState('')
+  const [docTipo, setDocTipo] = useState(TIPOS_DOC[0])
+  const [subiendo, setSubiendo] = useState(false)
+  const [msg, setMsg] = useState('')
+
+  const load = useCallback(async () => {
+    const { data: al } = await supabase
+      .from('alumnos')
+      .select(
+        'id_alumno, nombre, apellido, dni, fecha_nacimiento, obra_social, activo, cursos(nivel, grado_anio, division)',
+      )
+      .eq('id_alumno', idAlumno)
+      .single()
+    if (al) setAlumno(al as unknown as AlumnoLegajo)
+
+    const { data: ca } = await supabase
+      .from('calificaciones')
+      .select('*, asignaciones(materias(nombre))')
+      .eq('id_alumno', idAlumno)
+      .order('fecha_carga', { ascending: false })
+    if (ca) setCalifs(ca as unknown as Calificacion[])
+
+    const { data: as } = await supabase
+      .from('asistencias')
+      .select('estado')
+      .eq('id_alumno', idAlumno)
+    if (as) setAsist(as as { estado: string }[])
+
+    const { data: am } = await supabase
+      .from('amonestaciones')
+      .select('id_amonestacion, tipo, descripcion, fecha')
+      .eq('id_alumno', idAlumno)
+      .order('fecha', { ascending: false })
+    if (am) setAmonest(am as typeof amonest)
+
+    const { data: doc } = await supabase
+      .from('documentos_alumno')
+      .select('*')
+      .eq('id_alumno', idAlumno)
+      .order('fecha_carga', { ascending: false })
+    if (doc) setDocumentos(doc as DocumentoAlumno[])
+  }, [idAlumno])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const subirDocumento = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg('')
+    if (!file) {
+      setMsg('Seleccioná un archivo.')
+      return
+    }
+    setSubiendo(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const fileName = `${idAlumno}/${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 9)}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('documentos-alumnos')
+        .upload(fileName, file)
+      if (upErr) throw new Error(upErr.message)
+      const { data } = supabase.storage
+        .from('documentos-alumnos')
+        .getPublicUrl(fileName)
+      const { error } = await supabase.from('documentos_alumno').insert([
+        {
+          id_alumno: idAlumno,
+          nombre: docNombre || file.name,
+          tipo: docTipo,
+          url_archivo: data.publicUrl,
+        },
+      ])
+      if (error) throw new Error(error.message)
+      setMsg('✅ Documento cargado.')
+      setFile(null)
+      setDocNombre('')
+      load()
+    } catch (err) {
+      setMsg('Error: ' + (err as Error).message)
+    } finally {
+      setSubiendo(false)
+    }
+  }
+
+  const eliminarDocumento = async (d: DocumentoAlumno) => {
+    if (!window.confirm('¿Eliminar este documento?')) return
+    if (d.url_archivo.includes('documentos-alumnos')) {
+      const idx = d.url_archivo.indexOf('documentos-alumnos/')
+      const path = d.url_archivo.slice(idx + 'documentos-alumnos/'.length)
+      await supabase.storage.from('documentos-alumnos').remove([path])
+    }
+    await supabase
+      .from('documentos_alumno')
+      .delete()
+      .eq('id_documento', d.id_documento)
+    load()
+  }
+
+  // ── Derivados ──────────────────────────────────────────────
+  const promedioGeneral = califs.length
+    ? (califs.reduce((a, c) => a + Number(c.nota), 0) / califs.length).toFixed(2)
+    : '—'
+
+  const asistResumen = asist.reduce(
+    (acc, a) => {
+      acc[a.estado] = (acc[a.estado] ?? 0) + 1
+      return acc
+    },
+    {} as Record<string, number>,
+  )
+  const totalAsist = asist.length
+  const pctPresente =
+    totalAsist > 0
+      ? Math.round(((asistResumen['Presente'] ?? 0) / totalAsist) * 100)
+      : null
+
+  const dato = (etiqueta: string, valor: string) => (
+    <div>
+      <div style={{ ...label, marginBottom: 2 }}>{etiqueta}</div>
+      <div style={{ fontSize: 14, fontWeight: 700 }}>{valor}</div>
+    </div>
+  )
+
+  return (
+    <div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
+        <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
+          📁 Legajo del alumno
+        </h2>
+        <button style={btnSecondary} onClick={onClose}>
+          ← Volver a la lista
+        </button>
+      </div>
+
+      {/* Datos personales */}
+      <div style={{ ...card, marginBottom: 20 }}>
+        <div style={cardTitle}>Datos personales</div>
+        {alumno ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 18,
+            }}
+          >
+            {dato('Apellido y nombre', `${alumno.apellido}, ${alumno.nombre}`)}
+            {dato('DNI', alumno.dni)}
+            {dato(
+              'Fecha de nacimiento',
+              alumno.fecha_nacimiento
+                ? new Date(
+                    alumno.fecha_nacimiento + 'T00:00:00',
+                  ).toLocaleDateString('es-AR')
+                : '—',
+            )}
+            {dato(
+              'Curso',
+              alumno.cursos
+                ? `${alumno.cursos.nivel} — ${alumno.cursos.grado_anio} "${alumno.cursos.division}"`
+                : 'Sin asignar',
+            )}
+            {dato('Obra social', alumno.obra_social ?? '—')}
+            {dato('Estado', alumno.activo ? 'Activo' : 'Inactivo')}
+          </div>
+        ) : (
+          <div style={{ color: C.textMuted, fontSize: 13 }}>Cargando...</div>
+        )}
+      </div>
+
+      {/* Resumen académico */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 16,
+          marginBottom: 20,
+        }}
+      >
+        <div style={card}>
+          <div style={label}>Promedio general</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: C.purple }}>
+            {promedioGeneral}
+          </div>
+          <div style={{ fontSize: 12, color: C.textMuted }}>
+            {califs.length} calificaciones registradas
+          </div>
+        </div>
+        <div style={card}>
+          <div style={label}>Asistencia</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: C.green }}>
+            {pctPresente !== null ? `${pctPresente}%` : '—'}
+          </div>
+          <div style={{ fontSize: 12, color: C.textMuted }}>
+            {asistResumen['Presente'] ?? 0} pres. · {asistResumen['Ausente'] ?? 0}{' '}
+            aus. · {asistResumen['Tarde'] ?? 0} tarde
+          </div>
+        </div>
+        <div style={card}>
+          <div style={label}>Amonestaciones</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: C.orange }}>
+            {amonest.length}
+          </div>
+          <div style={{ fontSize: 12, color: C.textMuted }}>
+            registradas en su trayectoria
+          </div>
+        </div>
+      </div>
+
+      {/* Historial de calificaciones */}
+      <div style={{ ...card, marginBottom: 20 }}>
+        <div style={cardTitle}>Historial de calificaciones</div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Materia</th>
+              <th style={th}>Trimestre</th>
+              <th style={th}>Evaluación</th>
+              <th style={th}>Nota</th>
+              <th style={th}>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {califs.map((c) => (
+              <tr key={c.id_calificacion}>
+                <td style={{ ...td, fontWeight: 700 }}>
+                  {c.asignaciones?.materias?.nombre ?? '—'}
+                </td>
+                <td style={td}>{c.trimestre}°</td>
+                <td style={{ ...td, color: C.textMuted }}>
+                  {c.tipo_evaluacion}
+                </td>
+                <td style={td}>
+                  <span
+                    style={badge(
+                      Number(c.nota) >= 6 ? C.green : C.red,
+                    )}
+                  >
+                    {c.nota}
+                  </span>
+                </td>
+                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                  {new Date(c.fecha_carga).toLocaleDateString('es-AR')}
+                </td>
+              </tr>
+            ))}
+            {califs.length === 0 && (
+              <tr>
+                <td style={{ ...td, color: C.textMuted }} colSpan={5}>
+                  Sin calificaciones registradas.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Amonestaciones */}
+      <div style={{ ...card, marginBottom: 20 }}>
+        <div style={cardTitle}>Amonestaciones</div>
+        {amonest.length === 0 ? (
+          <div style={{ color: C.textMuted, fontSize: 13 }}>
+            Sin amonestaciones registradas.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {amonest.map((a) => (
+              <div
+                key={a.id_amonestacion}
+                style={{
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 10,
+                  padding: 12,
+                  display: 'flex',
+                  gap: 12,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <span style={badge(C.orange)}>{a.tipo}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13 }}>{a.descripcion}</div>
+                  <div style={{ fontSize: 11, color: C.textMuted }}>
+                    {new Date(a.fecha).toLocaleDateString('es-AR')}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Documentación */}
+      <div style={card}>
+        <div style={cardTitle}>Documentación del legajo</div>
+        <form
+          onSubmit={subirDocumento}
+          style={{
+            display: 'flex',
+            gap: 12,
+            alignItems: 'flex-end',
+            flexWrap: 'wrap',
+            marginBottom: 18,
+          }}
+        >
+          <div style={{ flex: '1 1 200px' }}>
+            <span style={label}>Nombre del documento</span>
+            <input
+              style={input}
+              value={docNombre}
+              placeholder='Ej: DNI frente y dorso'
+              onChange={(e) => setDocNombre(e.target.value)}
+            />
+          </div>
+          <div>
+            <span style={label}>Tipo</span>
+            <select
+              style={{ ...input, width: 220, appearance: 'none' as const }}
+              value={docTipo}
+              onChange={(e) => setDocTipo(e.target.value)}
+            >
+              {TIPOS_DOC.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span style={label}>Archivo</span>
+            <input
+              type='file'
+              style={{ ...input, padding: 7 }}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+          </div>
+          <button
+            type='submit'
+            disabled={subiendo}
+            style={{ ...btnPrimary, opacity: subiendo ? 0.6 : 1 }}
+          >
+            {subiendo ? 'Subiendo...' : 'Subir documento'}
+          </button>
+        </form>
+        {msg && (
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              marginBottom: 14,
+              color: msg.startsWith('✅') ? C.green : C.red,
+            }}
+          >
+            {msg}
+          </div>
+        )}
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Documento</th>
+              <th style={th}>Tipo</th>
+              <th style={th}>Fecha</th>
+              <th style={th}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {documentos.map((d) => (
+              <tr key={d.id_documento}>
+                <td style={{ ...td, fontWeight: 700 }}>{d.nombre}</td>
+                <td style={td}>
+                  <span style={badge(C.blue)}>{d.tipo ?? 'Documento'}</span>
+                </td>
+                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                  {new Date(d.fecha_carga).toLocaleDateString('es-AR')}
+                </td>
+                <td style={td}>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <a
+                      href={d.url_archivo}
+                      target='_blank'
+                      rel='noreferrer'
+                      style={{
+                        ...btnSecondary,
+                        padding: '6px 12px',
+                        fontSize: 12,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Ver
+                    </a>
+                    <button
+                      style={btnDanger}
+                      onClick={() => eliminarDocumento(d)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {documentos.length === 0 && (
+              <tr>
+                <td style={{ ...td, color: C.textMuted }} colSpan={4}>
+                  Sin documentación cargada.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -1874,6 +2442,47 @@ function GestionAsignaciones() {
 // ═══════════════════════════════════════════════════════════════
 //  CUOTAS — Generación automática
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  NOTIFICACIONES AUTOMÁTICAS A LAS FAMILIAS (R6)
+//  Crea avisos en la tabla `notificaciones`, dirigidos al usuario
+//  del padre/tutor (o, si no tiene, al del propio alumno).
+// ═══════════════════════════════════════════════════════════════
+async function notificarFamilias(
+  items: { id_alumno: number; titulo: string; mensaje: string }[],
+  tipo: string,
+) {
+  if (items.length === 0) return
+  const ids = [...new Set(items.map((i) => i.id_alumno))]
+  const { data: alumnos } = await supabase
+    .from('alumnos')
+    .select('id_alumno, id_usuario, id_usuario_padre')
+    .in('id_alumno', ids)
+
+  const destinoPorAlumno: Record<number, string> = {}
+  ;(alumnos ?? []).forEach(
+    (a: {
+      id_alumno: number
+      id_usuario: string | null
+      id_usuario_padre: string | null
+    }) => {
+      const destino = a.id_usuario_padre ?? a.id_usuario
+      if (destino) destinoPorAlumno[a.id_alumno] = destino
+    },
+  )
+
+  const rows = items
+    .filter((i) => destinoPorAlumno[i.id_alumno])
+    .map((i) => ({
+      id_usuario_destino: destinoPorAlumno[i.id_alumno],
+      titulo: i.titulo,
+      mensaje: i.mensaje,
+      tipo,
+      leida: false,
+    }))
+
+  if (rows.length) await supabase.from('notificaciones').insert(rows)
+}
+
 function GestionCuotas() {
   const [cuotas, setCuotas] = useState<Cuota[]>([])
   const [loading, setLoading] = useState(false)
@@ -1915,17 +2524,31 @@ function GestionCuotas() {
     const mes = Number(form.mes)
     const anio = Number(form.anio)
     const vencimiento = new Date(anio, mes - 1, 10) // vence el 10 de cada mes
+    const montoBase = Number(form.monto_base)
 
-    const cuotasNuevas = alumnos.map((a) => ({
-      id_alumno: a.id_alumno,
-      mes,
-      anio,
-      monto_base: Number(form.monto_base),
-      recargo: 0,
-      descuento: 0,
-      fecha_vencimiento: vencimiento.toISOString().split('T')[0],
-      estado: 'Pendiente',
-    }))
+    // Becas activas → mapa id_alumno → porcentaje de descuento
+    const { data: becas } = await supabase
+      .from('becas')
+      .select('id_alumno, porcentaje')
+      .eq('activo', true)
+    const becaPorAlumno: Record<number, number> = {}
+    ;(becas ?? []).forEach((b: { id_alumno: number; porcentaje: number }) => {
+      becaPorAlumno[b.id_alumno] = Number(b.porcentaje)
+    })
+
+    const cuotasNuevas = alumnos.map((a) => {
+      const pct = becaPorAlumno[a.id_alumno] ?? 0
+      return {
+        id_alumno: a.id_alumno,
+        mes,
+        anio,
+        monto_base: montoBase,
+        recargo: 0,
+        descuento: Math.round((montoBase * pct) / 100),
+        fecha_vencimiento: vencimiento.toISOString().split('T')[0],
+        estado: 'Pendiente',
+      }
+    })
 
     // upsert para no duplicar si ya existen
     const { error } = await supabase
@@ -1938,6 +2561,44 @@ function GestionCuotas() {
       )
       load()
     }
+    setLoading(false)
+  }
+
+  // R6 · Marca como vencidas las cuotas impagas pasadas de fecha
+  //       y notifica automáticamente a las familias.
+  const procesarVencimientos = async () => {
+    setLoading(true)
+    setMsg('')
+    const hoy = new Date().toISOString().slice(0, 10)
+    const { data: vencidas } = await supabase
+      .from('cuotas')
+      .select('id_cuota, id_alumno, mes, anio')
+      .eq('estado', 'Pendiente')
+      .lt('fecha_vencimiento', hoy)
+    if (!vencidas || vencidas.length === 0) {
+      setMsg('No hay cuotas pendientes que hayan vencido.')
+      setLoading(false)
+      return
+    }
+    await supabase
+      .from('cuotas')
+      .update({ estado: 'Vencida' })
+      .in(
+        'id_cuota',
+        vencidas.map((c) => c.id_cuota),
+      )
+    await notificarFamilias(
+      vencidas.map((c) => ({
+        id_alumno: c.id_alumno,
+        titulo: 'Cuota vencida',
+        mensaje: `La cuota de ${MESES[c.mes - 1]} ${c.anio} se encuentra vencida. Te pedimos regularizar el pago.`,
+      })),
+      'Cuota',
+    )
+    setMsg(
+      `✅ ${vencidas.length} cuota(s) marcadas como vencidas y familias notificadas.`,
+    )
+    load()
     setLoading(false)
   }
 
@@ -2010,6 +2671,15 @@ function GestionCuotas() {
           >
             {loading ? 'Generando...' : '⚡ Generar cuotas'}
           </button>
+          <button
+            type='button'
+            disabled={loading}
+            onClick={procesarVencimientos}
+            style={{ ...btnSecondary, opacity: loading ? 0.6 : 1 }}
+            title='Marca como vencidas las cuotas impagas pasadas de fecha y notifica a las familias'
+          >
+            ⏰ Procesar vencimientos
+          </button>
         </form>
         {msg && (
           <div
@@ -2033,33 +2703,697 @@ function GestionCuotas() {
             <tr>
               <th style={th}>Alumno</th>
               <th style={th}>Período</th>
-              <th style={th}>Monto</th>
+              <th style={th}>Monto base</th>
+              <th style={th}>Descuento beca</th>
+              <th style={th}>Neto a pagar</th>
               <th style={th}>Vencimiento</th>
               <th style={th}>Estado</th>
             </tr>
           </thead>
           <tbody>
-            {cuotas.map((c) => (
-              <tr key={c.id_cuota}>
+            {cuotas.map((c) => {
+              const desc = c.descuento ?? 0
+              return (
+                <tr key={c.id_cuota}>
+                  <td style={{ ...td, fontWeight: 700 }}>
+                    {c.alumnos?.apellido}, {c.alumnos?.nombre}
+                  </td>
+                  <td style={td}>
+                    {MESES[c.mes - 1]} {c.anio}
+                  </td>
+                  <td style={td}>
+                    ${c.monto_base.toLocaleString('es-AR')}
+                  </td>
+                  <td style={{ ...td, color: desc > 0 ? C.green : C.textMuted }}>
+                    {desc > 0 ? `– $${desc.toLocaleString('es-AR')}` : '—'}
+                  </td>
+                  <td style={{ ...td, fontWeight: 800, color: C.purple }}>
+                    ${(c.monto_base - desc).toLocaleString('es-AR')}
+                  </td>
+                  <td style={{ ...td, color: C.textMuted }}>
+                    {c.fecha_vencimiento}
+                  </td>
+                  <td style={td}>
+                    <span style={badge(CUOTA_COLOR[c.estado] ?? C.textMuted)}>
+                      {c.estado}
+                    </span>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BECAS (R4)
+// ═══════════════════════════════════════════════════════════════
+function GestionBecas() {
+  const [becas, setBecas] = useState<Beca[]>([])
+  const [alumnos, setAlumnos] = useState<Alumno[]>([])
+  const [msg, setMsg] = useState('')
+  const [form, setForm] = useState({
+    id_alumno: '',
+    porcentaje: '',
+    motivo: '',
+  })
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('becas')
+      .select('*, alumnos(nombre, apellido)')
+      .order('fecha_otorgamiento', { ascending: false })
+    if (data) setBecas(data as unknown as Beca[])
+
+    const { data: al } = await supabase
+      .from('alumnos')
+      .select('id_alumno, nombre, apellido, dni, activo, cursos(nivel, grado_anio, division)')
+      .eq('activo', true)
+      .order('apellido', { ascending: true })
+    if (al) setAlumnos(al as unknown as Alumno[])
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const guardar = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg('')
+    const pct = Number(form.porcentaje)
+    if (pct <= 0 || pct > 100) {
+      setMsg('El porcentaje debe estar entre 1 y 100.')
+      return
+    }
+    // upsert: una beca por alumno (unique id_alumno)
+    const { error } = await supabase.from('becas').upsert(
+      [
+        {
+          id_alumno: Number(form.id_alumno),
+          porcentaje: pct,
+          motivo: form.motivo || null,
+          activo: true,
+        },
+      ],
+      { onConflict: 'id_alumno' },
+    )
+    if (error) setMsg('Error: ' + error.message)
+    else {
+      setForm({ id_alumno: '', porcentaje: '', motivo: '' })
+      load()
+    }
+  }
+
+  const toggleActivo = async (b: Beca) => {
+    await supabase
+      .from('becas')
+      .update({ activo: !b.activo })
+      .eq('id_beca', b.id_beca)
+    load()
+  }
+
+  const eliminar = async (id: number) => {
+    await supabase.from('becas').delete().eq('id_beca', id)
+    load()
+  }
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
+        🎟️ Becas
+      </h2>
+
+      <div style={{ ...card, marginBottom: 24 }}>
+        <div style={cardTitle}>Otorgar / actualizar beca</div>
+        <form
+          onSubmit={guardar}
+          style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}
+        >
+          <div style={{ flex: '1 1 240px' }}>
+            <span style={label}>Alumno</span>
+            <select
+              style={{ ...input, appearance: 'none' as const }}
+              required
+              value={form.id_alumno}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, id_alumno: e.target.value }))
+              }
+            >
+              <option value=''>Seleccioná un alumno...</option>
+              {alumnos.map((a) => (
+                <option key={a.id_alumno} value={a.id_alumno}>
+                  {a.apellido}, {a.nombre} — DNI {a.dni}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span style={label}>Descuento (%)</span>
+            <input
+              style={{ ...input, width: 130 }}
+              type='number'
+              min={1}
+              max={100}
+              required
+              value={form.porcentaje}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, porcentaje: e.target.value }))
+              }
+            />
+          </div>
+          <div style={{ flex: '1 1 200px' }}>
+            <span style={label}>Motivo (opcional)</span>
+            <input
+              style={input}
+              value={form.motivo}
+              placeholder='Ej: beca por hermanos'
+              onChange={(e) =>
+                setForm((p) => ({ ...p, motivo: e.target.value }))
+              }
+            />
+          </div>
+          <button type='submit' style={btnPrimary}>
+            Guardar beca
+          </button>
+        </form>
+        {msg && (
+          <div style={{ marginTop: 12, fontSize: 12, color: C.red, fontWeight: 700 }}>
+            {msg}
+          </div>
+        )}
+        <div style={{ marginTop: 10, fontSize: 12, color: C.textMuted }}>
+          El descuento se aplica automáticamente al generar las cuotas del mes.
+        </div>
+      </div>
+
+      <div style={card}>
+        <div style={cardTitle}>Becas otorgadas</div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Alumno</th>
+              <th style={th}>Descuento</th>
+              <th style={th}>Motivo</th>
+              <th style={th}>Estado</th>
+              <th style={th}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {becas.map((b) => (
+              <tr key={b.id_beca}>
                 <td style={{ ...td, fontWeight: 700 }}>
-                  {c.alumnos?.apellido}, {c.alumnos?.nombre}
+                  {b.alumnos?.apellido}, {b.alumnos?.nombre}
                 </td>
                 <td style={td}>
-                  {MESES[c.mes - 1]} {c.anio}
-                </td>
-                <td style={{ ...td, fontWeight: 800, color: C.purple }}>
-                  ${c.monto_base.toLocaleString('es-AR')}
+                  <span style={badge(C.green)}>{b.porcentaje}%</span>
                 </td>
                 <td style={{ ...td, color: C.textMuted }}>
-                  {c.fecha_vencimiento}
+                  {b.motivo ?? '—'}
                 </td>
                 <td style={td}>
-                  <span style={badge(CUOTA_COLOR[c.estado] ?? C.textMuted)}>
-                    {c.estado}
+                  <span style={badge(b.activo ? C.green : C.textMuted)}>
+                    {b.activo ? 'Activa' : 'Inactiva'}
                   </span>
+                </td>
+                <td style={td}>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button
+                      style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                      onClick={() => toggleActivo(b)}
+                    >
+                      {b.activo ? 'Desactivar' : 'Activar'}
+                    </button>
+                    <button style={btnDanger} onClick={() => eliminar(b.id_beca)}>
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
+            {becas.length === 0 && (
+              <tr>
+                <td style={{ ...td, color: C.textMuted }} colSpan={5}>
+                  No hay becas otorgadas.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SUELDOS (R4)
+// ═══════════════════════════════════════════════════════════════
+function GestionSueldos() {
+  const [sueldos, setSueldos] = useState<Sueldo[]>([])
+  const [personal, setPersonal] = useState<UsuarioPanel[]>([])
+  const [msg, setMsg] = useState('')
+  const [form, setForm] = useState({
+    id_usuario: '',
+    mes: String(new Date().getMonth() + 1),
+    anio: String(new Date().getFullYear()),
+    monto: '',
+  })
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('sueldos')
+      .select('*, usuarios(nombre, apellido, rol)')
+      .order('anio', { ascending: false })
+      .order('mes', { ascending: false })
+    if (data) setSueldos(data as unknown as Sueldo[])
+
+    const { data: us } = await supabase
+      .from('usuarios')
+      .select('*')
+      .in('rol', ['Admin', 'Directivo', 'Docente'])
+      .eq('activo', true)
+      .order('apellido', { ascending: true })
+    if (us) setPersonal(us as UsuarioPanel[])
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const registrar = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg('')
+    const { error } = await supabase.from('sueldos').insert([
+      {
+        id_usuario: form.id_usuario,
+        mes: Number(form.mes),
+        anio: Number(form.anio),
+        monto: Number(form.monto),
+        estado: 'Pendiente',
+      },
+    ])
+    if (error) setMsg('Error: ' + error.message)
+    else {
+      setForm((p) => ({ ...p, id_usuario: '', monto: '' }))
+      load()
+    }
+  }
+
+  const marcarPagado = async (id: number) => {
+    await supabase
+      .from('sueldos')
+      .update({
+        estado: 'Pagado',
+        fecha_pago: new Date().toISOString().slice(0, 10),
+      })
+      .eq('id_sueldo', id)
+    load()
+  }
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
+        💼 Sueldos del personal
+      </h2>
+
+      <div style={{ ...card, marginBottom: 24 }}>
+        <div style={cardTitle}>Registrar pago de sueldo</div>
+        <form
+          onSubmit={registrar}
+          style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}
+        >
+          <div style={{ flex: '1 1 240px' }}>
+            <span style={label}>Personal</span>
+            <select
+              style={{ ...input, appearance: 'none' as const }}
+              required
+              value={form.id_usuario}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, id_usuario: e.target.value }))
+              }
+            >
+              <option value=''>Seleccioná...</option>
+              {personal.map((u) => (
+                <option key={u.id_usuario} value={u.id_usuario}>
+                  {u.apellido}, {u.nombre} ({u.rol})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span style={label}>Mes</span>
+            <select
+              style={{ ...input, width: 150, appearance: 'none' as const }}
+              value={form.mes}
+              onChange={(e) => setForm((p) => ({ ...p, mes: e.target.value }))}
+            >
+              {MESES.map((m, i) => (
+                <option key={i} value={i + 1}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span style={label}>Año</span>
+            <input
+              style={{ ...input, width: 100 }}
+              value={form.anio}
+              onChange={(e) => setForm((p) => ({ ...p, anio: e.target.value }))}
+            />
+          </div>
+          <div>
+            <span style={label}>Monto ($)</span>
+            <input
+              style={{ ...input, width: 150 }}
+              type='number'
+              required
+              value={form.monto}
+              onChange={(e) => setForm((p) => ({ ...p, monto: e.target.value }))}
+              placeholder='350000'
+            />
+          </div>
+          <button type='submit' style={btnPrimary}>
+            Registrar
+          </button>
+        </form>
+        {msg && (
+          <div style={{ marginTop: 12, fontSize: 12, color: C.red, fontWeight: 700 }}>
+            {msg}
+          </div>
+        )}
+      </div>
+
+      <div style={card}>
+        <div style={cardTitle}>Sueldos registrados</div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Personal</th>
+              <th style={th}>Período</th>
+              <th style={th}>Monto</th>
+              <th style={th}>Estado</th>
+              <th style={th}>Pagado el</th>
+              <th style={th}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sueldos.map((s) => (
+              <tr key={s.id_sueldo}>
+                <td style={{ ...td, fontWeight: 700 }}>
+                  {s.usuarios
+                    ? `${s.usuarios.apellido}, ${s.usuarios.nombre}`
+                    : '—'}
+                  {s.usuarios && (
+                    <>
+                      <br />
+                      <span style={{ fontSize: 11, color: C.textMuted }}>
+                        {s.usuarios.rol}
+                      </span>
+                    </>
+                  )}
+                </td>
+                <td style={td}>
+                  {MESES[s.mes - 1]} {s.anio}
+                </td>
+                <td style={{ ...td, fontWeight: 800, color: C.purple }}>
+                  ${Number(s.monto).toLocaleString('es-AR')}
+                </td>
+                <td style={td}>
+                  <span
+                    style={badge(s.estado === 'Pagado' ? C.green : C.orange)}
+                  >
+                    {s.estado}
+                  </span>
+                </td>
+                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                  {s.fecha_pago ?? '—'}
+                </td>
+                <td style={td}>
+                  {s.estado !== 'Pagado' && (
+                    <button
+                      style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                      onClick={() => marcarPagado(s.id_sueldo)}
+                    >
+                      Marcar pagado
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {sueldos.length === 0 && (
+              <tr>
+                <td style={{ ...td, color: C.textMuted }} colSpan={6}>
+                  No hay sueldos registrados.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  COMPRAS DE INSUMOS (R4)
+// ═══════════════════════════════════════════════════════════════
+const DESTINOS_INSUMO = [
+  'Laboratorio de computación',
+  'Laboratorio de física',
+  'Laboratorio de química',
+  'Enfermería',
+]
+
+function GestionCompras() {
+  const [compras, setCompras] = useState<Compra[]>([])
+  const [msg, setMsg] = useState('')
+  const FORM_VACIO = {
+    descripcion: '',
+    destino: DESTINOS_INSUMO[0],
+    cantidad: '1',
+    monto: '',
+    proveedor: '',
+    fecha_compra: new Date().toISOString().slice(0, 10),
+  }
+  const [form, setForm] = useState(FORM_VACIO)
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('compras_insumos')
+      .select('*')
+      .order('fecha_compra', { ascending: false })
+    if (data) setCompras(data as Compra[])
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const registrar = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg('')
+    const { error } = await supabase.from('compras_insumos').insert([
+      {
+        descripcion: form.descripcion,
+        destino: form.destino,
+        cantidad: Number(form.cantidad),
+        monto: Number(form.monto),
+        proveedor: form.proveedor || null,
+        fecha_compra: form.fecha_compra,
+      },
+    ])
+    if (error) setMsg('Error: ' + error.message)
+    else {
+      setForm(FORM_VACIO)
+      load()
+    }
+  }
+
+  const eliminar = async (id: number) => {
+    await supabase.from('compras_insumos').delete().eq('id_compra', id)
+    load()
+  }
+
+  const totalGastado = compras.reduce((acc, c) => acc + Number(c.monto), 0)
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
+        🧪 Compras de insumos
+      </h2>
+
+      <div style={{ ...card, marginBottom: 24 }}>
+        <div style={cardTitle}>Registrar compra</div>
+        <form
+          onSubmit={registrar}
+          style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 1.5fr',
+              gap: 14,
+            }}
+          >
+            <div>
+              <span style={label}>Descripción</span>
+              <input
+                style={input}
+                required
+                value={form.descripcion}
+                placeholder='Ej: 10 tubos de ensayo'
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, descripcion: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <span style={label}>Destino</span>
+              <select
+                style={{ ...input, appearance: 'none' as const }}
+                value={form.destino}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, destino: e.target.value }))
+                }
+              >
+                {DESTINOS_INSUMO.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1.5fr 1fr',
+              gap: 14,
+            }}
+          >
+            <div>
+              <span style={label}>Cantidad</span>
+              <input
+                style={input}
+                type='number'
+                min={1}
+                required
+                value={form.cantidad}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, cantidad: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <span style={label}>Monto total ($)</span>
+              <input
+                style={input}
+                type='number'
+                required
+                value={form.monto}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, monto: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <span style={label}>Proveedor (opcional)</span>
+              <input
+                style={input}
+                value={form.proveedor}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, proveedor: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <span style={label}>Fecha</span>
+              <input
+                style={input}
+                type='date'
+                value={form.fecha_compra}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, fecha_compra: e.target.value }))
+                }
+              />
+            </div>
+          </div>
+          {msg && (
+            <div style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+              {msg}
+            </div>
+          )}
+          <button type='submit' style={{ ...btnPrimary, alignSelf: 'flex-start' }}>
+            Registrar compra
+          </button>
+        </form>
+      </div>
+
+      <div style={card}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 20,
+          }}
+        >
+          <div style={{ ...cardTitle, marginBottom: 0 }}>
+            Compras registradas
+          </div>
+          <span style={badge(C.purple)}>
+            Total: ${totalGastado.toLocaleString('es-AR')}
+          </span>
+        </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Descripción</th>
+              <th style={th}>Destino</th>
+              <th style={th}>Cant.</th>
+              <th style={th}>Monto</th>
+              <th style={th}>Proveedor</th>
+              <th style={th}>Fecha</th>
+              <th style={th}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {compras.map((c) => (
+              <tr key={c.id_compra}>
+                <td style={{ ...td, fontWeight: 700 }}>{c.descripcion}</td>
+                <td style={td}>
+                  <span style={badge(C.blue)}>{c.destino}</span>
+                </td>
+                <td style={td}>{c.cantidad}</td>
+                <td style={{ ...td, fontWeight: 800, color: C.purple }}>
+                  ${Number(c.monto).toLocaleString('es-AR')}
+                </td>
+                <td style={{ ...td, color: C.textMuted }}>
+                  {c.proveedor ?? '—'}
+                </td>
+                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                  {c.fecha_compra}
+                </td>
+                <td style={td}>
+                  <button
+                    style={btnDanger}
+                    onClick={() => eliminar(c.id_compra)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {compras.length === 0 && (
+              <tr>
+                <td style={{ ...td, color: C.textMuted }} colSpan={7}>
+                  No hay compras registradas.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -2129,10 +3463,14 @@ function GestionInscripciones() {
             {inscripciones.map((i) => (
               <tr key={i.id_inscripcion}>
                 <td style={{ ...td, fontWeight: 700 }}>
-                  {i.nombre_aspirante}
+                  {i.nombre_aspirante} {i.apellido_aspirante ?? ''}
                   <br />
                   <span style={{ fontSize: 11, color: C.textMuted }}>
                     DNI: {i.dni_aspirante}
+                    {i.fecha_nacimiento_aspirante &&
+                      ` · Nac: ${new Date(
+                        i.fecha_nacimiento_aspirante,
+                      ).toLocaleDateString('es-AR')}`}
                   </span>
                 </td>
                 <td style={td}>
@@ -2183,6 +3521,633 @@ function GestionInscripciones() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  ACTIVIDADES EXTRACURRICULARES (R2)
+// ═══════════════════════════════════════════════════════════════
+function GestionActividades() {
+  const [actividades, setActividades] = useState<ActividadEx[]>([])
+  const [conteos, setConteos] = useState<Record<number, number>>({})
+  const [showForm, setShowForm] = useState(false)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [msg, setMsg] = useState('')
+  const FORM_VACIO = {
+    nombre: '',
+    tipo: 'Idioma',
+    descripcion: '',
+    cupo_maximo: 20,
+  }
+  const [form, setForm] = useState(FORM_VACIO)
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('actividades_extracurriculares')
+      .select('*')
+      .order('tipo', { ascending: true })
+      .order('nombre', { ascending: true })
+    if (data) setActividades(data as ActividadEx[])
+
+    const { data: insc } = await supabase
+      .from('inscripciones_actividades')
+      .select('id_actividad')
+    const cnt: Record<number, number> = {}
+    ;(insc ?? []).forEach((i: { id_actividad: number }) => {
+      cnt[i.id_actividad] = (cnt[i.id_actividad] ?? 0) + 1
+    })
+    setConteos(cnt)
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const abrirNueva = () => {
+    setEditId(null)
+    setForm(FORM_VACIO)
+    setShowForm(true)
+  }
+
+  const abrirEdicion = (a: ActividadEx) => {
+    setEditId(a.id_actividad)
+    setForm({
+      nombre: a.nombre,
+      tipo: a.tipo,
+      descripcion: a.descripcion ?? '',
+      cupo_maximo: a.cupo_maximo,
+    })
+    setShowForm(true)
+  }
+
+  const guardar = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg('')
+    const payload = { ...form, cupo_maximo: Number(form.cupo_maximo) }
+    const { error } = editId
+      ? await supabase
+          .from('actividades_extracurriculares')
+          .update(payload)
+          .eq('id_actividad', editId)
+      : await supabase
+          .from('actividades_extracurriculares')
+          .insert([payload])
+    if (error) setMsg('Error: ' + error.message)
+    else {
+      setShowForm(false)
+      load()
+    }
+  }
+
+  const toggleActivo = async (a: ActividadEx) => {
+    await supabase
+      .from('actividades_extracurriculares')
+      .update({ activo: !a.activo })
+      .eq('id_actividad', a.id_actividad)
+    load()
+  }
+
+  const idiomas = actividades.filter((a) => a.tipo === 'Idioma')
+  const deportes = actividades.filter((a) => a.tipo === 'Deporte')
+
+  const renderGrupo = (titulo: string, items: ActividadEx[]) => (
+    <div style={{ ...card, marginBottom: 20 }}>
+      <div style={cardTitle}>{titulo}</div>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={th}>Actividad</th>
+            <th style={th}>Cupo</th>
+            <th style={th}>Inscriptos</th>
+            <th style={th}>Estado</th>
+            <th style={th}>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((a) => {
+            const ocupados = conteos[a.id_actividad] ?? 0
+            const completo = ocupados >= a.cupo_maximo
+            return (
+              <tr key={a.id_actividad}>
+                <td style={{ ...td, fontWeight: 700 }}>
+                  {a.nombre}
+                  {a.descripcion && (
+                    <>
+                      <br />
+                      <span style={{ fontSize: 11, color: C.textMuted }}>
+                        {a.descripcion}
+                      </span>
+                    </>
+                  )}
+                </td>
+                <td style={td}>{a.cupo_maximo}</td>
+                <td style={td}>
+                  <span
+                    style={badge(
+                      completo ? C.red : ocupados > 0 ? C.green : C.textMuted,
+                    )}
+                  >
+                    {ocupados} / {a.cupo_maximo}
+                    {completo ? ' · COMPLETO' : ''}
+                  </span>
+                </td>
+                <td style={td}>
+                  <span style={badge(a.activo ? C.green : C.textMuted)}>
+                    {a.activo ? 'Activa' : 'Inactiva'}
+                  </span>
+                </td>
+                <td style={td}>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button
+                      style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                      onClick={() => abrirEdicion(a)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      style={{ ...btnDanger }}
+                      onClick={() => toggleActivo(a)}
+                    >
+                      {a.activo ? 'Desactivar' : 'Activar'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
+          {items.length === 0 && (
+            <tr>
+              <td style={{ ...td, color: C.textMuted }} colSpan={5}>
+                Sin actividades cargadas.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
+
+  return (
+    <div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
+        <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
+          🎨 Actividades extracurriculares
+        </h2>
+        <button style={btnPrimary} onClick={abrirNueva}>
+          + Nueva actividad
+        </button>
+      </div>
+
+      {showForm && (
+        <div style={{ ...card, marginBottom: 24 }}>
+          <div style={cardTitle}>
+            {editId ? 'Editar actividad' : 'Nueva actividad'}
+          </div>
+          <form
+            onSubmit={guardar}
+            style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 14 }}>
+              <div>
+                <span style={label}>Nombre</span>
+                <input
+                  style={input}
+                  required
+                  value={form.nombre}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, nombre: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <span style={label}>Tipo</span>
+                <select
+                  style={{ ...input, appearance: 'none' as const }}
+                  value={form.tipo}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, tipo: e.target.value }))
+                  }
+                >
+                  <option value='Idioma'>Idioma</option>
+                  <option value='Deporte'>Deporte</option>
+                </select>
+              </div>
+              <div>
+                <span style={label}>Cupo máximo</span>
+                <input
+                  style={input}
+                  type='number'
+                  min={1}
+                  required
+                  value={form.cupo_maximo}
+                  onChange={(e) =>
+                    setForm((p) => ({
+                      ...p,
+                      cupo_maximo: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div>
+              <span style={label}>Descripción (opcional)</span>
+              <input
+                style={input}
+                value={form.descripcion}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, descripcion: e.target.value }))
+                }
+              />
+            </div>
+            {msg && (
+              <div style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+                {msg}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type='submit' style={btnPrimary}>
+                {editId ? 'Guardar cambios' : 'Crear actividad'}
+              </button>
+              <button
+                type='button'
+                style={btnSecondary}
+                onClick={() => setShowForm(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {renderGrupo('🗣️ Idiomas', idiomas)}
+      {renderGrupo('⚽ Disciplinas deportivas', deportes)}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RESERVAS DE INSTALACIONES (R5)
+// ═══════════════════════════════════════════════════════════════
+function GestionReservas({ userId }: { userId: string }) {
+  const [instalaciones, setInstalaciones] = useState<Instalacion[]>([])
+  const [reservas, setReservas] = useState<Reserva[]>([])
+  const [msg, setMsg] = useState('')
+  const FORM_VACIO = {
+    id_instalacion: '',
+    fecha: '',
+    hora_inicio: '',
+    hora_fin: '',
+    motivo: '',
+  }
+  const [form, setForm] = useState(FORM_VACIO)
+
+  const hoy = new Date().toISOString().slice(0, 10)
+
+  const load = useCallback(async () => {
+    const { data: inst } = await supabase
+      .from('instalaciones')
+      .select('*')
+      .eq('activo', true)
+      .order('nombre', { ascending: true })
+    if (inst) setInstalaciones(inst as Instalacion[])
+
+    const { data: res } = await supabase
+      .from('reservas_instalaciones')
+      .select('*, instalaciones(nombre), usuarios(nombre, apellido)')
+      .gte('fecha', new Date().toISOString().slice(0, 10))
+      .order('fecha', { ascending: true })
+      .order('hora_inicio', { ascending: true })
+    if (res) setReservas(res as unknown as Reserva[])
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const crear = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg('')
+    if (form.hora_fin <= form.hora_inicio) {
+      setMsg('La hora de fin debe ser posterior a la de inicio.')
+      return
+    }
+    const { error } = await supabase.from('reservas_instalaciones').insert([
+      {
+        id_instalacion: Number(form.id_instalacion),
+        fecha: form.fecha,
+        hora_inicio: form.hora_inicio,
+        hora_fin: form.hora_fin,
+        motivo: form.motivo || null,
+        reservado_por: userId,
+      },
+    ])
+    if (error) {
+      setMsg(
+        error.message.includes('ya está reservada')
+          ? '⛔ La instalación ya está reservada en ese horario. Elegí otra franja.'
+          : 'Error: ' + error.message,
+      )
+    } else {
+      setForm(FORM_VACIO)
+      load()
+    }
+  }
+
+  const eliminar = async (id: number) => {
+    await supabase
+      .from('reservas_instalaciones')
+      .delete()
+      .eq('id_reserva', id)
+    load()
+  }
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
+        🏟️ Reservas de instalaciones
+      </h2>
+
+      <div style={{ ...card, marginBottom: 24 }}>
+        <div style={cardTitle}>Nueva reserva</div>
+        <form
+          onSubmit={crear}
+          style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 1fr 1fr 1fr',
+              gap: 14,
+            }}
+          >
+            <div>
+              <span style={label}>Instalación</span>
+              <select
+                style={{ ...input, appearance: 'none' as const }}
+                required
+                value={form.id_instalacion}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, id_instalacion: e.target.value }))
+                }
+              >
+                <option value=''>Seleccioná...</option>
+                {instalaciones.map((i) => (
+                  <option key={i.id_instalacion} value={i.id_instalacion}>
+                    {i.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <span style={label}>Fecha</span>
+              <input
+                style={input}
+                type='date'
+                required
+                min={hoy}
+                value={form.fecha}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, fecha: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <span style={label}>Hora inicio</span>
+              <input
+                style={input}
+                type='time'
+                required
+                value={form.hora_inicio}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, hora_inicio: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <span style={label}>Hora fin</span>
+              <input
+                style={input}
+                type='time'
+                required
+                value={form.hora_fin}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, hora_fin: e.target.value }))
+                }
+              />
+            </div>
+          </div>
+          <div>
+            <span style={label}>Motivo (opcional)</span>
+            <input
+              style={input}
+              value={form.motivo}
+              placeholder='Ej: entrenamiento de natación'
+              onChange={(e) =>
+                setForm((p) => ({ ...p, motivo: e.target.value }))
+              }
+            />
+          </div>
+          {msg && (
+            <div style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+              {msg}
+            </div>
+          )}
+          <button type='submit' style={{ ...btnPrimary, alignSelf: 'flex-start' }}>
+            Reservar
+          </button>
+        </form>
+      </div>
+
+      <div style={card}>
+        <div style={cardTitle}>Próximas reservas</div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Instalación</th>
+              <th style={th}>Fecha</th>
+              <th style={th}>Horario</th>
+              <th style={th}>Motivo</th>
+              <th style={th}>Reservó</th>
+              <th style={th}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reservas.map((r) => (
+              <tr key={r.id_reserva}>
+                <td style={{ ...td, fontWeight: 700 }}>
+                  {r.instalaciones?.nombre ?? '—'}
+                </td>
+                <td style={td}>
+                  {new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-AR')}
+                </td>
+                <td style={td}>
+                  {r.hora_inicio.slice(0, 5)} – {r.hora_fin.slice(0, 5)}
+                </td>
+                <td style={{ ...td, color: C.textMuted }}>
+                  {r.motivo ?? '—'}
+                </td>
+                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                  {r.usuarios
+                    ? `${r.usuarios.nombre} ${r.usuarios.apellido}`
+                    : '—'}
+                </td>
+                <td style={td}>
+                  <button
+                    style={btnDanger}
+                    onClick={() => eliminar(r.id_reserva)}
+                  >
+                    Cancelar
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {reservas.length === 0 && (
+              <tr>
+                <td style={{ ...td, color: C.textMuted }} colSpan={6}>
+                  No hay reservas próximas.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MENSAJES DE CONTACTO
+// ═══════════════════════════════════════════════════════════════
+function GestionMensajes() {
+  const [mensajes, setMensajes] = useState<MensajeContacto[]>([])
+  const [abierto, setAbierto] = useState<number | null>(null)
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('mensajes_contacto')
+      .select('*')
+      .order('fecha_envio', { ascending: false })
+    if (data) setMensajes(data as MensajeContacto[])
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const marcarLeido = async (id: number, leido: boolean) => {
+    await supabase
+      .from('mensajes_contacto')
+      .update({ leido })
+      .eq('id_mensaje', id)
+    load()
+  }
+
+  const sinLeer = mensajes.filter((m) => !m.leido).length
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
+        ✉️ Mensajes de contacto
+        {sinLeer > 0 && (
+          <span style={{ ...badge(C.orange), marginLeft: 10 }}>
+            {sinLeer} sin leer
+          </span>
+        )}
+      </h2>
+      <div style={card}>
+        {mensajes.length === 0 ? (
+          <div style={{ color: C.textMuted, fontSize: 13 }}>
+            No hay mensajes recibidos.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {mensajes.map((m) => (
+              <div
+                key={m.id_mensaje}
+                style={{
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  padding: 14,
+                  background: m.leido ? C.white : C.purpleLight,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() =>
+                    setAbierto(abierto === m.id_mensaje ? null : m.id_mensaje)
+                  }
+                >
+                  <div>
+                    <span style={{ fontWeight: 800, fontSize: 14 }}>
+                      {m.nombre}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: C.textMuted,
+                        marginLeft: 8,
+                      }}
+                    >
+                      {m.email}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 11, color: C.textMuted }}>
+                    {new Date(m.fecha_envio).toLocaleString('es-AR')}
+                  </span>
+                </div>
+                {abierto === m.id_mensaje && (
+                  <div style={{ marginTop: 12 }}>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        lineHeight: 1.6,
+                        color: C.text,
+                        whiteSpace: 'pre-wrap',
+                        margin: '0 0 12px',
+                      }}
+                    >
+                      {m.mensaje}
+                    </p>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <a
+                        href={`mailto:${m.email}`}
+                        style={{
+                          ...btnSecondary,
+                          padding: '6px 14px',
+                          fontSize: 12,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        Responder por correo
+                      </a>
+                      <button
+                        style={{ ...btnSecondary, padding: '6px 14px', fontSize: 12 }}
+                        onClick={() => marcarLeido(m.id_mensaje, !m.leido)}
+                      >
+                        {m.leido ? 'Marcar como no leído' : 'Marcar como leído'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  NOTICIAS
 // ═══════════════════════════════════════════════════════════════
 function GestionNoticias({ userId }: { userId: string }) {
@@ -2190,6 +4155,7 @@ function GestionNoticias({ userId }: { userId: string }) {
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
+  const [notificar, setNotificar] = useState(true)
   const [form, setForm] = useState({
     titulo: '',
     resumen: '',
@@ -2219,7 +4185,24 @@ function GestionNoticias({ userId }: { userId: string }) {
       .insert([{ ...form, id_autor: userId }])
     if (error) setMsg('Error: ' + error.message)
     else {
-      setMsg('✅ Noticia publicada.')
+      let aviso = '✅ Noticia publicada.'
+      // R6 · Comunicado institucional a las familias
+      if (notificar) {
+        const { data: todos } = await supabase
+          .from('alumnos')
+          .select('id_alumno')
+          .eq('activo', true)
+        await notificarFamilias(
+          (todos ?? []).map((a: { id_alumno: number }) => ({
+            id_alumno: a.id_alumno,
+            titulo: 'Comunicado institucional',
+            mensaje: form.titulo,
+          })),
+          'Novedad',
+        )
+        aviso = '✅ Noticia publicada y familias notificadas.'
+      }
+      setMsg(aviso)
       setShowForm(false)
       load()
     }
@@ -2323,6 +4306,23 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
               <span style={{ fontSize: 13, fontWeight: 700 }}>
                 Marcar como destacada
+              </span>
+            </label>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type='checkbox'
+                checked={notificar}
+                onChange={(e) => setNotificar(e.target.checked)}
+              />
+              <span style={{ fontSize: 13, fontWeight: 700 }}>
+                Notificar a las familias como comunicado institucional
               </span>
             </label>
             <div style={{ display: 'flex', gap: 12 }}>
@@ -2486,8 +4486,27 @@ function TomarAsistencia({ userId }: { userId: string }) {
     const { error } = await supabase
       .from('asistencias')
       .upsert(registros, { onConflict: 'id_alumno,id_asignacion,fecha' })
-    if (error) setMsg('Error: ' + error.message)
-    else setMsg('✅ Asistencia guardada correctamente.')
+    if (error) {
+      setMsg('Error: ' + error.message)
+    } else {
+      // R6 · Notificación automática por inasistencia
+      const ausentes = alumnos.filter((a) => a.estado === 'Ausente')
+      await notificarFamilias(
+        ausentes.map((a) => ({
+          id_alumno: a.id_alumno,
+          titulo: 'Inasistencia registrada',
+          mensaje: `${a.nombre} ${a.apellido} fue registrado/a como ausente el ${new Date(
+            fecha + 'T00:00:00',
+          ).toLocaleDateString('es-AR')}.`,
+        })),
+        'Asistencia',
+      )
+      setMsg(
+        ausentes.length > 0
+          ? `✅ Asistencia guardada. Se notificó a ${ausentes.length} familia(s) por inasistencia.`
+          : '✅ Asistencia guardada correctamente.',
+      )
+    }
     setLoading(false)
   }
 
@@ -2743,7 +4762,22 @@ function CargarCalificaciones({ userId }: { userId: string }) {
     ])
     if (error) setMsg('Error: ' + error.message)
     else {
-      setMsg('✅ Nota cargada.')
+      // R6 · Notificación automática por publicación de calificación
+      const asig = asignaciones.find(
+        (a) => a.id_asignacion === selAsignacion,
+      )
+      const materia = asig?.materias?.nombre ?? 'una materia'
+      await notificarFamilias(
+        [
+          {
+            id_alumno: Number(form.id_alumno),
+            titulo: 'Nueva calificación publicada',
+            mensaje: `Se publicó una nota de ${materia}: ${form.nota} (${form.tipo_evaluacion}, ${form.trimestre}° trimestre).`,
+          },
+        ],
+        'Calificación',
+      )
+      setMsg('✅ Nota cargada y familia notificada.')
       setForm((p) => ({ ...p, id_alumno: '', nota: '', descripcion: '' }))
       // Recargar calificaciones
       if (selAsignacion) {

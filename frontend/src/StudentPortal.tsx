@@ -38,6 +38,7 @@ interface Alumno {
   apellido: string
   dni: string
   obra_social: string | null
+  id_curso: number | null
   cursos: { nivel: string; grado_anio: string; division: string } | null
 }
 
@@ -88,6 +89,16 @@ interface AsistenciaStats {
   tarde: number
   justificados: number
   total: number
+}
+
+interface ActividadEx {
+  id_actividad: number
+  nombre: string
+  tipo: string
+  descripcion: string | null
+  cupo_maximo: number
+  inscriptos: number
+  inscripto: boolean
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -456,6 +467,7 @@ const NAV_ITEMS = [
   { key: 'calificaciones', icon: '📊', label: 'Calificaciones' },
   { key: 'cuotas', icon: '💳', label: 'Cuotas' },
   { key: 'horario', icon: '🕐', label: 'Mi Horario' },
+  { key: 'actividades', icon: '🎨', label: 'Extracurriculares' },
   { key: 'notificaciones', icon: '🔔', label: 'Notificaciones' },
 ]
 
@@ -653,14 +665,21 @@ function LoginScreen() {
 // ═══════════════════════════════════════════════════════════════
 export default function StudentPortal() {
   const [user, setUser] = useState<User | null>(null)
+  const [rol, setRol] = useState<string | null>(null)
+  const [hijos, setHijos] = useState<Alumno[]>([])
   const [alumno, setAlumno] = useState<Alumno | null>(null)
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([])
   const [cuotas, setCuotas] = useState<Cuota[]>([])
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
   const [horarioHoy, setHorarioHoy] = useState<HorarioHoy[]>([])
   const [asistStats, setAsistStats] = useState<AsistenciaStats | null>(null)
+  const [actividades, setActividades] = useState<ActividadEx[]>([])
+  const [actMsg, setActMsg] = useState('')
   const [activeNav, setActiveNav] = useState('inicio')
   const [loading, setLoading] = useState(true)
+
+  // Un padre/tutor ve los datos de su hijo/a; un estudiante, los propios.
+  const esTutor = !!rol && /padre|tutor/i.test(rol)
 
   console.log(import.meta.env.VITE_SUPABASE_URL)
   console.log(import.meta.env.VITE_SUPABASE_ANON_KEY)
@@ -687,60 +706,136 @@ export default function StudentPortal() {
   }, [user])
 
   // ── Data loading ─────────────────────────────────────────────
+  // Resuelve el rol del usuario y el/los alumno/s a los que tiene
+  // acceso: el propio (estudiante) o sus hijos (padre/tutor).
   const loadAll = useCallback(async (userId: string) => {
     setLoading(true)
-    await Promise.all([
-      loadAlumno(userId),
-      loadCalificaciones(userId),
-      loadCuotas(userId),
-      loadNotificaciones(userId),
-      loadHorarioHoy(userId),
-      loadAsistencias(userId),
-    ])
+    const { data: usuario } = await supabase
+      .from('usuarios')
+      .select('rol')
+      .eq('id_usuario', userId)
+      .single()
+    const rolUsuario = (usuario?.rol as string | undefined) ?? null
+    setRol(rolUsuario)
+    const tutor = !!rolUsuario && /padre|tutor/i.test(rolUsuario)
+
+    const { data: alumnosData } = await supabase
+      .from('alumnos')
+      .select(
+        'id_alumno, nombre, apellido, dni, obra_social, id_curso, cursos(nivel, grado_anio, division)',
+      )
+      .eq(tutor ? 'id_usuario_padre' : 'id_usuario', userId)
+      .order('apellido', { ascending: true })
+
+    const lista = (alumnosData ?? []) as unknown as Alumno[]
+    setHijos(lista)
+    const activo = lista[0] ?? null
+    setAlumno(activo)
+    await loadDatosAlumno(activo, userId)
     setLoading(false)
   }, [])
 
-  async function loadAlumno(userId: string) {
-    const { data } = await supabase
-      .from('alumnos')
-      .select(
-        'id_alumno, nombre, apellido, dni, obra_social, cursos(nivel, grado_anio, division)',
-      )
-      .eq('id_usuario', userId)
-      .single()
-    if (data) setAlumno(data as unknown as Alumno)
+  // Carga todos los datos del alumno activo (más las notificaciones
+  // del usuario logueado, que valen tanto para el padre como el hijo).
+  async function loadDatosAlumno(a: Alumno | null, userId: string) {
+    await Promise.all([
+      loadNotificaciones(userId),
+      a ? loadCalificaciones(a.id_alumno) : Promise.resolve(),
+      a ? loadCuotas(a.id_alumno) : Promise.resolve(),
+      a ? loadHorarioHoy(a.id_curso) : Promise.resolve(),
+      a ? loadAsistencias(a.id_alumno) : Promise.resolve(),
+      a ? loadActividades(a.id_alumno) : Promise.resolve(),
+    ])
   }
 
-  async function loadCalificaciones(userId: string) {
-    const { data: al } = await supabase
-      .from('alumnos')
-      .select('id_alumno')
-      .eq('id_usuario', userId)
-      .single()
-    if (!al) return
+  // Cambia el hijo/a activo (solo aplica al perfil padre/tutor)
+  async function seleccionarHijo(id: number) {
+    const a = hijos.find((h) => h.id_alumno === id) ?? null
+    setAlumno(a)
+    if (user) {
+      setLoading(true)
+      await loadDatosAlumno(a, user.id)
+      setLoading(false)
+    }
+  }
+
+  async function loadActividades(idAlumno: number) {
+    const { data: acts } = await supabase
+      .from('actividades_extracurriculares')
+      .select('*')
+      .eq('activo', true)
+      .order('tipo', { ascending: true })
+      .order('nombre', { ascending: true })
+
+    const { data: insc } = await supabase
+      .from('inscripciones_actividades')
+      .select('id_actividad, id_alumno')
+
+    const lista: ActividadEx[] = (acts ?? []).map(
+      (a: Omit<ActividadEx, 'inscriptos' | 'inscripto'>) => {
+        const delActividad = (insc ?? []).filter(
+          (i: { id_actividad: number }) => i.id_actividad === a.id_actividad,
+        )
+        return {
+          ...a,
+          inscriptos: delActividad.length,
+          inscripto: delActividad.some(
+            (i: { id_alumno: number }) => i.id_alumno === idAlumno,
+          ),
+        }
+      },
+    )
+    setActividades(lista)
+  }
+
+  async function inscribirseActividad(id_actividad: number) {
+    setActMsg('')
+    if (!alumno) {
+      setActMsg('No se encontró el legajo del alumno.')
+      return
+    }
+    const { error } = await supabase
+      .from('inscripciones_actividades')
+      .insert([{ id_actividad, id_alumno: alumno.id_alumno }])
+    if (error) {
+      setActMsg(
+        error.message.includes('Cupo completo')
+          ? 'No hay cupo disponible en esta actividad.'
+          : 'No se pudo completar la inscripción: ' + error.message,
+      )
+    }
+    await loadActividades(alumno.id_alumno)
+  }
+
+  async function cancelarActividad(id_actividad: number) {
+    setActMsg('')
+    if (!alumno) return
+    await supabase
+      .from('inscripciones_actividades')
+      .delete()
+      .eq('id_actividad', id_actividad)
+      .eq('id_alumno', alumno.id_alumno)
+    await loadActividades(alumno.id_alumno)
+  }
+
+  async function loadCalificaciones(idAlumno: number) {
     const { data } = await supabase
       .from('calificaciones')
       .select('*, asignaciones(materias(nombre))')
-      .eq('id_alumno', al.id_alumno)
+      .eq('id_alumno', idAlumno)
       .order('fecha_carga', { ascending: false })
       .limit(20)
-    if (data) setCalificaciones(data as unknown as Calificacion[])
+    setCalificaciones((data as unknown as Calificacion[]) ?? [])
   }
 
-  async function loadCuotas(userId: string) {
-    const { data: al } = await supabase
-      .from('alumnos')
-      .select('id_alumno')
-      .eq('id_usuario', userId)
-      .single()
-    if (!al) return
+  async function loadCuotas(idAlumno: number) {
     const { data } = await supabase
       .from('cuotas')
       .select('*')
-      .eq('id_alumno', al.id_alumno)
+      .eq('id_alumno', idAlumno)
       .in('estado', ['Pendiente', 'Vencida', 'En mora'])
       .order('fecha_vencimiento', { ascending: true })
-    if (data) setCuotas(data as Cuota[])
+    setCuotas((data as Cuota[]) ?? [])
   }
 
   async function loadNotificaciones(userId: string) {
@@ -753,35 +848,27 @@ export default function StudentPortal() {
     if (data) setNotificaciones(data as Notificacion[])
   }
 
-  async function loadHorarioHoy(userId: string) {
-    const { data: al } = await supabase
-      .from('alumnos')
-      .select('id_curso')
-      .eq('id_usuario', userId)
-      .single()
-    if (!al?.id_curso) return
+  async function loadHorarioHoy(idCurso: number | null) {
+    if (!idCurso) {
+      setHorarioHoy([])
+      return
+    }
     const { data } = await supabase
       .from('horarios')
       .select(
         '*, asignaciones!inner(materias(nombre), docentes(nombre, apellido), id_curso)',
       )
       .eq('dia_semana', diaActual())
-      .eq('asignaciones.id_curso', al.id_curso)
+      .eq('asignaciones.id_curso', idCurso)
       .order('hora_inicio', { ascending: true })
-    if (data) setHorarioHoy(data as unknown as HorarioHoy[])
+    setHorarioHoy((data as unknown as HorarioHoy[]) ?? [])
   }
 
-  async function loadAsistencias(userId: string) {
-    const { data: al } = await supabase
-      .from('alumnos')
-      .select('id_alumno')
-      .eq('id_usuario', userId)
-      .single()
-    if (!al) return
+  async function loadAsistencias(idAlumno: number) {
     const { data } = await supabase
       .from('asistencias')
       .select('estado')
-      .eq('id_alumno', al.id_alumno)
+      .eq('id_alumno', idAlumno)
     if (!data) return
     const stats: AsistenciaStats = {
       presentes: 0,
@@ -855,6 +942,39 @@ export default function StudentPortal() {
     )
   }
 
+  // Usuario autenticado pero sin alumno/hijos vinculados
+  if (!alumno) {
+    return (
+      <div
+        style={{
+          ...S.root,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <div style={{ textAlign: 'center', maxWidth: 420, padding: 24 }}>
+          <div style={{ fontSize: 44, marginBottom: 12 }}>🔍</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: C.purple }}>
+            No hay datos para mostrar
+          </div>
+          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6 }}>
+            {esTutor
+              ? 'Tu usuario de padre/tutor no tiene alumnos vinculados. Comunicate con la administración del centro educativo.'
+              : 'Tu usuario no está vinculado a un legajo de alumno. Comunicate con la administración del centro educativo.'}
+          </p>
+          <button
+            style={{ ...S.logoutBtn, marginTop: 12 }}
+            onClick={() => supabase.auth.signOut()}
+          >
+            Salir
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // ═══════════════════════════════════════════════════════════
   //  RENDER PRINCIPAL
   // ═══════════════════════════════════════════════════════════
@@ -916,11 +1036,49 @@ export default function StudentPortal() {
             {initials}
           </div>
 
-          {/* Nombre */}
+          {/* Nombre / perfil */}
           {alumno && (
-            <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>
-              {alumno.nombre} {alumno.apellido}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {esTutor && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: C.purple,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  Perfil padre/tutor · viendo a
+                </span>
+              )}
+              {esTutor && hijos.length > 1 ? (
+                <select
+                  value={alumno.id_alumno}
+                  onChange={(e) => seleccionarHijo(Number(e.target.value))}
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: C.text,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 8,
+                    padding: '4px 8px',
+                    fontFamily: 'inherit',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {hijos.map((h) => (
+                    <option key={h.id_alumno} value={h.id_alumno}>
+                      {h.nombre} {h.apellido}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>
+                  {alumno.nombre} {alumno.apellido}
+                </span>
+              )}
+            </div>
           )}
 
           {/* Logout */}
@@ -997,7 +1155,9 @@ export default function StudentPortal() {
                 />
                 <div style={{ position: 'relative' }}>
                   <div style={S.welcomeName}>
-                    Bienvenido/a, {alumno?.nombre} 👋
+                    {esTutor
+                      ? `Portal de ${alumno?.nombre} ${alumno?.apellido}`
+                      : `Bienvenido/a, ${alumno?.nombre} 👋`}
                   </div>
                   <div style={S.welcomeSub}>
                     {new Date().toLocaleDateString('es-AR', {
@@ -1590,6 +1750,165 @@ export default function StudentPortal() {
           )}
 
           {/* ━━━━━ NOTIFICACIONES ━━━━━ */}
+          {activeNav === 'actividades' && (
+            <div style={S.card}>
+              <div style={S.cardTitle}>🎨 Servicios extracurriculares</div>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: C.textMuted,
+                  margin: '0 0 20px',
+                  lineHeight: 1.5,
+                }}
+              >
+                Inscribite a los talleres de idiomas y a las disciplinas
+                deportivas. Las actividades sin cupo disponible quedan
+                bloqueadas.
+              </p>
+
+              {actMsg && (
+                <div
+                  style={{
+                    background: '#E74C3C12',
+                    border: `1px solid ${C.red}40`,
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    fontSize: 12,
+                    color: C.red,
+                    fontWeight: 700,
+                    marginBottom: 16,
+                  }}
+                >
+                  ⚠️ {actMsg}
+                </div>
+              )}
+
+              {(['Idioma', 'Deporte'] as const).map((tipo) => {
+                const items = actividades.filter((a) => a.tipo === tipo)
+                if (items.length === 0) return null
+                return (
+                  <div key={tipo} style={{ marginBottom: 24 }}>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 900,
+                        color: C.purple,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        marginBottom: 12,
+                      }}
+                    >
+                      {tipo === 'Idioma'
+                        ? '🗣️ Idiomas'
+                        : '⚽ Disciplinas deportivas'}
+                    </div>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: 12,
+                      }}
+                    >
+                      {items.map((a) => {
+                        const disponibles = a.cupo_maximo - a.inscriptos
+                        const completo = disponibles <= 0
+                        return (
+                          <div
+                            key={a.id_actividad}
+                            style={{
+                              border: `1px solid ${C.border}`,
+                              borderRadius: 12,
+                              padding: 16,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: 8,
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                gap: 8,
+                              }}
+                            >
+                              <span style={{ fontSize: 15, fontWeight: 900 }}>
+                                {a.nombre}
+                              </span>
+                              {a.inscripto && (
+                                <span style={badge(C.green)}>Inscripto</span>
+                              )}
+                            </div>
+                            {a.descripcion && (
+                              <span
+                                style={{ fontSize: 12, color: C.textMuted }}
+                              >
+                                {a.descripcion}
+                              </span>
+                            )}
+                            <span
+                              style={{
+                                fontSize: 12,
+                                fontWeight: 800,
+                                color: completo ? C.red : C.green,
+                              }}
+                            >
+                              {completo
+                                ? 'Cupo completo'
+                                : `${disponibles} de ${a.cupo_maximo} cupos disponibles`}
+                            </span>
+                            {a.inscripto ? (
+                              <button
+                                style={{
+                                  ...S.logoutBtn,
+                                  color: C.red,
+                                  borderColor: C.red,
+                                  marginTop: 4,
+                                }}
+                                onClick={() =>
+                                  cancelarActividad(a.id_actividad)
+                                }
+                              >
+                                Cancelar inscripción
+                              </button>
+                            ) : (
+                              <button
+                                disabled={completo}
+                                style={{
+                                  ...S.logoutBtn,
+                                  marginTop: 4,
+                                  color: completo ? C.textMuted : C.white,
+                                  background: completo
+                                    ? C.border
+                                    : C.purple,
+                                  borderColor: completo ? C.border : C.purple,
+                                  cursor: completo
+                                    ? 'not-allowed'
+                                    : 'pointer',
+                                }}
+                                onClick={() =>
+                                  inscribirseActividad(a.id_actividad)
+                                }
+                              >
+                                {completo ? 'Sin cupo' : 'Inscribirme'}
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+
+              {actividades.length === 0 && (
+                <div style={S.centered}>
+                  No hay actividades disponibles por el momento.
+                </div>
+              )}
+            </div>
+          )}
+
           {activeNav === 'notificaciones' && (
             <div style={S.card}>
               <div

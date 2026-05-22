@@ -97,6 +97,21 @@ const PLACEHOLDERS: Record<string, string> = {
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  DATOS DE CONTACTO INSTITUCIONALES
+// ═══════════════════════════════════════════════════════════════
+const CONTACTO = {
+  // Número en formato internacional, solo dígitos (para enlaces wa.me)
+  whatsapp: '5493624123456',
+  whatsappLabel: '+54 9 362 412-3456',
+  email: 'educarparatransformar@gmail.com',
+  direccion: 'Resistencia, Chaco',
+  instagram: 'https://instagram.com/educarparatransformar',
+  instagramHandle: '@educarparatransformar',
+  facebook: 'https://facebook.com/educarparatransformar',
+  facebookHandle: 'Educar Para Transformar',
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  CAROUSEL DATA
 // ═══════════════════════════════════════════════════════════════
 const CAROUSEL_ITEMS = [
@@ -1267,10 +1282,196 @@ export default function Home() {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          CONTACTO / FOOTER
+          CONTACTO
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section
+        id='contacto'
+        style={{ background: C.white, padding: '60px 24px' }}
+      >
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ marginBottom: 36 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: C.purple,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+              }}
+            >
+              Estamos para ayudarte
+            </span>
+            <h2
+              style={{
+                fontSize: 30,
+                fontWeight: 900,
+                margin: '8px 0 0',
+                color: C.text,
+              }}
+            >
+              Contacto
+            </h2>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1.2fr 1fr',
+              gap: 40,
+              alignItems: 'start',
+            }}
+          >
+            {/* Formulario de contacto */}
+            <div
+              style={{
+                background: C.bg,
+                borderRadius: 20,
+                padding: 32,
+                border: `1px solid ${C.border}`,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 18,
+                  fontWeight: 900,
+                  margin: '0 0 6px',
+                  color: C.text,
+                }}
+              >
+                Escribinos
+              </h3>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: C.textMuted,
+                  margin: '0 0 20px',
+                  lineHeight: 1.6,
+                }}
+              >
+                Dejanos tu consulta y el equipo de la institución te responderá
+                a la brevedad.
+              </p>
+              <ContactoForm />
+            </div>
+
+            {/* Canales directos */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <a
+                href={`https://wa.me/${CONTACTO.whatsapp}`}
+                target='_blank'
+                rel='noreferrer'
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  background: '#25D36612',
+                  border: '1px solid #25D36640',
+                  borderRadius: 14,
+                  padding: '16px 18px',
+                  textDecoration: 'none',
+                  color: C.text,
+                }}
+              >
+                <span style={{ fontSize: 26 }}>💬</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 900 }}>WhatsApp</div>
+                  <div style={{ fontSize: 12, color: C.textMuted }}>
+                    {CONTACTO.whatsappLabel}
+                  </div>
+                </div>
+              </a>
+              <a
+                href={`mailto:${CONTACTO.email}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  background: C.purpleLight,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 14,
+                  padding: '16px 18px',
+                  textDecoration: 'none',
+                  color: C.text,
+                }}
+              >
+                <span style={{ fontSize: 26 }}>✉️</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 900 }}>
+                    Correo electrónico
+                  </div>
+                  <div style={{ fontSize: 12, color: C.textMuted }}>
+                    {CONTACTO.email}
+                  </div>
+                </div>
+              </a>
+              <div style={{ display: 'flex', gap: 14 }}>
+                <a
+                  href={CONTACTO.instagram}
+                  target='_blank'
+                  rel='noreferrer'
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    background: '#E91E8C12',
+                    border: '1px solid #E91E8C40',
+                    borderRadius: 14,
+                    padding: '14px 16px',
+                    textDecoration: 'none',
+                    color: C.text,
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>📸</span>
+                  <span style={{ fontSize: 13, fontWeight: 800 }}>
+                    Instagram
+                  </span>
+                </a>
+                <a
+                  href={CONTACTO.facebook}
+                  target='_blank'
+                  rel='noreferrer'
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    background: '#2980B912',
+                    border: '1px solid #2980B940',
+                    borderRadius: 14,
+                    padding: '14px 16px',
+                    textDecoration: 'none',
+                    color: C.text,
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>📘</span>
+                  <span style={{ fontSize: 13, fontWeight: 800 }}>
+                    Facebook
+                  </span>
+                </a>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: '16px 18px',
+                  color: C.textMuted,
+                  fontSize: 13,
+                }}
+              >
+                <span style={{ fontSize: 22 }}>📍</span>
+                {CONTACTO.direccion}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          FOOTER
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <footer
-        id='contacto'
         style={{
           background: C.text,
           color: C.white,
@@ -1392,24 +1593,38 @@ export default function Home() {
                 Datos de contacto
               </div>
               {[
-                { icon: '📞', text: '+57 321 456 7890' },
-                { icon: '✉️', text: 'educarparatransformar@gmail.com' },
-                { icon: '📍', text: 'Resistencia, Chaco' },
+                {
+                  icon: '📞',
+                  text: CONTACTO.whatsappLabel,
+                  href: `https://wa.me/${CONTACTO.whatsapp}`,
+                },
+                {
+                  icon: '✉️',
+                  text: CONTACTO.email,
+                  href: `mailto:${CONTACTO.email}`,
+                },
+                { icon: '📍', text: CONTACTO.direccion, href: undefined },
               ].map((item) => (
-                <div
+                <a
                   key={item.text}
+                  href={item.href}
+                  target={item.href?.startsWith('http') ? '_blank' : undefined}
+                  rel='noreferrer'
                   style={{
                     display: 'flex',
                     gap: 8,
                     alignItems: 'flex-start',
                     marginBottom: 12,
+                    textDecoration: 'none',
+                    color: C.white,
+                    cursor: item.href ? 'pointer' : 'default',
                   }}
                 >
                   <span style={{ fontSize: 14 }}>{item.icon}</span>
                   <span style={{ fontSize: 12, opacity: 0.7, lineHeight: 1.5 }}>
                     {item.text}
                   </span>
-                </div>
+                </a>
               ))}
             </div>
 
@@ -1431,22 +1646,29 @@ export default function Home() {
                 {
                   icon: '📸',
                   label: 'Instagram',
-                  handle: '@educarparatransformar',
+                  handle: CONTACTO.instagramHandle,
+                  href: CONTACTO.instagram,
                 },
                 {
                   icon: '📘',
                   label: 'Facebook',
-                  handle: 'Educar Para Transformar',
+                  handle: CONTACTO.facebookHandle,
+                  href: CONTACTO.facebook,
                 },
               ].map((red) => (
-                <div
+                <a
                   key={red.label}
+                  href={red.href}
+                  target='_blank'
+                  rel='noreferrer'
                   style={{
                     display: 'flex',
                     gap: 10,
                     alignItems: 'center',
                     marginBottom: 14,
                     cursor: 'pointer',
+                    textDecoration: 'none',
+                    color: C.white,
                   }}
                 >
                   <div
@@ -1471,7 +1693,7 @@ export default function Home() {
                       {red.handle}
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
@@ -1519,6 +1741,8 @@ export default function Home() {
 function InscripcionForm() {
   const [form, setForm] = useState({
     nombre_aspirante: '',
+    apellido_aspirante: '',
+    fecha_nacimiento_aspirante: '',
     dni_aspirante: '',
     nombre_tutor: '',
     email_tutor: '',
@@ -1602,10 +1826,23 @@ function InscripcionForm() {
             required
             value={form.nombre_aspirante}
             onChange={handleChange}
-            placeholder='Juan Pérez'
+            placeholder='Juan'
             style={inputStyle}
           />
         </div>
+        <div>
+          <label style={labelStyle}>Apellido del aspirante</label>
+          <input
+            name='apellido_aspirante'
+            required
+            value={form.apellido_aspirante}
+            onChange={handleChange}
+            placeholder='Pérez'
+            style={inputStyle}
+          />
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
           <label style={labelStyle}>DNI del aspirante</label>
           <input
@@ -1614,6 +1851,17 @@ function InscripcionForm() {
             value={form.dni_aspirante}
             onChange={handleChange}
             placeholder='12345678'
+            style={inputStyle}
+          />
+        </div>
+        <div>
+          <label style={labelStyle}>Fecha de nacimiento</label>
+          <input
+            type='date'
+            name='fecha_nacimiento_aspirante'
+            required
+            value={form.fecha_nacimiento_aspirante}
+            onChange={handleChange}
             style={inputStyle}
           />
         </div>
@@ -1704,6 +1952,157 @@ function InscripcionForm() {
         }}
       >
         {loading ? 'Enviando...' : 'Enviar solicitud'}
+      </button>
+    </form>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FORMULARIO DE CONTACTO
+// ═══════════════════════════════════════════════════════════════
+function ContactoForm() {
+  const [form, setForm] = useState({ nombre: '', email: '', mensaje: '' })
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    const { error: err } = await supabase
+      .from('mensajes_contacto')
+      .insert([form])
+    if (err) {
+      setError('Hubo un error al enviar. Intentá de nuevo.')
+    } else {
+      setSuccess(true)
+    }
+    setLoading(false)
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '11px 14px',
+    borderRadius: 10,
+    border: `2px solid ${C.border}`,
+    fontSize: 13,
+    fontFamily: 'inherit',
+    outline: 'none',
+    color: C.text,
+    boxSizing: 'border-box',
+  }
+  const labelStyle: React.CSSProperties = {
+    fontSize: 11,
+    fontWeight: 800,
+    color: C.textMuted,
+    display: 'block',
+    marginBottom: 5,
+  }
+
+  if (success) {
+    return (
+      <div style={{ textAlign: 'center', padding: '20px 0' }}>
+        <div style={{ fontSize: 44, marginBottom: 12 }}>✅</div>
+        <div
+          style={{
+            fontSize: 16,
+            fontWeight: 900,
+            color: C.purple,
+            marginBottom: 8,
+          }}
+        >
+          ¡Mensaje enviado!
+        </div>
+        <p style={{ fontSize: 13, color: C.textMuted }}>
+          Recibimos tu consulta. Te responderemos a la brevedad.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+    >
+      <div>
+        <label style={labelStyle}>Nombre</label>
+        <input
+          name='nombre'
+          required
+          value={form.nombre}
+          onChange={handleChange}
+          placeholder='Tu nombre'
+          style={inputStyle}
+        />
+      </div>
+      <div>
+        <label style={labelStyle}>Correo electrónico</label>
+        <input
+          type='email'
+          name='email'
+          required
+          value={form.email}
+          onChange={handleChange}
+          placeholder='mail@gmail.com'
+          style={inputStyle}
+        />
+      </div>
+      <div>
+        <label style={labelStyle}>Mensaje</label>
+        <textarea
+          name='mensaje'
+          required
+          value={form.mensaje}
+          onChange={handleChange}
+          placeholder='Escribí tu consulta...'
+          rows={4}
+          style={{ ...inputStyle, resize: 'vertical' as const }}
+        />
+      </div>
+
+      {error && (
+        <div
+          style={{
+            background: '#E74C3C12',
+            border: '1px solid #E74C3C40',
+            borderRadius: 8,
+            padding: '10px 14px',
+            fontSize: 12,
+            color: '#E74C3C',
+            fontWeight: 700,
+          }}
+        >
+          ⚠️ {error}
+        </div>
+      )}
+
+      <button
+        type='submit'
+        disabled={loading}
+        style={{
+          background: loading
+            ? C.border
+            : `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`,
+          color: loading ? C.textMuted : C.white,
+          border: 'none',
+          borderRadius: 10,
+          padding: '13px',
+          fontSize: 14,
+          fontWeight: 800,
+          cursor: loading ? 'not-allowed' : 'pointer',
+          fontFamily: 'inherit',
+          marginTop: 4,
+        }}
+      >
+        {loading ? 'Enviando...' : 'Enviar mensaje'}
       </button>
     </form>
   )
