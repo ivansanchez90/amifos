@@ -254,6 +254,7 @@ const NAV_ADMIN = [
   { key: 'cuotas', icon: '💳', label: 'Cuotas' },
   { key: 'inscripciones', icon: '📋', label: 'Inscripciones' },
   { key: 'noticias', icon: '📰', label: 'Noticias' },
+  { key: 'galeria', icon: '🖼️', label: 'Galería' },
 ]
 
 const NAV_DOCENTE = [
@@ -485,6 +486,9 @@ export default function AdminPanel() {
           {activeNav === 'noticias' && esAdmin && (
             <GestionNoticias userId={user.id} />
           )}
+          {activeNav === 'galeria' && esAdmin && (
+             <GestionGaleria userId={user.id} />
+           )}
           {activeNav === 'asistencia' && !esAdmin && (
             <TomarAsistencia userId={user.id} />
           )}
@@ -3192,6 +3196,278 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
                 </td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+// ═══════════════════════════════════════════════════════════════
+//  R7: GESTIÓN DE GALERÍA DE FOTOS (Admin / Directivos)
+// ═══════════════════════════════════════════════════════════════
+function GestionGaleria({ userId }: { userId: string }) {
+  const [imagenes, setImagenes] = useState<any[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+  const [form, setForm] = useState({
+    titulo: '',
+    descripcion: '',
+    categoria: 'Instalaciones',
+    url_imagen: '',
+  })
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('galeria')
+      .select('*')
+      .order('fecha_subida', { ascending: false })
+    if (data) setImagenes(data)
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMsg('')
+
+    try {
+      let finalUrl = form.url_imagen
+
+      // Si el usuario adjuntó un archivo local, procesamos la subida a Supabase Storage
+      if (file) {
+        const fileExt = file.name.split('.').pop()
+        const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('galeria-imagenes')
+          .upload(uniqueFileName, file)
+
+        if (uploadError) throw new Error('Error en Storage: ' + uploadError.message)
+
+        // Recuperar URL pública del archivo cargado
+        const { data } = supabase.storage
+          .from('galeria-imagenes')
+          .getPublicUrl(uniqueFileName)
+
+        finalUrl = data.publicUrl
+      }
+
+      if (!finalUrl) {
+        throw new Error('Debes seleccionar un archivo de imagen o ingresar una URL externa.')
+      }
+
+      // Persistir registro meta en la base de datos relacional
+      const { error } = await supabase
+        .from('galeria')
+        .insert([
+          {
+            titulo: form.titulo || null,
+            descripcion: form.descripcion || null,
+            categoria: form.categoria || null,
+            url_imagen: finalUrl,
+            id_autor: userId,
+          },
+        ])
+
+      if (error) throw error
+
+      setMsg('✅ Imagen incorporada a la galería correctamente.')
+      setForm({ titulo: '', descripcion: '', categoria: 'Instalaciones', url_imagen: '' })
+      setFile(null)
+      setShowForm(false)
+      load()
+    } catch (err: any) {
+      setMsg('Error: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggleActivo = async (id: number, activo: boolean) => {
+    await supabase
+      .from('galeria')
+      .update({ activo: !activo })
+      .eq('id_imagen', id)
+    load()
+  }
+
+  const eliminarImagen = async (id: number, urlImagen: string) => {
+    if (!window.confirm('¿Confirmás la eliminación permanente de esta fotografía?')) return
+    
+    try {
+      // Si la imagen pertenece al storage propio, borramos el binario para evitar archivos huérfanos
+      if (urlImagen.includes('galeria-imagenes')) {
+        const parts = urlImagen.split('/')
+        const fileName = parts[parts.length - 1]
+        await supabase.storage.from('galeria-imagenes').remove([fileName])
+      }
+
+      const { error } = await supabase.from('galeria').delete().eq('id_imagen', id)
+      if (error) throw error
+
+      setMsg('✅ Registro fotográfico purgado con éxito.')
+      load()
+    } catch (err: any) {
+      setMsg('Error al eliminar: ' + err.message)
+    }
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🖼️ Galería Institucional</h2>
+        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancelar' : '+ Agregar Imagen'}
+        </button>
+      </div>
+
+      {showForm && (
+        <div style={{ ...card, marginBottom: 24 }}>
+          <div style={cardTitle}>Publicar nueva fotografía</div>
+          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div>
+                <span style={label}>Título de la foto (Opcional)</span>
+                <input
+                  style={input}
+                  value={form.titulo}
+                  onChange={(e) => setForm((p) => ({ ...p, titulo: e.target.value }))}
+                  placeholder='Ej: Laboratorio de Ciencias Avanzadas'
+                />
+              </div>
+              <div>
+                <span style={label}>Categoría / Sección</span>
+                <select
+                  style={{ ...input, appearance: 'none' as const }}
+                  value={form.categoria}
+                  onChange={(e) => setForm((p) => ({ ...p, categoria: e.target.value }))}
+                >
+                  <option value='Instalaciones'>Instalaciones</option>
+                  <option value='Actividades'>Actividades</option>
+                  <option value='Idiomas'>Idiomas</option>
+                  <option value='Deportes'>Deportes</option>
+                  <option value='Arte'>Arte</option>
+                  <option value='Tecnología'>Tecnología</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <span style={label}>Descripción descriptiva (Opcional)</span>
+              <input
+                style={input}
+                value={form.descripcion}
+                onChange={(e) => setForm((p) => ({ ...p, descripcion: e.target.value }))}
+                placeholder='Breve reseña sobre lo que muestra la imagen...'
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'center' }}>
+              <div>
+                <span style={label}>Opción A: Seleccionar archivo local</span>
+                <input
+                  type='file'
+                  accept='image/*'
+                  style={input}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setFile(e.target.files[0])
+                    }
+                  }}
+                />
+              </div>
+              <div>
+                <span style={label}>Opción B: Vincular URL de imagen remota</span>
+                <input
+                  style={input}
+                  value={form.url_imagen}
+                  onChange={(e) => setForm((p) => ({ ...p, url_imagen: e.target.value }))}
+                  placeholder='https://images.unsplash.com/...'
+                  disabled={!!file}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+              <button type='submit' disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}>
+                {loading ? 'Subiendo contenido...' : 'Publicar en Galería'}
+              </button>
+            </div>
+
+            {msg && (
+              <div style={{ fontSize: 13, fontWeight: 700, color: msg.startsWith('✅') ? C.green : C.red }}>
+                {msg}
+              </div>
+            )}
+          </form>
+        </div>
+      )}
+
+      {/* Lista del Repositorio Visual */}
+      <div style={card}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Miniatura</th>
+              <th style={th}>Título / Categoría</th>
+              <th style={th}>Fecha de Subida</th>
+              <th style={th}>Estado</th>
+              <th style={th}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {imagenes.map((img) => (
+              <tr key={img.id_imagen}>
+                <td style={td}>
+                  <img
+                    src={img.url_imagen}
+                    alt={img.titulo || 'Mina'}
+                    style={{ width: 65, height: 48, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}` }}
+                  />
+                </td>
+                <td style={td}>
+                  <span style={{ fontWeight: 700 }}>{img.titulo || 'Fotografía sin título'}</span>
+                  <br />
+                  <span style={badge(C.purple)}>{img.categoria || 'General'}</span>
+                </td>
+                <td style={{ ...td, color: C.textMuted }}>
+                  {new Date(img.fecha_subida).toLocaleDateString('es-AR')}
+                </td>
+                <td style={td}>
+                  <span style={badge(img.activo ? C.green : C.red)}>
+                    {img.activo ? 'Visible en Home' : 'Oculta'}
+                  </span>
+                </td>
+                <td style={td}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      style={img.activo ? btnDanger : { ...btnDanger, background: '#27AE601A', color: C.green }}
+                      onClick={() => toggleActivo(img.id_imagen, img.activo)}
+                    >
+                      {img.activo ? 'Ocultar' : 'Mostrar'}
+                    </button>
+                    <button
+                      style={{ ...btnDanger, background: '#E74C3C26' }}
+                      onClick={() => eliminarImagen(img.id_imagen, img.url_imagen)}
+                    >
+                      Eliminar permanentemente
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {imagenes.length === 0 && (
+              <tr>
+                <td colSpan={5} style={{ ...td, textAlign: 'center', color: C.textMuted, padding: 32 }}>
+                  No se registran imágenes en la galería institucional.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
