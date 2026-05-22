@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Salida de tsc emitida por error dentro de src (proyecto solo .tsx)
+src/**/*.js
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
