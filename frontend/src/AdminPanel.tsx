@@ -26,6 +26,22 @@ interface UsuarioPanel {
   activo: boolean
 }
 
+interface PrefillAlumno {
+  nombre: string
+  apellido: string
+  dni: string
+  fecha_nacimiento: string
+}
+
+interface PrefillUsuario {
+  nombre: string
+  apellido: string
+  email: string
+  password: string
+  rol: string
+  alumno?: PrefillAlumno | null
+}
+
 interface Alumno {
   id_alumno: number
   nombre: string
@@ -358,6 +374,14 @@ export default function AdminPanel() {
   const [perfil, setPerfil] = useState<UsuarioPanel | null>(null)
   const [activeNav, setActiveNav] = useState('dashboard')
   const [loading, setLoading] = useState(true)
+  const [prefillUsuario, setPrefillUsuario] = useState<PrefillUsuario | null>(
+    null,
+  )
+
+  const irARegistrarUsuario = useCallback((data: PrefillUsuario) => {
+    setPrefillUsuario(data)
+    setActiveNav('usuarios')
+  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -561,7 +585,12 @@ export default function AdminPanel() {
           {activeNav === 'dashboard' && (
             <Dashboard esAdmin={esAdmin} perfil={perfil} />
           )}
-          {activeNav === 'usuarios' && esAdmin && <GestionUsuarios />}
+          {activeNav === 'usuarios' && esAdmin && (
+            <GestionUsuarios
+              prefill={prefillUsuario}
+              onPrefillConsumed={() => setPrefillUsuario(null)}
+            />
+          )}
           {activeNav === 'alumnos' && esAdmin && <GestionAlumnos />}
           {activeNav === 'docentes' && esAdmin && <GestionDocentes />}
           {activeNav === 'cursos' && esAdmin && <GestionCursos />}
@@ -571,7 +600,9 @@ export default function AdminPanel() {
           {activeNav === 'becas' && esAdmin && <GestionBecas />}
           {activeNav === 'sueldos' && esAdmin && <GestionSueldos />}
           {activeNav === 'compras' && esAdmin && <GestionCompras />}
-          {activeNav === 'inscripciones' && esAdmin && <GestionInscripciones />}
+          {activeNav === 'inscripciones' && esAdmin && (
+            <GestionInscripciones onRegistrar={irARegistrarUsuario} />
+          )}
           {activeNav === 'mensajes' && esAdmin && <GestionMensajes />}
           {activeNav === 'actividades' && esAdmin && <GestionActividades />}
           {activeNav === 'reservas' && <GestionReservas userId={user.id} />}
@@ -898,8 +929,15 @@ function Dashboard({
 // ═══════════════════════════════════════════════════════════════
 //  GESTIÓN DE USUARIOS (crear directivos, docentes, alumnos)
 // ═══════════════════════════════════════════════════════════════
-function GestionUsuarios() {
+function GestionUsuarios({
+  prefill,
+  onPrefillConsumed,
+}: {
+  prefill?: PrefillUsuario | null
+  onPrefillConsumed?: () => void
+} = {}) {
   const [usuarios, setUsuarios] = useState<UsuarioPanel[]>([])
+  const [cursos, setCursos] = useState<Curso[]>([])
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
@@ -909,42 +947,167 @@ function GestionUsuarios() {
     apellido: '',
     rol: 'Docente',
   })
+  const ALUMNO_VACIO = {
+    nombre: '',
+    apellido: '',
+    dni: '',
+    fecha_nacimiento: '',
+    id_curso: '',
+    obra_social: '',
+  }
+  const [alumnoForm, setAlumnoForm] = useState(ALUMNO_VACIO)
   const [msg, setMsg] = useState('')
 
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from('usuarios')
-      .select('*')
-      .order('apellido')
-    if (data) setUsuarios(data as UsuarioPanel[])
+    const [{ data: us }, { data: cu }] = await Promise.all([
+      supabase.from('usuarios').select('*').order('apellido'),
+      supabase.from('cursos').select('*').eq('activo', true),
+    ])
+    if (us) setUsuarios(us as UsuarioPanel[])
+    if (cu) setCursos(cu as Curso[])
   }, [])
 
   useEffect(() => {
     load()
   }, [load])
 
+  useEffect(() => {
+    if (!prefill) return
+    setForm({
+      email: prefill.email,
+      password: prefill.password,
+      nombre: prefill.nombre,
+      apellido: prefill.apellido,
+      rol: prefill.rol,
+    })
+    setAlumnoForm(
+      prefill.alumno
+        ? {
+            nombre: prefill.alumno.nombre,
+            apellido: prefill.alumno.apellido,
+            dni: prefill.alumno.dni,
+            fecha_nacimiento: prefill.alumno.fecha_nacimiento,
+            id_curso: '',
+            obra_social: '',
+          }
+        : ALUMNO_VACIO,
+    )
+    setMsg('')
+    setShowForm(true)
+    onPrefillConsumed?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill, onPrefillConsumed])
+
+  // Crea el usuario vía edge function y luego fuerza nombre/apellido/rol en la
+  // fila de `usuarios`, porque el backend desplegado no respeta esos valores
+  // (los crea sin nombre y con un rol por defecto). Devuelve el id_usuario.
+  const crearUsuario = async (datos: {
+    email: string
+    password: string
+    nombre: string
+    apellido: string
+    rol: string
+  }): Promise<{ error: string | null; id: string | null }> => {
+    const { error } = await supabase.functions.invoke('crear-usuario', {
+      body: datos,
+    })
+    if (error) return { error: error.message, id: null }
+
+    const { data: u } = await supabase
+      .from('usuarios')
+      .select('id_usuario')
+      .eq('email', datos.email)
+      .single()
+    if (!u?.id_usuario) {
+      return {
+        error: 'No se encontró el usuario recién creado para completar sus datos.',
+        id: null,
+      }
+    }
+    const { error: updErr } = await supabase
+      .from('usuarios')
+      .update({
+        nombre: datos.nombre,
+        apellido: datos.apellido,
+        rol: datos.rol,
+      })
+      .eq('id_usuario', u.id_usuario)
+    if (updErr) {
+      return {
+        error: 'no se pudo guardar nombre/rol del usuario: ' + updErr.message,
+        id: u.id_usuario,
+      }
+    }
+    return { error: null, id: u.id_usuario }
+  }
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMsg('')
 
-    const { error } = await supabase.functions.invoke('crear-usuario', {
-      body: {
-        email: form.email,
-        password: form.password,
-        nombre: form.nombre,
-        apellido: form.apellido,
-        rol: form.rol,
-      },
+    const { error: errUser, id: idUsuario } = await crearUsuario({
+      email: form.email,
+      password: form.password,
+      nombre: form.nombre,
+      apellido: form.apellido,
+      rol: form.rol,
     })
-
-    if (error) {
-      setMsg('Error: ' + error.message)
+    if (errUser) {
+      setMsg('Error: ' + errUser)
       setLoading(false)
       return
     }
 
-    setMsg('✅ Usuario creado correctamente.')
+    // Si es Tutor: crear también el usuario del alumno (email generado desde el
+    // DNI) y el registro en `alumnos` vinculado al alumno y al tutor.
+    if (form.rol === 'Padre') {
+      const emailAlumno = `${alumnoForm.dni}@alumno.local`
+      const { error: errAlumno, id: idAlumno } = await crearUsuario({
+        email: emailAlumno,
+        password: alumnoForm.dni,
+        nombre: alumnoForm.nombre,
+        apellido: alumnoForm.apellido,
+        rol: 'Alumno',
+      })
+      if (errAlumno) {
+        setMsg(
+          '⚠️ Tutor creado, pero hubo un error al crear el usuario del alumno: ' +
+            errAlumno,
+        )
+        setLoading(false)
+        load()
+        return
+      }
+
+      const { error: alErr } = await supabase.from('alumnos').insert([
+        {
+          nombre: alumnoForm.nombre,
+          apellido: alumnoForm.apellido,
+          dni: alumnoForm.dni,
+          fecha_nacimiento: alumnoForm.fecha_nacimiento || null,
+          id_curso: alumnoForm.id_curso ? Number(alumnoForm.id_curso) : null,
+          id_usuario: idAlumno,
+          id_usuario_padre: idUsuario,
+          obra_social: alumnoForm.obra_social || null,
+        },
+      ])
+      if (alErr) {
+        setMsg(
+          '⚠️ Usuarios creados, pero hubo un error al registrar el alumno: ' +
+            alErr.message,
+        )
+        setLoading(false)
+        load()
+        return
+      }
+    }
+
+    setMsg(
+      form.rol === 'Padre'
+        ? '✅ Tutor y alumno (usuario + registro) creados correctamente.'
+        : '✅ Usuario creado correctamente.',
+    )
     setForm({
       email: '',
       password: '',
@@ -952,6 +1115,7 @@ function GestionUsuarios() {
       apellido: '',
       rol: 'Docente',
     })
+    setAlumnoForm(ALUMNO_VACIO)
     setShowForm(false)
     load()
     setLoading(false)
@@ -1050,8 +1214,133 @@ function GestionUsuarios() {
                 <option value='Docente'>Docente</option>
                 <option value='Directivo'>Directivo</option>
                 <option value='Admin'>Admin</option>
+                <option value='Alumno'>Alumno</option>
+                <option value='Padre'>Tutor</option>
               </select>
             </div>
+
+            {form.rol === 'Padre' && (
+              <div
+                style={{
+                  gridColumn: '1/-1',
+                  borderTop: `1px solid ${C.border}`,
+                  paddingTop: 16,
+                  marginTop: 4,
+                }}
+              >
+                <div style={cardTitle}>Datos del alumno asociado</div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 14,
+                  }}
+                >
+                  <div>
+                    <span style={label}>Nombre del alumno</span>
+                    <input
+                      style={input}
+                      required
+                      value={alumnoForm.nombre}
+                      onChange={(e) =>
+                        setAlumnoForm((p) => ({ ...p, nombre: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <span style={label}>Apellido del alumno</span>
+                    <input
+                      style={input}
+                      required
+                      value={alumnoForm.apellido}
+                      onChange={(e) =>
+                        setAlumnoForm((p) => ({
+                          ...p,
+                          apellido: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <span style={label}>DNI del alumno</span>
+                    <input
+                      style={input}
+                      required
+                      value={alumnoForm.dni}
+                      onChange={(e) =>
+                        setAlumnoForm((p) => ({ ...p, dni: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <span style={label}>Fecha de nacimiento</span>
+                    <input
+                      type='date'
+                      style={input}
+                      value={alumnoForm.fecha_nacimiento}
+                      onChange={(e) =>
+                        setAlumnoForm((p) => ({
+                          ...p,
+                          fecha_nacimiento: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <span style={label}>Curso</span>
+                    <select
+                      style={{ ...input, appearance: 'none' as const }}
+                      value={alumnoForm.id_curso}
+                      onChange={(e) =>
+                        setAlumnoForm((p) => ({
+                          ...p,
+                          id_curso: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value=''>Sin asignar</option>
+                      {cursos.map((c) => (
+                        <option key={c.id_curso} value={c.id_curso}>
+                          {c.nivel} — {c.grado_anio} "{c.division}"
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <span style={label}>Obra social</span>
+                    <input
+                      style={input}
+                      value={alumnoForm.obra_social}
+                      onChange={(e) =>
+                        setAlumnoForm((p) => ({
+                          ...p,
+                          obra_social: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginTop: 12,
+                    fontSize: 12,
+                    color: C.textMuted,
+                    background: C.purpleLight,
+                    borderRadius: 8,
+                    padding: '8px 12px',
+                  }}
+                >
+                  Acceso del alumno al portal — email:{' '}
+                  <strong>
+                    {alumnoForm.dni
+                      ? `${alumnoForm.dni}@alumno.local`
+                      : '(se genera con el DNI)'}
+                  </strong>{' '}
+                  · contraseña: <strong>el DNI</strong>
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
               <button
                 type='submit'
@@ -1062,7 +1351,11 @@ function GestionUsuarios() {
                   opacity: loading ? 0.6 : 1,
                 }}
               >
-                {loading ? 'Creando...' : 'Crear usuario'}
+                {loading
+                  ? 'Creando...'
+                  : form.rol === 'Padre'
+                    ? 'Crear tutor y alumno'
+                    : 'Crear usuario'}
               </button>
             </div>
             {msg && (
@@ -3404,7 +3697,11 @@ function GestionCompras() {
 // ═══════════════════════════════════════════════════════════════
 //  INSCRIPCIONES
 // ═══════════════════════════════════════════════════════════════
-function GestionInscripciones() {
+function GestionInscripciones({
+  onRegistrar,
+}: {
+  onRegistrar: (data: PrefillUsuario) => void
+}) {
   const [inscripciones, setInscripciones] = useState<Inscripcion[]>([])
 
   const load = useCallback(async () => {
@@ -3492,24 +3789,58 @@ function GestionInscripciones() {
                   </span>
                 </td>
                 <td style={td}>
-                  <select
+                  <div
                     style={{
-                      ...input,
-                      width: 160,
-                      padding: '6px 10px',
-                      appearance: 'none' as const,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 6,
                     }}
-                    value={i.estado}
-                    onChange={(e) =>
-                      cambiarEstado(i.id_inscripcion, e.target.value)
-                    }
                   >
-                    {ESTADOS.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      style={{
+                        ...input,
+                        width: 160,
+                        padding: '6px 10px',
+                        appearance: 'none' as const,
+                      }}
+                      value={i.estado}
+                      onChange={(e) =>
+                        cambiarEstado(i.id_inscripcion, e.target.value)
+                      }
+                    >
+                      {ESTADOS.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      style={{
+                        ...btnPrimary,
+                        width: 160,
+                        padding: '6px 10px',
+                        fontSize: 12,
+                      }}
+                      onClick={() => {
+                        const partes = i.nombre_tutor.trim().split(/\s+/)
+                        onRegistrar({
+                          nombre: partes[0] ?? '',
+                          apellido: partes.slice(1).join(' '),
+                          email: i.email_tutor,
+                          password: i.dni_aspirante,
+                          rol: 'Padre',
+                          alumno: {
+                            nombre: i.nombre_aspirante,
+                            apellido: i.apellido_aspirante ?? '',
+                            dni: i.dni_aspirante,
+                            fecha_nacimiento: i.fecha_nacimiento_aspirante ?? '',
+                          },
+                        })
+                      }}
+                    >
+                      Registrar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
