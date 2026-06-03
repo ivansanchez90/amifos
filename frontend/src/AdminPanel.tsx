@@ -216,13 +216,11 @@ interface Empleo {
   descripcion: string | null
   area: string | null
   requisitos: string | null
-  modalidad: string | null
   tipo_contrato: string | null
   activo: boolean
   fecha_publicacion: string
   fecha_cierre: string | null
 }
-
 
 const MESES = [
   'Enero',
@@ -349,7 +347,10 @@ export default function AdminPanel() {
           <p style={{ color: '#6B6B8A' }}>
             Tu usuario no tiene permisos para este panel.
           </p>
-          <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => supabase.auth.signOut()}>
+          <button
+            className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+            onClick={() => supabase.auth.signOut()}
+          >
             Salir
           </button>
         </div>
@@ -436,7 +437,7 @@ export default function AdminPanel() {
             <div style={{ fontSize: 11, color: '#6B6B8A' }}>{perfil.rol}</div>
           </div>
           <button
-            className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[7px] !px-[14px] !text-xs"
+            className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[7px] !px-[14px] !text-xs'
             onClick={() => supabase.auth.signOut()}
           >
             Salir
@@ -528,8 +529,8 @@ export default function AdminPanel() {
           )}
           {activeNav === 'empleos' && esAdmin && <GestionEmpleos />}
           {activeNav === 'galeria' && esAdmin && (
-             <GestionGaleria userId={user.id} />
-           )}
+            <GestionGaleria userId={user.id} />
+          )}
           {activeNav === 'asistencia' && !esAdmin && (
             <TomarAsistencia userId={user.id} />
           )}
@@ -603,9 +604,7 @@ function LoginAdmin({
         background: `radial-gradient(ellipse at 60% 0%, ${'#EEE9FF'} 0%, ${'#F5F4FB'} 60%)`,
       }}
     >
-      <div
-        className="bg-white rounded-card p-6 shadow-card border border-border w-full max-w-[380px] px-[36px] py-[44px]"
-      >
+      <div className='bg-white rounded-card p-6 shadow-card border border-border w-full max-w-[380px] px-[36px] py-[44px]'>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <img
             src='/logo.png'
@@ -627,22 +626,26 @@ function LoginAdmin({
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
         >
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Email</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Email
+            </span>
             <input
               type='email'
               required
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder='admin@email.com'
             />
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Contraseña</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Contraseña
+            </span>
             <input
               type='password'
               required
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder='••••••••'
@@ -666,7 +669,11 @@ function LoginAdmin({
           <button
             type='submit'
             disabled={busy}
-            className={busy ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn p-[14px] text-sm font-extrabold cursor-pointer opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn p-[14px] text-sm font-extrabold cursor-pointer'}
+            className={
+              busy
+                ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn p-[14px] text-sm font-extrabold cursor-pointer opacity-60'
+                : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn p-[14px] text-sm font-extrabold cursor-pointer'
+            }
           >
             {busy ? 'Ingresando...' : 'Ingresar'}
           </button>
@@ -779,7 +786,8 @@ function Dashboard({
           {statItems.map((s) => (
             <div
               key={s.label}
-              className="bg-white rounded-card p-6 shadow-card border border-border" style={{ borderTop: `3px solid ${s.color}` }}
+              className='bg-white rounded-card p-6 shadow-card border border-border'
+              style={{ borderTop: `3px solid ${s.color}` }}
             >
               <div style={{ fontSize: 28, marginBottom: 8 }}>{s.icon}</div>
               <div style={{ fontSize: 30, fontWeight: 900, color: s.color }}>
@@ -800,18 +808,22 @@ function Dashboard({
         </div>
       )}
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Accesos rápidos</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Accesos rápidos
+        </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
           {(esAdmin ? NAV_ADMIN : NAV_DOCENTE)
             .filter((n) => n.key !== 'dashboard')
             .map((item) => (
               <div
                 key={item.key}
-                className="bg-white rounded-card px-5 py-4 shadow-card border border-border cursor-pointer min-w-[140px] text-center transition-all duration-200 flex-1 hover:-translate-y-[3px] hover:shadow-card-hover"
+                className='bg-white rounded-card px-5 py-4 shadow-card border border-border cursor-pointer min-w-[140px] text-center transition-all duration-200 flex-1 hover:-translate-y-[3px] hover:shadow-card-hover'
               >
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{item.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#5B35C5' }}>
+                <div
+                  style={{ fontSize: 13, fontWeight: 800, color: '#5B35C5' }}
+                >
                   {item.label}
                 </div>
               </div>
@@ -916,7 +928,8 @@ function GestionUsuarios({
       .single()
     if (!u?.id_usuario) {
       return {
-        error: 'No se encontró el usuario recién creado para completar sus datos.',
+        error:
+          'No se encontró el usuario recién creado para completar sus datos.',
         id: null,
       }
     }
@@ -1038,23 +1051,30 @@ function GestionUsuarios({
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           👥 Usuarios
         </h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Nuevo usuario'}
         </button>
       </div>
 
       {/* Formulario */}
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">Crear nuevo usuario</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Crear nuevo usuario
+          </div>
           <form
             onSubmit={handleCreate}
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Nombre
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.nombre}
                 onChange={(e) =>
@@ -1063,9 +1083,11 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Apellido</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Apellido
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.apellido}
                 onChange={(e) =>
@@ -1074,10 +1096,12 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Email</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Email
+              </span>
               <input
                 type='email'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.email}
                 onChange={(e) =>
@@ -1086,10 +1110,12 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Contraseña</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Contraseña
+              </span>
               <input
                 type='password'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 minLength={6}
                 value={form.password}
@@ -1099,9 +1125,11 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Rol</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Rol
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 value={form.rol}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, rol: e.target.value }))
@@ -1124,7 +1152,9 @@ function GestionUsuarios({
                   marginTop: 4,
                 }}
               >
-                <div className="text-[15px] font-extrabold text-text mb-5">Datos del alumno asociado</div>
+                <div className='text-[15px] font-extrabold text-text mb-5'>
+                  Datos del alumno asociado
+                </div>
                 <div
                   style={{
                     display: 'grid',
@@ -1133,9 +1163,11 @@ function GestionUsuarios({
                   }}
                 >
                   <div>
-                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre del alumno</span>
+                    <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                      Nombre del alumno
+                    </span>
                     <input
-                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                      className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                       required
                       value={alumnoForm.nombre}
                       onChange={(e) =>
@@ -1144,9 +1176,11 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Apellido del alumno</span>
+                    <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                      Apellido del alumno
+                    </span>
                     <input
-                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                      className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                       required
                       value={alumnoForm.apellido}
                       onChange={(e) =>
@@ -1158,9 +1192,11 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">DNI del alumno</span>
+                    <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                      DNI del alumno
+                    </span>
                     <input
-                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                      className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                       required
                       value={alumnoForm.dni}
                       onChange={(e) =>
@@ -1169,10 +1205,12 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de nacimiento</span>
+                    <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                      Fecha de nacimiento
+                    </span>
                     <input
                       type='date'
-                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                      className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                       value={alumnoForm.fecha_nacimiento}
                       onChange={(e) =>
                         setAlumnoForm((p) => ({
@@ -1183,9 +1221,11 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Curso</span>
+                    <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                      Curso
+                    </span>
                     <select
-                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                      className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                       value={alumnoForm.id_curso}
                       onChange={(e) =>
                         setAlumnoForm((p) => ({
@@ -1203,9 +1243,11 @@ function GestionUsuarios({
                     </select>
                   </div>
                   <div>
-                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Obra social</span>
+                    <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                      Obra social
+                    </span>
                     <input
-                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                      className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                       value={alumnoForm.obra_social}
                       onChange={(e) =>
                         setAlumnoForm((p) => ({
@@ -1241,7 +1283,11 @@ function GestionUsuarios({
               <button
                 type='submit'
                 disabled={loading}
-                className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full'}
+                className={
+                  loading
+                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full opacity-60'
+                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full'
+                }
               >
                 {loading
                   ? 'Creando...'
@@ -1267,25 +1313,37 @@ function GestionUsuarios({
       )}
 
       {/* Tabla */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nombre</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Email</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Rol</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Nombre
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Email
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Rol
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {usuarios.map((u) => (
               <tr key={u.id_usuario}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {u.apellido}, {u.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">{u.email}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
+                  {u.email}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span
                     style={badge(
                       u.rol === 'Admin' || u.rol === 'Directivo'
@@ -1296,14 +1354,18 @@ function GestionUsuarios({
                     {u.rol}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(u.activo ? '#27AE60' : '#E74C3C')}>
                     {u.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <button
-                    className={u.activo ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
+                    className={
+                      u.activo
+                        ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                        : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                    }
                     onClick={() => toggleActivo(u.id_usuario, u.activo)}
                   >
                     {u.activo ? 'Desactivar' : 'Activar'}
@@ -1328,6 +1390,9 @@ function GestionAlumnos() {
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
   const [legajoId, setLegajoId] = useState<number | null>(null)
+  const [editCursoId, setEditCursoId] = useState<number | null>(null)
+  const [editCursoVal, setEditCursoVal] = useState<string>('')
+  const [savingCurso, setSavingCurso] = useState(false)
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
@@ -1385,6 +1450,32 @@ function GestionAlumnos() {
     setLoading(false)
   }
 
+  const abrirEditCurso = (a: Alumno) => {
+    setEditCursoId(a.id_alumno)
+    setEditCursoVal(
+      cursos
+        .find(
+          (c) =>
+            c.nivel === a.cursos?.nivel &&
+            c.grado_anio === a.cursos?.grado_anio &&
+            c.division === a.cursos?.division,
+        )
+        ?.id_curso?.toString() ?? '',
+    )
+  }
+
+  const guardarCurso = async () => {
+    if (editCursoId === null) return
+    setSavingCurso(true)
+    await supabase
+      .from('alumnos')
+      .update({ id_curso: editCursoVal ? Number(editCursoVal) : null })
+      .eq('id_alumno', editCursoId)
+    setSavingCurso(false)
+    setEditCursoId(null)
+    load()
+  }
+
   if (legajoId !== null) {
     return (
       <LegajoAlumno idAlumno={legajoId} onClose={() => setLegajoId(null)} />
@@ -1402,22 +1493,29 @@ function GestionAlumnos() {
         }}
       >
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🎓 Alumnos</h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Nuevo alumno'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">Registrar alumno</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Registrar alumno
+          </div>
           <form
             onSubmit={handleCreate}
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Nombre
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.nombre}
                 onChange={(e) =>
@@ -1426,9 +1524,11 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Apellido</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Apellido
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.apellido}
                 onChange={(e) =>
@@ -1437,9 +1537,11 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">DNI</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                DNI
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.dni}
                 onChange={(e) =>
@@ -1448,10 +1550,12 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de nacimiento</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Fecha de nacimiento
+              </span>
               <input
                 type='date'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.fecha_nacimiento}
                 onChange={(e) =>
@@ -1460,9 +1564,11 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Curso</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Curso
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 value={form.id_curso}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, id_curso: e.target.value }))
@@ -1477,10 +1583,12 @@ function GestionAlumnos() {
               </select>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Email del padre/tutor</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Email del padre/tutor
+              </span>
               <input
                 type='email'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.email_padre}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, email_padre: e.target.value }))
@@ -1489,9 +1597,11 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Obra social</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Obra social
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.obra_social}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, obra_social: e.target.value }))
@@ -1502,7 +1612,11 @@ function GestionAlumnos() {
               <button
                 type='submit'
                 disabled={loading}
-                className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full'}
+                className={
+                  loading
+                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full opacity-60'
+                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full'
+                }
               >
                 {loading ? 'Guardando...' : 'Registrar alumno'}
               </button>
@@ -1523,39 +1637,95 @@ function GestionAlumnos() {
         </div>
       )}
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">DNI</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Curso</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Legajo</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Alumno
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                DNI
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Curso
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
             {alumnos.map((a) => (
               <tr key={a.id_alumno}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {a.apellido}, {a.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">{a.dni}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                  {a.cursos ? (
-                    `${a.cursos.nivel} — ${a.cursos.grado_anio} "${a.cursos.division}"`
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
+                  {a.dni}
+                </td>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'
+                  style={{ minWidth: 260 }}
+                >
+                  {editCursoId === a.id_alumno ? (
+                    <div className='flex items-center gap-2'>
+                      <select
+                        className='flex-1 px-[10px] py-[6px] rounded-input border-2 border-border text-[13px] text-text outline-none appearance-none'
+                        value={editCursoVal}
+                        onChange={(e) => setEditCursoVal(e.target.value)}
+                        autoFocus
+                      >
+                        <option value=''>Sin asignar</option>
+                        {cursos.map((c) => (
+                          <option key={c.id_curso} value={c.id_curso}>
+                            {c.nivel} — {c.grado_anio} "{c.division}"
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer shrink-0'
+                        disabled={savingCurso}
+                        onClick={guardarCurso}
+                      >
+                        {savingCurso ? '...' : '✓'}
+                      </button>
+                      <button
+                        className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer shrink-0'
+                        onClick={() => setEditCursoId(null)}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ) : (
-                    <span style={{ color: '#6B6B8A' }}>Sin asignar</span>
+                    <div className='flex items-center gap-2'>
+                      <span
+                        className={a.cursos ? 'text-text' : 'text-textMuted'}
+                      >
+                        {a.cursos
+                          ? `${a.cursos.nivel} — ${a.cursos.grado_anio} "${a.cursos.division}"`
+                          : 'Sin asignar'}
+                      </span>
+                      <button
+                        className='bg-purpleLight text-purple-700 border-0 rounded py-[3px] px-[8px] text-[10px] font-extrabold cursor-pointer shrink-0 opacity-70 hover:opacity-100 transition-opacity'
+                        onClick={() => abrirEditCurso(a)}
+                      >
+                        Cambiar
+                      </button>
+                    </div>
                   )}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(a.activo ? '#27AE60' : '#E74C3C')}>
                     {a.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <button
-                    className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
+                    className='bg-purpleLight text-purple-700 border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                     onClick={() => setLegajoId(a.id_alumno)}
                   >
                     Ver legajo
@@ -1604,7 +1774,12 @@ function LegajoAlumno({
   const [califs, setCalifs] = useState<Calificacion[]>([])
   const [asist, setAsist] = useState<{ estado: string }[]>([])
   const [amonest, setAmonest] = useState<
-    { id_amonestacion: number; tipo: string; descripcion: string; fecha: string }[]
+    {
+      id_amonestacion: number
+      tipo: string
+      descripcion: string
+      fecha: string
+    }[]
   >([])
   const [documentos, setDocumentos] = useState<DocumentoAlumno[]>([])
   const [file, setFile] = useState<File | null>(null)
@@ -1711,7 +1886,9 @@ function LegajoAlumno({
 
   // ── Derivados ──────────────────────────────────────────────
   const promedioGeneral = califs.length
-    ? (califs.reduce((a, c) => a + Number(c.nota), 0) / califs.length).toFixed(2)
+    ? (califs.reduce((a, c) => a + Number(c.nota), 0) / califs.length).toFixed(
+        2,
+      )
     : '—'
 
   const asistResumen = asist.reduce(
@@ -1729,7 +1906,9 @@ function LegajoAlumno({
 
   const dato = (etiqueta: string, valor: string) => (
     <div>
-      <div className="text-[11px] font-extrabold text-textMuted block mb-[2px]">{etiqueta}</div>
+      <div className='text-[11px] font-extrabold text-textMuted block mb-[2px]'>
+        {etiqueta}
+      </div>
       <div style={{ fontSize: 14, fontWeight: 700 }}>{valor}</div>
     </div>
   )
@@ -1747,14 +1926,19 @@ function LegajoAlumno({
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           📁 Legajo del alumno
         </h2>
-        <button className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={onClose}>
+        <button
+          className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={onClose}
+        >
           ← Volver a la lista
         </button>
       </div>
 
       {/* Datos personales */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-        <div className="text-[15px] font-extrabold text-text mb-5">Datos personales</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Datos personales
+        </div>
         {alumno ? (
           <div
             style={{
@@ -1796,8 +1980,10 @@ function LegajoAlumno({
           marginBottom: 20,
         }}
       >
-        <div className="bg-white rounded-card p-6 shadow-card border border-border">
-          <div className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Promedio general</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+          <div className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+            Promedio general
+          </div>
           <div style={{ fontSize: 30, fontWeight: 900, color: '#5B35C5' }}>
             {promedioGeneral}
           </div>
@@ -1805,18 +1991,23 @@ function LegajoAlumno({
             {califs.length} calificaciones registradas
           </div>
         </div>
-        <div className="bg-white rounded-card p-6 shadow-card border border-border">
-          <div className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Asistencia</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+          <div className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+            Asistencia
+          </div>
           <div style={{ fontSize: 30, fontWeight: 900, color: '#27AE60' }}>
             {pctPresente !== null ? `${pctPresente}%` : '—'}
           </div>
           <div style={{ fontSize: 12, color: '#6B6B8A' }}>
-            {asistResumen['Presente'] ?? 0} pres. · {asistResumen['Ausente'] ?? 0}{' '}
-            aus. · {asistResumen['Tarde'] ?? 0} tarde
+            {asistResumen['Presente'] ?? 0} pres. ·{' '}
+            {asistResumen['Ausente'] ?? 0} aus. · {asistResumen['Tarde'] ?? 0}{' '}
+            tarde
           </div>
         </div>
-        <div className="bg-white rounded-card p-6 shadow-card border border-border">
-          <div className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Amonestaciones</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+          <div className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+            Amonestaciones
+          </div>
           <div style={{ fontSize: 30, fontWeight: 900, color: '#E67E22' }}>
             {amonest.length}
           </div>
@@ -1827,45 +2018,60 @@ function LegajoAlumno({
       </div>
 
       {/* Historial de calificaciones */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-        <div className="text-[15px] font-extrabold text-text mb-5">Historial de calificaciones</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Historial de calificaciones
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Materia</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Trimestre</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Evaluación</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nota</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Materia
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Trimestre
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Evaluación
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Nota
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
             </tr>
           </thead>
           <tbody>
             {califs.map((c) => (
               <tr key={c.id_calificacion}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {c.asignaciones?.materias?.nombre ?? '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{c.trimestre}°</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {c.trimestre}°
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {c.tipo_evaluacion}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span
-                    style={badge(
-                      Number(c.nota) >= 6 ? '#27AE60' : '#E74C3C',
-                    )}
+                    style={badge(Number(c.nota) >= 6 ? '#27AE60' : '#E74C3C')}
                   >
                     {c.nota}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
                   {new Date(c.fecha_carga).toLocaleDateString('es-AR')}
                 </td>
               </tr>
             ))}
             {califs.length === 0 && (
               <tr>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={5}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                  colSpan={5}
+                >
                   Sin calificaciones registradas.
                 </td>
               </tr>
@@ -1875,8 +2081,10 @@ function LegajoAlumno({
       </div>
 
       {/* Amonestaciones */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-        <div className="text-[15px] font-extrabold text-text mb-5">Amonestaciones</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Amonestaciones
+        </div>
         {amonest.length === 0 ? (
           <div style={{ color: '#6B6B8A', fontSize: 13 }}>
             Sin amonestaciones registradas.
@@ -1895,7 +2103,9 @@ function LegajoAlumno({
                   alignItems: 'flex-start',
                 }}
               >
-                <span className="inline-block bg-[#E67E221A] text-orange rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{a.tipo}</span>
+                <span className='inline-block bg-[#E67E221A] text-orange rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                  {a.tipo}
+                </span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13 }}>{a.descripcion}</div>
                   <div style={{ fontSize: 11, color: '#6B6B8A' }}>
@@ -1909,8 +2119,10 @@ function LegajoAlumno({
       </div>
 
       {/* Documentación */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Documentación del legajo</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Documentación del legajo
+        </div>
         <form
           onSubmit={subirDocumento}
           style={{
@@ -1922,18 +2134,22 @@ function LegajoAlumno({
           }}
         >
           <div style={{ flex: '1 1 200px' }}>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre del documento</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Nombre del documento
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
               value={docNombre}
               placeholder='Ej: DNI frente y dorso'
               onChange={(e) => setDocNombre(e.target.value)}
             />
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Tipo
+            </span>
             <select
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none w-[220px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none w-[220px]'
               value={docTipo}
               onChange={(e) => setDocTipo(e.target.value)}
             >
@@ -1945,17 +2161,23 @@ function LegajoAlumno({
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Archivo</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Archivo
+            </span>
             <input
               type='file'
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border !p-[7px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border !p-[7px]'
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </div>
           <button
             type='submit'
             disabled={subiendo}
-            className={subiendo ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
+            className={
+              subiendo
+                ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+            }
           >
             {subiendo ? 'Subiendo...' : 'Subir documento'}
           </button>
@@ -1975,34 +2197,46 @@ function LegajoAlumno({
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Documento</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tipo</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Documento
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Tipo
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {documentos.map((d) => (
               <tr key={d.id_documento}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{d.nombre}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                  <span className="inline-block bg-[#2980B91A] text-blue rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{d.tipo ?? 'Documento'}</span>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                  {d.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  <span className='inline-block bg-[#2980B91A] text-blue rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                    {d.tipo ?? 'Documento'}
+                  </span>
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
                   {new Date(d.fecha_carga).toLocaleDateString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <a
                       href={d.url_archivo}
                       target='_blank'
                       rel='noreferrer'
-                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[12px] !text-xs no-underline"
+                      className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[12px] !text-xs no-underline'
                     >
                       Ver
                     </a>
                     <button
-                      className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                      className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                       onClick={() => eliminarDocumento(d)}
                     >
                       Eliminar
@@ -2013,7 +2247,10 @@ function LegajoAlumno({
             ))}
             {documentos.length === 0 && (
               <tr>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={4}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                  colSpan={4}
+                >
                   Sin documentación cargada.
                 </td>
               </tr>
@@ -2046,34 +2283,44 @@ function GestionDocentes() {
       <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
         👨‍🏫 Docentes
       </h2>
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-3">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-3'>
         <p style={{ fontSize: 13, color: '#6B6B8A', margin: 0 }}>
           Para agregar docentes, primero creá el usuario desde{' '}
           <strong>Usuarios</strong> con rol <strong>Docente</strong>. El
           registro en esta tabla se crea automáticamente.
         </p>
       </div>
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Docente</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Email</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Especialidad</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Docente
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Email
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Especialidad
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
             </tr>
           </thead>
           <tbody>
             {docentes.map((d) => (
               <tr key={d.id_docente}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {d.usuarios?.apellido}, {d.usuarios?.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {d.usuarios?.email}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{d.especialidad ?? '—'}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {d.especialidad ?? '—'}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(d.activo ? '#27AE60' : '#E74C3C')}>
                     {d.activo ? 'Activo' : 'Inactivo'}
                   </span>
@@ -2154,14 +2401,19 @@ function GestionCursos() {
         }}
       >
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🏫 Cursos</h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Nuevo curso'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">Crear curso</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Crear curso
+          </div>
           <form
             onSubmit={handleCreate}
             style={{
@@ -2171,9 +2423,11 @@ function GestionCursos() {
             }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nivel</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Nivel
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 value={form.nivel}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, nivel: e.target.value }))
@@ -2185,9 +2439,11 @@ function GestionCursos() {
               </select>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Grado / Año</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Grado / Año
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.grado_anio}
                 placeholder='1er Grado'
@@ -2197,9 +2453,11 @@ function GestionCursos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">División</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                División
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.division}
                 placeholder='A'
@@ -2209,10 +2467,12 @@ function GestionCursos() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Capacidad máx.</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Capacidad máx.
+              </span>
               <input
                 type='number'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.capacidad_maxima}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, capacidad_maxima: e.target.value }))
@@ -2223,7 +2483,11 @@ function GestionCursos() {
               <button
                 type='submit'
                 disabled={loading}
-                className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
+                className={
+                  loading
+                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                }
               >
                 {loading ? 'Guardando...' : 'Crear curso'}
               </button>
@@ -2244,20 +2508,28 @@ function GestionCursos() {
         </div>
       )}
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nivel</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Grado / Año</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">División</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Capacidad</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Nivel
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Grado / Año
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                División
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Capacidad
+              </th>
             </tr>
           </thead>
           <tbody>
             {cursos.map((c) => (
               <tr key={c.id_curso}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span
                     style={badge(
                       c.nivel === 'Inicial'
@@ -2270,9 +2542,13 @@ function GestionCursos() {
                     {c.nivel}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{c.grado_anio}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">División {c.division}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                  {c.grado_anio}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  División {c.division}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {c.capacidad_maxima} alumnos
                 </td>
               </tr>
@@ -2331,20 +2607,25 @@ function GestionMaterias() {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           📚 Materias
         </h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Nueva materia'}
         </button>
       </div>
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
           <form
             onSubmit={handleCreate}
             style={{ display: 'flex', gap: 14, alignItems: 'flex-end' }}
           >
             <div style={{ flex: 2 }}>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre de la materia</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Nombre de la materia
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.nombre}
                 onChange={(e) =>
@@ -2353,17 +2634,22 @@ function GestionMaterias() {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Horas semanales</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Horas semanales
+              </span>
               <input
                 type='number'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.horas_semanales}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, horas_semanales: e.target.value }))
                 }
               />
             </div>
-            <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+            <button
+              type='submit'
+              className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+            >
               Guardar
             </button>
           </form>
@@ -2381,21 +2667,31 @@ function GestionMaterias() {
           )}
         </div>
       )}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Materia</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Horas semanales</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Materia
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Horas semanales
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
             </tr>
           </thead>
           <tbody>
             {materias.map((m) => (
               <tr key={m.id_materia}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{m.nombre}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{m.horas_semanales} hs</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                  {m.nombre}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {m.horas_semanales} hs
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(m.activo ? '#27AE60' : '#E74C3C')}>
                     {m.activo ? 'Activa' : 'Inactiva'}
                   </span>
@@ -2488,13 +2784,18 @@ function GestionAsignaciones() {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           🔗 Asignaciones
         </h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Nueva asignación'}
         </button>
       </div>
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">Asignar docente a materia y curso</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Asignar docente a materia y curso
+          </div>
           <form
             onSubmit={handleCreate}
             style={{
@@ -2504,9 +2805,11 @@ function GestionAsignaciones() {
             }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Docente</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Docente
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 required
                 value={form.id_docente}
                 onChange={(e) =>
@@ -2522,9 +2825,11 @@ function GestionAsignaciones() {
               </select>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Materia</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Materia
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 required
                 value={form.id_materia}
                 onChange={(e) =>
@@ -2540,9 +2845,11 @@ function GestionAsignaciones() {
               </select>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Curso</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Curso
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 required
                 value={form.id_curso}
                 onChange={(e) =>
@@ -2558,7 +2865,10 @@ function GestionAsignaciones() {
               </select>
             </div>
             <div style={{ gridColumn: '1/-1' }}>
-              <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+              <button
+                type='submit'
+                className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+              >
                 Crear asignación
               </button>
             </div>
@@ -2577,24 +2887,32 @@ function GestionAsignaciones() {
           </form>
         </div>
       )}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Docente</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Materia</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Curso</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Docente
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Materia
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Curso
+              </th>
             </tr>
           </thead>
           <tbody>
             {asignaciones.map((a) => (
               <tr key={a.id_asignacion}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {a.docentes?.usuarios?.apellido},{' '}
                   {a.docentes?.usuarios?.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{a.materias?.nombre}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {a.materias?.nombre}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   {a.cursos?.nivel} — {a.cursos?.grado_anio} "
                   {a.cursos?.division}"
                 </td>
@@ -2784,8 +3102,8 @@ function GestionCuotas() {
       </h2>
 
       {/* Generador */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-        <div className="text-[15px] font-extrabold text-text mb-5">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
           Generar cuotas automáticamente para todos los alumnos
         </div>
         <form
@@ -2798,9 +3116,11 @@ function GestionCuotas() {
           }}
         >
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Mes</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Mes
+            </span>
             <select
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px] appearance-none"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px] appearance-none'
               value={form.mes}
               onChange={(e) => setForm((p) => ({ ...p, mes: e.target.value }))}
             >
@@ -2812,18 +3132,22 @@ function GestionCuotas() {
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Año</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Año
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[100px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[100px]'
               value={form.anio}
               onChange={(e) => setForm((p) => ({ ...p, anio: e.target.value }))}
             />
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Monto base ($)</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Monto base ($)
+            </span>
             <input
               type='number'
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px]'
               required
               value={form.monto_base}
               onChange={(e) =>
@@ -2835,7 +3159,11 @@ function GestionCuotas() {
           <button
             type='submit'
             disabled={loading}
-            className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
+            className={
+              loading
+                ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+            }
           >
             {loading ? 'Generando...' : '⚡ Generar cuotas'}
           </button>
@@ -2843,7 +3171,7 @@ function GestionCuotas() {
             type='button'
             disabled={loading}
             onClick={procesarVencimientos}
-            className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"
+            className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
             title='Marca como vencidas las cuotas impagas pasadas de fecha y notifica a las familias'
           >
             ⏰ Procesar vencimientos
@@ -2864,18 +3192,34 @@ function GestionCuotas() {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Últimas cuotas generadas</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Últimas cuotas generadas
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Período</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Monto base</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descuento beca</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Neto a pagar</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Vencimiento</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Alumno
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Período
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Monto base
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Descuento beca
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Neto a pagar
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Vencimiento
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -2883,25 +3227,28 @@ function GestionCuotas() {
               const desc = c.descuento ?? 0
               return (
                 <tr key={c.id_cuota}>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                     {c.alumnos?.apellido}, {c.alumnos?.nombre}
                   </td>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                     {MESES[c.mes - 1]} {c.anio}
                   </td>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                     ${c.monto_base.toLocaleString('es-AR')}
                   </td>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle" style={{ color: desc > 0 ? '#27AE60' : '#6B6B8A' }}>
+                  <td
+                    className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'
+                    style={{ color: desc > 0 ? '#27AE60' : '#6B6B8A' }}
+                  >
                     {desc > 0 ? `– $${desc.toLocaleString('es-AR')}` : '—'}
                   </td>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700'>
                     ${(c.monto_base - desc).toLocaleString('es-AR')}
                   </td>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                     {c.fecha_vencimiento}
                   </td>
-                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                     <span style={badge(CUOTA_COLOR[c.estado] ?? '#6B6B8A')}>
                       {c.estado}
                     </span>
@@ -2980,7 +3327,9 @@ function RegistrarPagos() {
     if (error) {
       setMsg('❌ Error al registrar: ' + error.message)
     } else {
-      setMsg(`✅ Pago de ${c.alumnos?.apellido}, ${c.alumnos?.nombre} registrado correctamente.`)
+      setMsg(
+        `✅ Pago de ${c.alumnos?.apellido}, ${c.alumnos?.nombre} registrado correctamente.`,
+      )
       setSelCuota(null)
       load()
     }
@@ -3003,46 +3352,58 @@ function RegistrarPagos() {
   )
 
   return (
-    <div className="flex flex-col gap-6">
-      <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>💰 Registro de pagos</h2>
+    <div className='flex flex-col gap-6'>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
+        💰 Registro de pagos
+      </h2>
 
       {/* Filtros */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="flex-1" style={{ minWidth: 200 }}>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Buscar alumno</span>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='flex flex-wrap gap-4 items-end'>
+          <div className='flex-1' style={{ minWidth: 200 }}>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Buscar alumno
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
-              placeholder="Apellido o nombre..."
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
+              placeholder='Apellido o nombre...'
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Mes</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Mes
+            </span>
             <select
-              className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+              className='px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
               value={filtroMes}
               onChange={(e) => setFiltroMes(e.target.value)}
             >
               <option value=''>Todos</option>
               {MESES.map((m, i) => (
-                <option key={i} value={i + 1}>{m}</option>
+                <option key={i} value={i + 1}>
+                  {m}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Año</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Año
+            </span>
             <input
-              className="w-[90px] px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              className='w-[90px] px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
               value={filtroAnio}
               onChange={(e) => setFiltroAnio(e.target.value)}
             />
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Estado</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Estado
+            </span>
             <select
-              className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+              className='px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
               value={filtroEstado}
               onChange={(e) => setFiltroEstado(e.target.value)}
             >
@@ -3056,22 +3417,41 @@ function RegistrarPagos() {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className='grid grid-cols-3 gap-4'>
         {[
-          { label: 'Total pendiente', value: `$${totalPendiente.toLocaleString('es-AR')}`, color: '#5B35C5' },
-          { label: 'Cuotas sin pagar', value: cuotasFiltradas.length, color: '#E67E22' },
-          { label: 'Vencidas', value: cuotasFiltradas.filter(c => c.estado === 'Vencida' || c.estado === 'En mora').length, color: '#E74C3C' },
+          {
+            label: 'Total pendiente',
+            value: `$${totalPendiente.toLocaleString('es-AR')}`,
+            color: '#5B35C5',
+          },
+          {
+            label: 'Cuotas sin pagar',
+            value: cuotasFiltradas.length,
+            color: '#E67E22',
+          },
+          {
+            label: 'Vencidas',
+            value: cuotasFiltradas.filter(
+              (c) => c.estado === 'Vencida' || c.estado === 'En mora',
+            ).length,
+            color: '#E74C3C',
+          },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-card p-6 shadow-card border border-border text-center">
-            <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.value}</div>
-            <div className="text-[12px] text-textMuted mt-1">{s.label}</div>
+          <div
+            key={s.label}
+            className='bg-white rounded-card p-6 shadow-card border border-border text-center'
+          >
+            <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>
+              {s.value}
+            </div>
+            <div className='text-[12px] text-textMuted mt-1'>{s.label}</div>
           </div>
         ))}
       </div>
 
       {msg && (
         <div
-          className="text-[13px] font-bold px-4 py-3 rounded-lg border"
+          className='text-[13px] font-bold px-4 py-3 rounded-lg border'
           style={{
             color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
             background: msg.startsWith('✅') ? '#27AE6012' : '#E74C3C12',
@@ -3083,30 +3463,43 @@ function RegistrarPagos() {
       )}
 
       {/* Tabla */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
           Cuotas pendientes de pago
           {cuotasFiltradas.length > 0 && (
-            <span className="ml-2 text-[12px] font-bold text-textMuted">
-              ({cuotasFiltradas.length} resultado{cuotasFiltradas.length !== 1 ? 's' : ''})
+            <span className='ml-2 text-[12px] font-bold text-textMuted'>
+              ({cuotasFiltradas.length} resultado
+              {cuotasFiltradas.length !== 1 ? 's' : ''})
             </span>
           )}
         </div>
 
         {cuotasFiltradas.length === 0 ? (
-          <div className="text-center text-textMuted py-10 text-[14px]">
+          <div className='text-center text-textMuted py-10 text-[14px]'>
             🎉 No hay cuotas pendientes con los filtros seleccionados.
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Período</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Neto a pagar</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Vencimiento</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Alumno
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Período
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Neto a pagar
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Vencimiento
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Estado
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Acción
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -3117,32 +3510,32 @@ function RegistrarPagos() {
                 return (
                   <>
                     <tr key={c.id_cuota}>
-                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                      <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                         {c.alumnos?.apellido}, {c.alumnos?.nombre}
                       </td>
-                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                      <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                         {MESES[c.mes - 1]} {c.anio}
                       </td>
-                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
+                      <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700'>
                         ${neto.toLocaleString('es-AR')}
                       </td>
-                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                      <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                         {c.fecha_vencimiento}
                       </td>
-                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                      <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                         <span style={badge(color)}>{c.estado}</span>
                       </td>
-                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                      <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                         {isSelected ? (
                           <button
-                            className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                            className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                             onClick={() => setSelCuota(null)}
                           >
                             Cancelar
                           </button>
                         ) : (
                           <button
-                            className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                            className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                             onClick={() => {
                               setSelCuota(c.id_cuota)
                               setMsg('')
@@ -3155,40 +3548,68 @@ function RegistrarPagos() {
                     </tr>
                     {isSelected && (
                       <tr key={`pago-${c.id_cuota}`}>
-                        <td colSpan={6} className="bg-purpleLight border-b border-border py-4 px-4">
-                          <div className="flex items-center gap-4 flex-wrap">
+                        <td
+                          colSpan={6}
+                          className='bg-purpleLight border-b border-border py-4 px-4'
+                        >
+                          <div className='flex items-center gap-4 flex-wrap'>
                             <div>
-                              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de pago</span>
+                              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                                Fecha de pago
+                              </span>
                               <input
                                 type='date'
-                                className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                                className='px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                                 value={formPago.fecha_pago}
-                                onChange={(e) => setFormPago((p) => ({ ...p, fecha_pago: e.target.value }))}
+                                onChange={(e) =>
+                                  setFormPago((p) => ({
+                                    ...p,
+                                    fecha_pago: e.target.value,
+                                  }))
+                                }
                               />
                             </div>
                             <div>
-                              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Método de pago</span>
+                              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                                Método de pago
+                              </span>
                               <select
-                                className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                                className='px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                                 value={formPago.metodo_pago}
-                                onChange={(e) => setFormPago((p) => ({ ...p, metodo_pago: e.target.value }))}
+                                onChange={(e) =>
+                                  setFormPago((p) => ({
+                                    ...p,
+                                    metodo_pago: e.target.value,
+                                  }))
+                                }
                               >
                                 {METODOS_PAGO.map((m) => (
-                                  <option key={m} value={m}>{m}</option>
+                                  <option key={m} value={m}>
+                                    {m}
+                                  </option>
                                 ))}
                               </select>
                             </div>
-                            <div className="flex items-end">
+                            <div className='flex items-end'>
                               <button
                                 disabled={loading}
-                                className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'}
+                                className={
+                                  loading
+                                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                                }
                                 onClick={() => registrarPago(c)}
                               >
                                 {loading ? 'Guardando...' : '✅ Confirmar pago'}
                               </button>
                             </div>
-                            <div className="text-[12px] text-textMuted self-end pb-[10px]">
-                              Alumno: <strong>{c.alumnos?.apellido}, {c.alumnos?.nombre}</strong> · Neto: <strong>${neto.toLocaleString('es-AR')}</strong>
+                            <div className='text-[12px] text-textMuted self-end pb-[10px]'>
+                              Alumno:{' '}
+                              <strong>
+                                {c.alumnos?.apellido}, {c.alumnos?.nombre}
+                              </strong>{' '}
+                              · Neto:{' '}
+                              <strong>${neto.toLocaleString('es-AR')}</strong>
                             </div>
                           </div>
                         </td>
@@ -3227,7 +3648,9 @@ function GestionBecas() {
 
     const { data: al } = await supabase
       .from('alumnos')
-      .select('id_alumno, nombre, apellido, dni, activo, cursos(nivel, grado_anio, division)')
+      .select(
+        'id_alumno, nombre, apellido, dni, activo, cursos(nivel, grado_anio, division)',
+      )
       .eq('activo', true)
       .order('apellido', { ascending: true })
     if (al) setAlumnos(al as unknown as Alumno[])
@@ -3283,16 +3706,25 @@ function GestionBecas() {
         🎟️ Becas
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-        <div className="text-[15px] font-extrabold text-text mb-5">Otorgar / actualizar beca</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Otorgar / actualizar beca
+        </div>
         <form
           onSubmit={guardar}
-          style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}
+          style={{
+            display: 'flex',
+            gap: 14,
+            alignItems: 'flex-end',
+            flexWrap: 'wrap',
+          }}
         >
           <div style={{ flex: '1 1 240px' }}>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Alumno</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Alumno
+            </span>
             <select
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
               required
               value={form.id_alumno}
               onChange={(e) =>
@@ -3308,9 +3740,11 @@ function GestionBecas() {
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descuento (%)</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Descuento (%)
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[130px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[130px]'
               type='number'
               min={1}
               max={100}
@@ -3322,9 +3756,11 @@ function GestionBecas() {
             />
           </div>
           <div style={{ flex: '1 1 200px' }}>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Motivo (opcional)</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Motivo (opcional)
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
               value={form.motivo}
               placeholder='Ej: beca por hermanos'
               onChange={(e) =>
@@ -3332,12 +3768,22 @@ function GestionBecas() {
               }
             />
           </div>
-          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+          <button
+            type='submit'
+            className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          >
             Guardar beca
           </button>
         </form>
         {msg && (
-          <div style={{ marginTop: 12, fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
+          <div
+            style={{
+              marginTop: 12,
+              fontSize: 12,
+              color: '#E74C3C',
+              fontWeight: 700,
+            }}
+          >
             {msg}
           </div>
         )}
@@ -3346,44 +3792,61 @@ function GestionBecas() {
         </div>
       </div>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Becas otorgadas</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Becas otorgadas
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descuento</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Motivo</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Alumno
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Descuento
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Motivo
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {becas.map((b) => (
               <tr key={b.id_beca}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {b.alumnos?.apellido}, {b.alumnos?.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                  <span className="inline-block bg-[#27AE601A] text-green rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{b.porcentaje}%</span>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  <span className='inline-block bg-[#27AE601A] text-green rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                    {b.porcentaje}%
+                  </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {b.motivo ?? '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(b.activo ? '#27AE60' : '#6B6B8A')}>
                     {b.activo ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
-                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
+                      className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs'
                       onClick={() => toggleActivo(b)}
                     >
                       {b.activo ? 'Desactivar' : 'Activar'}
                     </button>
-                    <button className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer" onClick={() => eliminar(b.id_beca)}>
+                    <button
+                      className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      onClick={() => eliminar(b.id_beca)}
+                    >
                       Eliminar
                     </button>
                   </div>
@@ -3392,7 +3855,10 @@ function GestionBecas() {
             ))}
             {becas.length === 0 && (
               <tr>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={5}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                  colSpan={5}
+                >
                   No hay becas otorgadas.
                 </td>
               </tr>
@@ -3475,16 +3941,25 @@ function GestionSueldos() {
         💼 Sueldos del personal
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-        <div className="text-[15px] font-extrabold text-text mb-5">Registrar pago de sueldo</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Registrar pago de sueldo
+        </div>
         <form
           onSubmit={registrar}
-          style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}
+          style={{
+            display: 'flex',
+            gap: 14,
+            alignItems: 'flex-end',
+            flexWrap: 'wrap',
+          }}
         >
           <div style={{ flex: '1 1 240px' }}>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Personal</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Personal
+            </span>
             <select
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
               required
               value={form.id_usuario}
               onChange={(e) =>
@@ -3500,9 +3975,11 @@ function GestionSueldos() {
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Mes</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Mes
+            </span>
             <select
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[150px] appearance-none"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[150px] appearance-none'
               value={form.mes}
               onChange={(e) => setForm((p) => ({ ...p, mes: e.target.value }))}
             >
@@ -3514,52 +3991,82 @@ function GestionSueldos() {
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Año</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Año
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[100px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[100px]'
               value={form.anio}
               onChange={(e) => setForm((p) => ({ ...p, anio: e.target.value }))}
             />
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Monto ($)</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Monto ($)
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[150px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[150px]'
               type='number'
               required
               value={form.monto}
-              onChange={(e) => setForm((p) => ({ ...p, monto: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, monto: e.target.value }))
+              }
               placeholder='350000'
             />
           </div>
-          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+          <button
+            type='submit'
+            className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          >
             Registrar
           </button>
         </form>
         {msg && (
-          <div style={{ marginTop: 12, fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
+          <div
+            style={{
+              marginTop: 12,
+              fontSize: 12,
+              color: '#E74C3C',
+              fontWeight: 700,
+            }}
+          >
             {msg}
           </div>
         )}
       </div>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Sueldos registrados</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Sueldos registrados
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Personal</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Período</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Monto</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Pagado el</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Personal
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Período
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Monto
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Pagado el
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {sueldos.map((s) => (
               <tr key={s.id_sueldo}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {s.usuarios
                     ? `${s.usuarios.apellido}, ${s.usuarios.nombre}`
                     : '—'}
@@ -3572,26 +4079,26 @@ function GestionSueldos() {
                     </>
                   )}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   {MESES[s.mes - 1]} {s.anio}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700'>
                   ${Number(s.monto).toLocaleString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span
                     style={badge(s.estado === 'Pagado' ? '#27AE60' : '#E67E22')}
                   >
                     {s.estado}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
                   {s.fecha_pago ?? '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   {s.estado !== 'Pagado' && (
                     <button
-                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
+                      className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs'
                       onClick={() => marcarPagado(s.id_sueldo)}
                     >
                       Marcar pagado
@@ -3602,7 +4109,10 @@ function GestionSueldos() {
             ))}
             {sueldos.length === 0 && (
               <tr>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={6}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                  colSpan={6}
+                >
                   No hay sueldos registrados.
                 </td>
               </tr>
@@ -3682,8 +4192,10 @@ function GestionCompras() {
         🧪 Compras de insumos
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-        <div className="text-[15px] font-extrabold text-text mb-5">Registrar compra</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Registrar compra
+        </div>
         <form
           onSubmit={registrar}
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
@@ -3696,9 +4208,11 @@ function GestionCompras() {
             }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Descripción
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.descripcion}
                 placeholder='Ej: 10 tubos de ensayo'
@@ -3708,9 +4222,11 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Destino</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Destino
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 value={form.destino}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, destino: e.target.value }))
@@ -3732,9 +4248,11 @@ function GestionCompras() {
             }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Cantidad</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Cantidad
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 type='number'
                 min={1}
                 required
@@ -3745,9 +4263,11 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Monto total ($)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Monto total ($)
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 type='number'
                 required
                 value={form.monto}
@@ -3757,9 +4277,11 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Proveedor (opcional)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Proveedor (opcional)
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.proveedor}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, proveedor: e.target.value }))
@@ -3767,9 +4289,11 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Fecha
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 type='date'
                 value={form.fecha_compra}
                 onChange={(e) =>
@@ -3783,13 +4307,16 @@ function GestionCompras() {
               {msg}
             </div>
           )}
-          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start">
+          <button
+            type='submit'
+            className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start'
+          >
             Registrar compra
           </button>
         </form>
       </div>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <div
           style={{
             display: 'flex',
@@ -3798,45 +4325,65 @@ function GestionCompras() {
             marginBottom: 20,
           }}
         >
-          <div className="text-[15px] font-extrabold text-text mb-0">
+          <div className='text-[15px] font-extrabold text-text mb-0'>
             Compras registradas
           </div>
-          <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">
+          <span className='inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
             Total: ${totalGastado.toLocaleString('es-AR')}
           </span>
         </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descripción</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Destino</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Cant.</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Monto</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Proveedor</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Descripción
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Destino
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Cant.
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Monto
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Proveedor
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {compras.map((c) => (
               <tr key={c.id_compra}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{c.descripcion}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                  <span className="inline-block bg-[#2980B91A] text-blue rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{c.destino}</span>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                  {c.descripcion}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{c.cantidad}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  <span className='inline-block bg-[#2980B91A] text-blue rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                    {c.destino}
+                  </span>
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {c.cantidad}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700'>
                   ${Number(c.monto).toLocaleString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {c.proveedor ?? '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
                   {c.fecha_compra}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <button
-                    className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                    className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                     onClick={() => eliminar(c.id_compra)}
                   >
                     Eliminar
@@ -3846,7 +4393,10 @@ function GestionCompras() {
             ))}
             {compras.length === 0 && (
               <tr>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={7}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                  colSpan={7}
+                >
                   No hay compras registradas.
                 </td>
               </tr>
@@ -3908,22 +4458,34 @@ function GestionInscripciones({
       <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
         📋 Inscripciones
       </h2>
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Aspirante</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tutor</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nivel</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Aspirante
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Tutor
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Nivel
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {inscripciones.map((i) => (
               <tr key={i.id_inscripcion}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {i.nombre_aspirante} {i.apellido_aspirante ?? ''}
                   <br />
                   <span style={{ fontSize: 11, color: '#6B6B8A' }}>
@@ -3934,25 +4496,27 @@ function GestionInscripciones({
                       ).toLocaleDateString('es-AR')}`}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   {i.nombre_tutor}
                   <br />
                   <span style={{ fontSize: 11, color: '#6B6B8A' }}>
                     {i.email_tutor}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                  <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{i.nivel_solicitado}</span>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  <span className='inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                    {i.nivel_solicitado}
+                  </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
                   {new Date(i.fecha_solicitud).toLocaleDateString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(EST_COLOR[i.estado] ?? '#6B6B8A')}>
                     {i.estado}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <div
                     style={{
                       display: 'flex',
@@ -3961,7 +4525,7 @@ function GestionInscripciones({
                     }}
                   >
                     <select
-                      className="rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px] px-[10px] py-[6px] appearance-none"
+                      className='rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px] px-[10px] py-[6px] appearance-none'
                       value={i.estado}
                       onChange={(e) =>
                         cambiarEstado(i.id_inscripcion, e.target.value)
@@ -3974,7 +4538,7 @@ function GestionInscripciones({
                       ))}
                     </select>
                     <button
-                      className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer"
+                      className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer'
                       onClick={() => {
                         const partes = i.nombre_tutor.trim().split(/\s+/)
                         onRegistrar({
@@ -3987,7 +4551,8 @@ function GestionInscripciones({
                             nombre: i.nombre_aspirante,
                             apellido: i.apellido_aspirante ?? '',
                             dni: i.dni_aspirante,
-                            fecha_nacimiento: i.fecha_nacimiento_aspirante ?? '',
+                            fecha_nacimiento:
+                              i.fecha_nacimiento_aspirante ?? '',
                           },
                         })
                       }}
@@ -4070,9 +4635,7 @@ function GestionActividades() {
           .from('actividades_extracurriculares')
           .update(payload)
           .eq('id_actividad', editId)
-      : await supabase
-          .from('actividades_extracurriculares')
-          .insert([payload])
+      : await supabase.from('actividades_extracurriculares').insert([payload])
     if (error) setMsg('Error: ' + error.message)
     else {
       setShowForm(false)
@@ -4092,16 +4655,26 @@ function GestionActividades() {
   const deportes = actividades.filter((a) => a.tipo === 'Deporte')
 
   const renderGrupo = (titulo: string, items: ActividadEx[]) => (
-    <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-      <div className="text-[15px] font-extrabold text-text mb-5">{titulo}</div>
+    <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+      <div className='text-[15px] font-extrabold text-text mb-5'>{titulo}</div>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Actividad</th>
-            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Cupo</th>
-            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Inscriptos</th>
-            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+            <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+              Actividad
+            </th>
+            <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+              Cupo
+            </th>
+            <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+              Inscriptos
+            </th>
+            <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+              Estado
+            </th>
+            <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+              Acción
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -4110,7 +4683,7 @@ function GestionActividades() {
             const completo = ocupados >= a.cupo_maximo
             return (
               <tr key={a.id_actividad}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {a.nombre}
                   {a.descripcion && (
                     <>
@@ -4121,32 +4694,38 @@ function GestionActividades() {
                     </>
                   )}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{a.cupo_maximo}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {a.cupo_maximo}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span
                     style={badge(
-                      completo ? '#E74C3C' : ocupados > 0 ? '#27AE60' : '#6B6B8A',
+                      completo
+                        ? '#E74C3C'
+                        : ocupados > 0
+                          ? '#27AE60'
+                          : '#6B6B8A',
                     )}
                   >
                     {ocupados} / {a.cupo_maximo}
                     {completo ? ' · COMPLETO' : ''}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(a.activo ? '#27AE60' : '#6B6B8A')}>
                     {a.activo ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
-                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
+                      className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs'
                       onClick={() => abrirEdicion(a)}
                     >
                       Editar
                     </button>
                     <button
-                      className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                      className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                       onClick={() => toggleActivo(a)}
                     >
                       {a.activo ? 'Desactivar' : 'Activar'}
@@ -4158,7 +4737,10 @@ function GestionActividades() {
           })}
           {items.length === 0 && (
             <tr>
-              <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={5}>
+              <td
+                className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                colSpan={5}
+              >
                 Sin actividades cargadas.
               </td>
             </tr>
@@ -4181,25 +4763,36 @@ function GestionActividades() {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           🎨 Actividades extracurriculares
         </h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={abrirNueva}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={abrirNueva}
+        >
           + Nueva actividad
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
             {editId ? 'Editar actividad' : 'Nueva actividad'}
           </div>
           <form
             onSubmit={guardar}
             style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
           >
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 14 }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr',
+                gap: 14,
+              }}
+            >
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Nombre
+                </span>
                 <input
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                   required
                   value={form.nombre}
                   onChange={(e) =>
@@ -4208,9 +4801,11 @@ function GestionActividades() {
                 />
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Tipo
+                </span>
                 <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                   value={form.tipo}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, tipo: e.target.value }))
@@ -4221,9 +4816,11 @@ function GestionActividades() {
                 </select>
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Cupo máximo</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Cupo máximo
+                </span>
                 <input
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                   type='number'
                   min={1}
                   required
@@ -4238,9 +4835,11 @@ function GestionActividades() {
               </div>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción (opcional)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Descripción (opcional)
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.descripcion}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, descripcion: e.target.value }))
@@ -4253,12 +4852,15 @@ function GestionActividades() {
               </div>
             )}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+              <button
+                type='submit'
+                className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+              >
                 {editId ? 'Guardar cambios' : 'Crear actividad'}
               </button>
               <button
                 type='button'
-                className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"
+                className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
                 onClick={() => setShowForm(false)}
               >
                 Cancelar
@@ -4343,10 +4945,7 @@ function GestionReservas({ userId }: { userId: string }) {
   }
 
   const eliminar = async (id: number) => {
-    await supabase
-      .from('reservas_instalaciones')
-      .delete()
-      .eq('id_reserva', id)
+    await supabase.from('reservas_instalaciones').delete().eq('id_reserva', id)
     load()
   }
 
@@ -4356,8 +4955,10 @@ function GestionReservas({ userId }: { userId: string }) {
         🏟️ Reservas de instalaciones
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-        <div className="text-[15px] font-extrabold text-text mb-5">Nueva reserva</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Nueva reserva
+        </div>
         <form
           onSubmit={crear}
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
@@ -4370,9 +4971,11 @@ function GestionReservas({ userId }: { userId: string }) {
             }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Instalación</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Instalación
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 required
                 value={form.id_instalacion}
                 onChange={(e) =>
@@ -4388,9 +4991,11 @@ function GestionReservas({ userId }: { userId: string }) {
               </select>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Fecha
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 type='date'
                 required
                 min={hoy}
@@ -4401,9 +5006,11 @@ function GestionReservas({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Hora inicio</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Hora inicio
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 type='time'
                 required
                 value={form.hora_inicio}
@@ -4413,9 +5020,11 @@ function GestionReservas({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Hora fin</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Hora fin
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 type='time'
                 required
                 value={form.hora_fin}
@@ -4426,9 +5035,11 @@ function GestionReservas({ userId }: { userId: string }) {
             </div>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Motivo (opcional)</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Motivo (opcional)
+            </span>
             <input
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
               value={form.motivo}
               placeholder='Ej: entrenamiento de natación'
               onChange={(e) =>
@@ -4441,48 +5052,65 @@ function GestionReservas({ userId }: { userId: string }) {
               {msg}
             </div>
           )}
-          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start">
+          <button
+            type='submit'
+            className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start'
+          >
             Reservar
           </button>
         </form>
       </div>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Próximas reservas</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Próximas reservas
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Instalación</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Horario</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Motivo</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Reservó</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Instalación
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Horario
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Motivo
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Reservó
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {reservas.map((r) => (
               <tr key={r.id_reserva}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {r.instalaciones?.nombre ?? '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   {new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   {r.hora_inicio.slice(0, 5)} – {r.hora_fin.slice(0, 5)}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {r.motivo ?? '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
                   {r.usuarios
                     ? `${r.usuarios.nombre} ${r.usuarios.apellido}`
                     : '—'}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <button
-                    className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                    className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                     onClick={() => eliminar(r.id_reserva)}
                   >
                     Cancelar
@@ -4492,7 +5120,10 @@ function GestionReservas({ userId }: { userId: string }) {
             ))}
             {reservas.length === 0 && (
               <tr>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={6}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'
+                  colSpan={6}
+                >
                   No hay reservas próximas.
                 </td>
               </tr>
@@ -4543,7 +5174,7 @@ function GestionMensajes() {
           </span>
         )}
       </h2>
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         {mensajes.length === 0 ? (
           <div style={{ color: '#6B6B8A', fontSize: 13 }}>
             No hay mensajes recibidos.
@@ -4605,12 +5236,12 @@ function GestionMensajes() {
                     <div style={{ display: 'flex', gap: 8 }}>
                       <a
                         href={`mailto:${m.email}`}
-                        className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[14px] !text-xs no-underline"
+                        className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[14px] !text-xs no-underline'
                       >
                         Responder por correo
                       </a>
                       <button
-                        className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[14px] !text-xs"
+                        className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[14px] !text-xs'
                         onClick={() => marcarLeido(m.id_mensaje, !m.leido)}
                       >
                         {m.leido ? 'Marcar como no leído' : 'Marcar como leído'}
@@ -4710,22 +5341,29 @@ function GestionNoticias({ userId }: { userId: string }) {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           📰 Noticias
         </h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Nueva noticia'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">Publicar noticia</div>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Publicar noticia
+          </div>
           <form
             onSubmit={handleCreate}
             style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Título</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Título
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
                 value={form.titulo}
                 onChange={(e) =>
@@ -4734,9 +5372,11 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Resumen (opcional)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Resumen (opcional)
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.resumen}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, resumen: e.target.value }))
@@ -4744,9 +5384,11 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">URL de imagen (opcional)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                URL de imagen (opcional)
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.url_imagen}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, url_imagen: e.target.value }))
@@ -4755,9 +5397,11 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Contenido</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Contenido
+              </span>
               <textarea
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[120px] resize-y"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[120px] resize-y'
                 required
                 value={form.contenido}
                 onChange={(e) =>
@@ -4805,7 +5449,11 @@ function GestionNoticias({ userId }: { userId: string }) {
               <button
                 type='submit'
                 disabled={loading}
-                className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
+                className={
+                  loading
+                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                }
               >
                 {loading ? 'Publicando...' : 'Publicar'}
               </button>
@@ -4825,35 +5473,51 @@ function GestionNoticias({ userId }: { userId: string }) {
         </div>
       )}
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Título</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Destacada</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Título
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Destacada
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acción
+              </th>
             </tr>
           </thead>
           <tbody>
             {noticias.map((n) => (
               <tr key={n.id_noticia}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold max-w-[300px]">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold max-w-[300px]'>
                   {n.titulo}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {new Date(n.fecha_publicacion).toLocaleDateString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{n.destacada ? '⭐' : '—'}</td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  {n.destacada ? '⭐' : '—'}
+                </td>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(n.activo ? '#27AE60' : '#E74C3C')}>
                     {n.activo ? 'Publicada' : 'Oculta'}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <button
-                    className={n.activo ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
+                    className={
+                      n.activo
+                        ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                        : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                    }
                     onClick={() => toggleActivo(n.id_noticia, n.activo)}
                   >
                     {n.activo ? 'Ocultar' : 'Publicar'}
@@ -4991,7 +5655,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
         📅 Tomar asistencia
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
         <div
           style={{
             display: 'flex',
@@ -5001,9 +5665,11 @@ function TomarAsistencia({ userId }: { userId: string }) {
           }}
         >
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Clase / Materia</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Clase / Materia
+            </span>
             <select
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[280px] appearance-none"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[280px] appearance-none'
               value={selAsignacion ?? ''}
               onChange={(e) => setSelAsignacion(Number(e.target.value))}
             >
@@ -5017,10 +5683,12 @@ function TomarAsistencia({ userId }: { userId: string }) {
             </select>
           </div>
           <div>
-            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha</span>
+            <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+              Fecha
+            </span>
             <input
               type='date'
-              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px]"
+              className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px]'
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
             />
@@ -5029,7 +5697,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
       </div>
 
       {selAsignacion && alumnos.length > 0 && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className='bg-white rounded-card p-6 shadow-card border border-border'>
           <div
             style={{
               display: 'flex',
@@ -5038,7 +5706,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
               marginBottom: 16,
             }}
           >
-            <div className="text-[15px] font-extrabold text-text mb-5">
+            <div className='text-[15px] font-extrabold text-text mb-5'>
               {alumnos.length} alumnos — Tocá el estado para cambiar
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -5114,7 +5782,11 @@ function TomarAsistencia({ userId }: { userId: string }) {
             <button
               onClick={guardar}
               disabled={loading}
-              className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
+              className={
+                loading
+                  ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                  : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+              }
             >
               {loading ? 'Guardando...' : '💾 Guardar asistencia'}
             </button>
@@ -5134,7 +5806,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
       )}
 
       {selAsignacion && alumnos.length === 0 && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border text-center text-textMuted">
+        <div className='bg-white rounded-card p-6 shadow-card border border-border text-center text-textMuted'>
           No hay alumnos asignados a este curso.
         </div>
       )}
@@ -5231,9 +5903,7 @@ function CargarCalificaciones({ userId }: { userId: string }) {
     if (error) setMsg('Error: ' + error.message)
     else {
       // R6 · Notificación automática por publicación de calificación
-      const asig = asignaciones.find(
-        (a) => a.id_asignacion === selAsignacion,
-      )
+      const asig = asignaciones.find((a) => a.id_asignacion === selAsignacion)
       const materia = asig?.materias?.nombre ?? 'una materia'
       await notificarFamilias(
         [
@@ -5272,10 +5942,12 @@ function CargarCalificaciones({ userId }: { userId: string }) {
         📝 Calificaciones
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-        <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Clase / Materia</span>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+        <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+          Clase / Materia
+        </span>
         <select
-          className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none max-w-[360px]"
+          className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none max-w-[360px]'
           value={selAsignacion ?? ''}
           onChange={(e) => setSelAsig(Number(e.target.value))}
         >
@@ -5292,8 +5964,10 @@ function CargarCalificaciones({ userId }: { userId: string }) {
       {selAsignacion && (
         <>
           {/* Formulario */}
-          <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-            <div className="text-[15px] font-extrabold text-text mb-5">Cargar nota</div>
+          <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+            <div className='text-[15px] font-extrabold text-text mb-5'>
+              Cargar nota
+            </div>
             <form
               onSubmit={handleCargar}
               style={{
@@ -5303,9 +5977,11 @@ function CargarCalificaciones({ userId }: { userId: string }) {
               }}
             >
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Alumno</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Alumno
+                </span>
                 <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                   required
                   value={form.id_alumno}
                   onChange={(e) =>
@@ -5321,9 +5997,11 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 </select>
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Trimestre</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Trimestre
+                </span>
                 <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                   value={form.trimestre}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, trimestre: e.target.value }))
@@ -5335,9 +6013,11 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 </select>
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Tipo
+                </span>
                 <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                   value={form.tipo_evaluacion}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, tipo_evaluacion: e.target.value }))
@@ -5351,14 +6031,16 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 </select>
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nota (0–10)</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Nota (0–10)
+                </span>
                 <input
                   type='number'
                   min='0'
                   max='10'
                   step='0.25'
                   required
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                   value={form.nota}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, nota: e.target.value }))
@@ -5374,9 +6056,11 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción (opcional)</span>
+                  <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                    Descripción (opcional)
+                  </span>
                   <input
-                    className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                    className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                     value={form.descripcion}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, descripcion: e.target.value }))
@@ -5384,7 +6068,10 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                     placeholder='Ej: Primer parcial unidad 1'
                   />
                 </div>
-                <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+                <button
+                  type='submit'
+                  className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                >
                   Cargar nota
                 </button>
               </div>
@@ -5404,34 +6091,48 @@ function CargarCalificaciones({ userId }: { userId: string }) {
           </div>
 
           {/* Historial */}
-          <div className="bg-white rounded-card p-6 shadow-card border border-border">
-            <div className="text-[15px] font-extrabold text-text mb-5">Notas cargadas</div>
+          <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+            <div className='text-[15px] font-extrabold text-text mb-5'>
+              Notas cargadas
+            </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
-                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tipo</th>
-                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Trimestre</th>
-                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nota</th>
+                  <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                    Alumno
+                  </th>
+                  <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                    Tipo
+                  </th>
+                  <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                    Trimestre
+                  </th>
+                  <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                    Fecha
+                  </th>
+                  <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                    Nota
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {calificaciones.map((c) => (
                   <tr key={c.id_calificacion}>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                       {c.alumnos?.apellido}, {c.alumnos?.nombre}
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                      <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{c.tipo_evaluacion}</span>
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                      <span className='inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                        {c.tipo_evaluacion}
+                      </span>
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                       T{c.trimestre}
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                       {new Date(c.fecha_carga).toLocaleDateString('es-AR')}
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                       <div
                         style={{
                           width: 36,
@@ -5573,15 +6274,23 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
         ⚠️ Amonestaciones
       </h2>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
-        <div className="text-[15px] font-extrabold text-text mb-5">Registrar amonestación</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border mb-5'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Registrar amonestación
+        </div>
         <div style={{ marginBottom: 14 }}>
-          <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Seleccioná el curso</span>
+          <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+            Seleccioná el curso
+          </span>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {cursosUnicos.map((a) => (
               <button
                 key={(a.cursos as any)?.id_curso}
-                className={selCurso === (a.cursos as any)?.id_curso ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer' : 'bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'}
+                className={
+                  selCurso === (a.cursos as any)?.id_curso
+                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                    : 'bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                }
                 onClick={() => handleSelCurso((a.cursos as any)?.id_curso)}
               >
                 {a.cursos?.nivel} {a.cursos?.grado_anio} "{a.cursos?.division}"
@@ -5595,9 +6304,11 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
             style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14 }}
           >
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Alumno</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Alumno
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 required
                 value={form.id_alumno}
                 onChange={(e) =>
@@ -5613,9 +6324,11 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
               </select>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Tipo
+              </span>
               <select
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                 value={form.tipo}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, tipo: e.target.value }))
@@ -5627,9 +6340,11 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
               </select>
             </div>
             <div style={{ gridColumn: '1/-1' }}>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción del hecho</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Descripción del hecho
+              </span>
               <textarea
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y'
                 required
                 value={form.descripcion}
                 onChange={(e) =>
@@ -5645,7 +6360,10 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
                 gap: 14,
               }}
             >
-              <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
+              <button
+                type='submit'
+                className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+              >
                 Registrar amonestación
               </button>
               {msg && (
@@ -5664,32 +6382,45 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
         )}
       </div>
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">Historial de amonestaciones</div>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
+          Historial de amonestaciones
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tipo</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descripción</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Alumno
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Tipo
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Descripción
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha
+              </th>
             </tr>
           </thead>
           <tbody>
             {amonestaciones.map((a) => (
               <tr key={a.id_amonestacion}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
                   {a.alumnos?.apellido}, {a.alumnos?.nombre}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(TIPO_COLOR[a.tipo] ?? '#6B6B8A')}>
                     {a.tipo}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle" style={{ color: '#6B6B8A', maxWidth: 300 }}>
+                <td
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'
+                  style={{ color: '#6B6B8A', maxWidth: 300 }}
+                >
                   {a.descripcion}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {new Date(a.fecha).toLocaleDateString('es-AR')}
                 </td>
               </tr>
@@ -5740,12 +6471,13 @@ function GestionGaleria({ userId }: { userId: string }) {
       if (file) {
         const fileExt = file.name.split('.').pop()
         const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
-        
+
         const { error: uploadError } = await supabase.storage
           .from('galeria-imagenes')
           .upload(uniqueFileName, file)
 
-        if (uploadError) throw new Error('Error en Storage: ' + uploadError.message)
+        if (uploadError)
+          throw new Error('Error en Storage: ' + uploadError.message)
 
         // Recuperar URL pública del archivo cargado
         const { data } = supabase.storage
@@ -5756,26 +6488,31 @@ function GestionGaleria({ userId }: { userId: string }) {
       }
 
       if (!finalUrl) {
-        throw new Error('Debes seleccionar un archivo de imagen o ingresar una URL externa.')
+        throw new Error(
+          'Debes seleccionar un archivo de imagen o ingresar una URL externa.',
+        )
       }
 
       // Persistir registro meta en la base de datos relacional
-      const { error } = await supabase
-        .from('galeria')
-        .insert([
-          {
-            titulo: form.titulo || null,
-            descripcion: form.descripcion || null,
-            categoria: form.categoria || null,
-            url_imagen: finalUrl,
-            id_autor: userId,
-          },
-        ])
+      const { error } = await supabase.from('galeria').insert([
+        {
+          titulo: form.titulo || null,
+          descripcion: form.descripcion || null,
+          categoria: form.categoria || null,
+          url_imagen: finalUrl,
+          id_autor: userId,
+        },
+      ])
 
       if (error) throw error
 
       setMsg('✅ Imagen incorporada a la galería correctamente.')
-      setForm({ titulo: '', descripcion: '', categoria: 'Instalaciones', url_imagen: '' })
+      setForm({
+        titulo: '',
+        descripcion: '',
+        categoria: 'Instalaciones',
+        url_imagen: '',
+      })
       setFile(null)
       setShowForm(false)
       load()
@@ -5795,8 +6532,13 @@ function GestionGaleria({ userId }: { userId: string }) {
   }
 
   const eliminarImagen = async (id: number, urlImagen: string) => {
-    if (!window.confirm('¿Confirmás la eliminación permanente de esta fotografía?')) return
-    
+    if (
+      !window.confirm(
+        '¿Confirmás la eliminación permanente de esta fotografía?',
+      )
+    )
+      return
+
     try {
       // Si la imagen pertenece al storage propio, borramos el binario para evitar archivos huérfanos
       if (urlImagen.includes('galeria-imagenes')) {
@@ -5805,7 +6547,10 @@ function GestionGaleria({ userId }: { userId: string }) {
         await supabase.storage.from('galeria-imagenes').remove([fileName])
       }
 
-      const { error } = await supabase.from('galeria').delete().eq('id_imagen', id)
+      const { error } = await supabase
+        .from('galeria')
+        .delete()
+        .eq('id_imagen', id)
       if (error) throw error
 
       setMsg('✅ Registro fotográfico purgado con éxito.')
@@ -5817,33 +6562,64 @@ function GestionGaleria({ userId }: { userId: string }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🖼️ Galería Institucional</h2>
-        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
+        <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
+          🖼️ Galería Institucional
+        </h2>
+        <button
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? 'Cancelar' : '+ Agregar Imagen'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
-          <div className="text-[15px] font-extrabold text-text mb-5">Publicar nueva fotografía</div>
-          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className='bg-white rounded-card p-6 shadow-card border border-border mb-6'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Publicar nueva fotografía
+          </div>
+          <form
+            onSubmit={handleCreate}
+            style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+          >
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 14,
+              }}
+            >
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Título de la foto (Opcional)</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Título de la foto (Opcional)
+                </span>
                 <input
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                   value={form.titulo}
-                  onChange={(e) => setForm((p) => ({ ...p, titulo: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, titulo: e.target.value }))
+                  }
                   placeholder='Ej: Laboratorio de Ciencias Avanzadas'
                 />
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Categoría / Sección</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Categoría / Sección
+                </span>
                 <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                   value={form.categoria}
-                  onChange={(e) => setForm((p) => ({ ...p, categoria: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, categoria: e.target.value }))
+                  }
                 >
                   <option value='Instalaciones'>Instalaciones</option>
                   <option value='Actividades'>Actividades</option>
@@ -5856,22 +6632,35 @@ function GestionGaleria({ userId }: { userId: string }) {
             </div>
 
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción descriptiva (Opcional)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Descripción descriptiva (Opcional)
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.descripcion}
-                onChange={(e) => setForm((p) => ({ ...p, descripcion: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, descripcion: e.target.value }))
+                }
                 placeholder='Breve reseña sobre lo que muestra la imagen...'
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'center' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 14,
+                alignItems: 'center',
+              }}
+            >
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Opción A: Seleccionar archivo local</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Opción A: Seleccionar archivo local
+                </span>
                 <input
                   type='file'
                   accept='image/*'
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       setFile(e.target.files[0])
@@ -5880,11 +6669,15 @@ function GestionGaleria({ userId }: { userId: string }) {
                 />
               </div>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Opción B: Vincular URL de imagen remota</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Opción B: Vincular URL de imagen remota
+                </span>
                 <input
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                   value={form.url_imagen}
-                  onChange={(e) => setForm((p) => ({ ...p, url_imagen: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, url_imagen: e.target.value }))
+                  }
                   placeholder='https://images.unsplash.com/...'
                   disabled={!!file}
                 />
@@ -5892,13 +6685,27 @@ function GestionGaleria({ userId }: { userId: string }) {
             </div>
 
             <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
-              <button type='submit' disabled={loading} className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}>
+              <button
+                type='submit'
+                disabled={loading}
+                className={
+                  loading
+                    ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60'
+                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                }
+              >
                 {loading ? 'Subiendo contenido...' : 'Publicar en Galería'}
               </button>
             </div>
 
             {msg && (
-              <div style={{ fontSize: 13, fontWeight: 700, color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C' }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
+                }}
+              >
                 {msg}
               </div>
             )}
@@ -5907,51 +6714,77 @@ function GestionGaleria({ userId }: { userId: string }) {
       )}
 
       {/* Lista del Repositorio Visual */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Miniatura</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Título / Categoría</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha de Subida</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acciones</th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Miniatura
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Título / Categoría
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Fecha de Subida
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Estado
+              </th>
+              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
             {imagenes.map((img) => (
               <tr key={img.id_imagen}>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <img
                     src={img.url_imagen}
                     alt={img.titulo || 'Mina'}
-                    style={{ width: 65, height: 48, objectFit: 'cover', borderRadius: 8, border: `1px solid ${'#E8E6F5'}` }}
+                    style={{
+                      width: 65,
+                      height: 48,
+                      objectFit: 'cover',
+                      borderRadius: 8,
+                      border: `1px solid ${'#E8E6F5'}`,
+                    }}
                   />
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                  <span style={{ fontWeight: 700 }}>{img.titulo || 'Fotografía sin título'}</span>
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                  <span style={{ fontWeight: 700 }}>
+                    {img.titulo || 'Fotografía sin título'}
+                  </span>
                   <br />
-                  <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{img.categoria || 'General'}</span>
+                  <span className='inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold'>
+                    {img.categoria || 'General'}
+                  </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
                   {new Date(img.fecha_subida).toLocaleDateString('es-AR')}
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <span style={badge(img.activo ? '#27AE60' : '#E74C3C')}>
                     {img.activo ? 'Visible en Home' : 'Oculta'}
                   </span>
                 </td>
-                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button
-                      className={img.activo ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
+                      className={
+                        img.activo
+                          ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                          : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      }
                       onClick={() => toggleActivo(img.id_imagen, img.activo)}
                     >
                       {img.activo ? 'Ocultar' : 'Mostrar'}
                     </button>
                     <button
-                      className="bg-[#E74C3C26] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
-                      onClick={() => eliminarImagen(img.id_imagen, img.url_imagen)}
+                      className='bg-[#E74C3C26] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      onClick={() =>
+                        eliminarImagen(img.id_imagen, img.url_imagen)
+                      }
                     >
                       Eliminar permanentemente
                     </button>
@@ -5961,7 +6794,10 @@ function GestionGaleria({ userId }: { userId: string }) {
             ))}
             {imagenes.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-center text-textMuted p-8">
+                <td
+                  colSpan={5}
+                  className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-center text-textMuted p-8'
+                >
                   No se registran imágenes en la galería institucional.
                 </td>
               </tr>
@@ -5976,7 +6812,13 @@ function GestionGaleria({ userId }: { userId: string }) {
 //  GESTIÓN DE EMPLEOS
 // ═══════════════════════════════════════════════════════════════
 const MODALIDADES = ['Presencial', 'Remoto', 'Híbrido']
-const TIPOS_CONTRATO = ['Full-time', 'Part-time', 'Pasantía', 'Suplencia', 'Temporal']
+const TIPOS_CONTRATO = [
+  'Full-time',
+  'Part-time',
+  'Pasantía',
+  'Suplencia',
+  'Temporal',
+]
 const MODALIDAD_COLOR: Record<string, string> = {
   Presencial: '#2980B9',
   Remoto: '#27AE60',
@@ -5993,7 +6835,6 @@ function GestionEmpleos() {
     descripcion: '',
     area: '',
     requisitos: '',
-    modalidad: 'Presencial',
     tipo_contrato: 'Full-time',
     fecha_cierre: '',
   }
@@ -6007,16 +6848,20 @@ function GestionEmpleos() {
     if (data) setEmpleos(data as Empleo[])
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMsg('')
-    const { error } = await supabase.from('empleos').insert([{
-      ...form,
-      fecha_cierre: form.fecha_cierre || null,
-    }])
+    const { error } = await supabase.from('empleos').insert([
+      {
+        ...form,
+        fecha_cierre: form.fecha_cierre || null,
+      },
+    ])
     if (error) {
       setMsg('❌ Error: ' + error.message)
     } else {
@@ -6029,7 +6874,10 @@ function GestionEmpleos() {
   }
 
   const toggleActivo = async (id: number, activo: boolean) => {
-    await supabase.from('empleos').update({ activo: !activo }).eq('id_empleo', id)
+    await supabase
+      .from('empleos')
+      .update({ activo: !activo })
+      .eq('id_empleo', id)
     load()
   }
 
@@ -6040,99 +6888,127 @@ function GestionEmpleos() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
+    <div className='flex flex-col gap-6'>
+      <div className='flex justify-between items-center'>
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>💼 Empleos</h2>
         <button
-          className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"
-          onClick={() => { setShowForm(!showForm); setMsg('') }}
+          className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+          onClick={() => {
+            setShowForm(!showForm)
+            setMsg('')
+          }}
         >
           {showForm ? 'Cancelar' : '+ Publicar empleo'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-card p-6 shadow-card border border-border">
-          <div className="text-[15px] font-extrabold text-text mb-5">Nueva oferta laboral</div>
-          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+        <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+          <div className='text-[15px] font-extrabold text-text mb-5'>
+            Nueva oferta laboral
+          </div>
+          <form onSubmit={handleCreate} className='flex flex-col gap-4'>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Título del puesto *</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Título del puesto *
+              </span>
               <input
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 required
-                placeholder="Ej: Docente de Matemáticas"
+                placeholder='Ej: Docente de Matemáticas'
                 value={form.titulo}
-                onChange={(e) => setForm((p) => ({ ...p, titulo: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, titulo: e.target.value }))
+                }
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className='grid grid-cols-3 gap-4'>
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Área / Departamento</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Área / Departamento
+                </span>
                 <input
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
-                  placeholder="Ej: Educación primaria"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
+                  placeholder='Ej: Educación primaria'
                   value={form.area}
-                  onChange={(e) => setForm((p) => ({ ...p, area: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, area: e.target.value }))
+                  }
                 />
               </div>
+
               <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Modalidad</span>
+                <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                  Tipo de contrato
+                </span>
                 <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
-                  value={form.modalidad}
-                  onChange={(e) => setForm((p) => ({ ...p, modalidad: e.target.value }))}
-                >
-                  {MODALIDADES.map((m) => <option key={m} value={m}>{m}</option>)}
-                </select>
-              </div>
-              <div>
-                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo de contrato</span>
-                <select
-                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none'
                   value={form.tipo_contrato}
-                  onChange={(e) => setForm((p) => ({ ...p, tipo_contrato: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, tipo_contrato: e.target.value }))
+                  }
                 >
-                  {TIPOS_CONTRATO.map((t) => <option key={t} value={t}>{t}</option>)}
+                  {TIPOS_CONTRATO.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Descripción
+              </span>
               <textarea
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y"
-                placeholder="Descripción del puesto, tareas, etc."
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y'
+                placeholder='Descripción del puesto, tareas, etc.'
                 value={form.descripcion}
-                onChange={(e) => setForm((p) => ({ ...p, descripcion: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, descripcion: e.target.value }))
+                }
               />
             </div>
             <div>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Requisitos</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Requisitos
+              </span>
               <textarea
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y"
-                placeholder="Formación requerida, experiencia, certificaciones..."
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y'
+                placeholder='Formación requerida, experiencia, certificaciones...'
                 value={form.requisitos}
-                onChange={(e) => setForm((p) => ({ ...p, requisitos: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, requisitos: e.target.value }))
+                }
               />
             </div>
             <div style={{ maxWidth: 240 }}>
-              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de cierre (opcional)</span>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                Fecha de cierre (opcional)
+              </span>
               <input
                 type='date'
-                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
                 value={form.fecha_cierre}
-                onChange={(e) => setForm((p) => ({ ...p, fecha_cierre: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, fecha_cierre: e.target.value }))
+                }
               />
             </div>
             <button
               type='submit'
               disabled={loading}
-              className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60 self-start' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start'}
+              className={
+                loading
+                  ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60 self-start'
+                  : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start'
+              }
             >
               {loading ? 'Publicando...' : 'Publicar oferta'}
             </button>
             {msg && (
               <div
-                className="text-[13px] font-bold px-4 py-3 rounded-lg border"
+                className='text-[13px] font-bold px-4 py-3 rounded-lg border'
                 style={{
                   color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                   background: msg.startsWith('✅') ? '#27AE6012' : '#E74C3C12',
@@ -6147,68 +7023,76 @@ function GestionEmpleos() {
       )}
 
       {msg && !showForm && (
-        <div className="text-[13px] font-bold text-green px-4 py-3 rounded-lg bg-[#27AE6012] border border-[#27AE6040]">
+        <div className='text-[13px] font-bold text-green px-4 py-3 rounded-lg bg-[#27AE6012] border border-[#27AE6040]'>
           {msg}
         </div>
       )}
 
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
           Ofertas publicadas
-          <span className="ml-2 text-[12px] font-bold text-textMuted">({empleos.length})</span>
+          <span className='ml-2 text-[12px] font-bold text-textMuted'>
+            ({empleos.length})
+          </span>
         </div>
         {empleos.length === 0 ? (
-          <div className="text-center text-textMuted py-8 text-[14px]">No hay ofertas publicadas aún.</div>
+          <div className='text-center text-textMuted py-8 text-[14px]'>
+            No hay ofertas publicadas aún.
+          </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className='flex flex-col gap-3'>
             {empleos.map((emp) => (
               <div
                 key={emp.id_empleo}
-                className="flex items-start justify-between gap-4 p-4 rounded-xl border border-border transition-all duration-200"
+                className='flex items-start justify-between gap-4 p-4 rounded-xl border border-border transition-all duration-200'
                 style={{ opacity: emp.activo ? 1 : 0.5 }}
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-[15px] font-extrabold text-text">{emp.titulo}</span>
-                    {emp.modalidad && (
-                      <span
-                        className="inline-block px-[8px] py-[2px] rounded-full text-[10px] font-extrabold text-white"
-                        style={{ background: MODALIDAD_COLOR[emp.modalidad] ?? '#6B6B8A' }}
-                      >
-                        {emp.modalidad}
-                      </span>
-                    )}
+                <div className='flex-1 min-w-0'>
+                  <div className='flex items-center gap-2 flex-wrap mb-1'>
+                    <span className='text-[15px] font-extrabold text-text'>
+                      {emp.titulo}
+                    </span>
+
                     {emp.tipo_contrato && (
-                      <span className="inline-block bg-purpleLight text-purple-700 px-[8px] py-[2px] rounded-full text-[10px] font-extrabold">
+                      <span className='inline-block bg-purpleLight text-purple-700 px-[8px] py-[2px] rounded-full text-[10px] font-extrabold'>
                         {emp.tipo_contrato}
                       </span>
                     )}
                     {!emp.activo && (
-                      <span className="inline-block bg-[#6B6B8A1A] text-textMuted px-[8px] py-[2px] rounded-full text-[10px] font-extrabold">
+                      <span className='inline-block bg-[#6B6B8A1A] text-textMuted px-[8px] py-[2px] rounded-full text-[10px] font-extrabold'>
                         Inactivo
                       </span>
                     )}
                   </div>
-                  {emp.area && <div className="text-[12px] text-textMuted mb-1">📍 {emp.area}</div>}
-                  {emp.descripcion && (
-                    <div className="text-[12px] text-text leading-relaxed">
-                      {emp.descripcion.slice(0, 120)}{emp.descripcion.length > 120 ? '...' : ''}
+                  {emp.area && (
+                    <div className='text-[12px] text-textMuted mb-1'>
+                      📍 {emp.area}
                     </div>
                   )}
-                  <div className="text-[11px] text-textMuted mt-2">
+                  {emp.descripcion && (
+                    <div className='text-[12px] text-text leading-relaxed'>
+                      {emp.descripcion.slice(0, 120)}
+                      {emp.descripcion.length > 120 ? '...' : ''}
+                    </div>
+                  )}
+                  <div className='text-[11px] text-textMuted mt-2'>
                     Publicado: {emp.fecha_publicacion}
                     {emp.fecha_cierre && ` · Cierre: ${emp.fecha_cierre}`}
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className='flex gap-2 shrink-0'>
                   <button
-                    className={emp.activo ? 'bg-[#E67E221A] text-orange border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
+                    className={
+                      emp.activo
+                        ? 'bg-[#E67E221A] text-orange border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                        : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                    }
                     onClick={() => toggleActivo(emp.id_empleo, emp.activo)}
                   >
                     {emp.activo ? 'Pausar' : 'Activar'}
                   </button>
                   <button
-                    className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                    className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
                     onClick={() => eliminar(emp.id_empleo)}
                   >
                     Eliminar
