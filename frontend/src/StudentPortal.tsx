@@ -102,27 +102,6 @@ interface ActividadEx {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  PALETA DE COLORES (basada en el logo del centro)
-// ═══════════════════════════════════════════════════════════════
-const C = {
-  purple: '#5B35C5',
-  purpleLight: '#EEE9FF',
-  purpleDark: '#3D2092',
-  purpleMid: '#7B55E8',
-  white: '#FFFFFF',
-  bg: '#F5F4FB',
-  card: '#FFFFFF',
-  text: '#1A1A2E',
-  textMuted: '#6B6B8A',
-  border: '#E8E6F5',
-  green: '#27AE60',
-  orange: '#E67E22',
-  red: '#E74C3C',
-  pink: '#E91E8C',
-  blue: '#2980B9',
-}
-
-// ═══════════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════════
 const MESES = [
@@ -156,307 +135,29 @@ const formatFecha = (dateStr: string) => {
   return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`
 }
 
+// Dynamic color helpers — kept as JS functions because they return
+// computed values from runtime data (nota number / estado string).
 const notaColor = (nota: number) => {
-  if (nota >= 8) return C.green
-  if (nota >= 6) return C.orange
-  return C.red
+  if (nota >= 8) return '#27AE60'
+  if (nota >= 6) return '#E67E22'
+  return '#E74C3C'
 }
 
 const CUOTA_COLOR: Record<string, string> = {
-  Pendiente: C.orange,
-  Pagada: C.green,
-  Vencida: C.red,
+  Pendiente: '#E67E22',
+  Pagada: '#27AE60',
+  Vencida: '#E74C3C',
   'En mora': '#C0392B',
 }
 
 const NOTIF_COLOR: Record<string, string> = {
-  General: C.purple,
-  Asistencia: C.orange,
-  Calificación: C.green,
-  Cuota: C.red,
-  Novedad: C.blue,
+  General: '#5B35C5',
+  Asistencia: '#E67E22',
+  Calificación: '#27AE60',
+  Cuota: '#E74C3C',
+  Novedad: '#2980B9',
   Urgente: '#C0392B',
 }
-
-// ═══════════════════════════════════════════════════════════════
-//  ESTILOS BASE (React.CSSProperties)
-// ═══════════════════════════════════════════════════════════════
-const S: Record<string, React.CSSProperties> = {
-  root: {
-    fontFamily: "'Nunito', 'Segoe UI', sans-serif",
-    background: C.bg,
-    minHeight: '100vh',
-    color: C.text,
-  },
-  header: {
-    background: C.white,
-    borderBottom: `3px solid ${C.purple}`,
-    padding: '0 32px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 70,
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-    boxShadow: '0 2px 16px rgba(91,53,197,0.08)',
-  },
-  logo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-  },
-  logoImg: {
-    height: 50,
-    width: 'auto',
-  },
-  logoTitle: {
-    fontSize: 13,
-    fontWeight: 900,
-    color: C.purple,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    lineHeight: 1.2,
-  },
-  logoSub: {
-    fontSize: 10,
-    color: C.textMuted,
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
-  },
-  layout: {
-    display: 'flex',
-    minHeight: 'calc(100vh - 70px)',
-  },
-  sidebar: {
-    width: 230,
-    background: C.white,
-    borderRight: `1px solid ${C.border}`,
-    padding: '20px 0',
-    flexShrink: 0,
-  },
-  sidebarLabel: {
-    fontSize: 10,
-    color: C.textMuted,
-    fontWeight: 800,
-    textTransform: 'uppercase',
-    letterSpacing: '0.1em',
-    padding: '0 24px 16px',
-    display: 'block',
-    borderBottom: `1px solid ${C.border}`,
-    marginBottom: 8,
-  },
-  navItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '11px 24px',
-    cursor: 'pointer',
-    fontSize: 14,
-    fontWeight: 600,
-    color: C.textMuted,
-    borderLeft: '3px solid transparent',
-    transition: 'all 0.15s',
-  },
-  navActive: {
-    color: C.purple,
-    background: C.purpleLight,
-    borderLeft: `3px solid ${C.purple}`,
-    fontWeight: 800,
-  },
-  main: {
-    flex: 1,
-    padding: 28,
-    overflowY: 'auto',
-  },
-  card: {
-    background: C.card,
-    borderRadius: 16,
-    padding: 24,
-    boxShadow: '0 2px 16px rgba(91,53,197,0.06)',
-    border: `1px solid ${C.border}`,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: 800,
-    color: C.text,
-    marginBottom: 20,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-  },
-  welcome: {
-    background: `linear-gradient(135deg, ${C.purple} 0%, ${C.purpleMid} 100%)`,
-    borderRadius: 20,
-    padding: '28px 32px',
-    color: C.white,
-    marginBottom: 24,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  welcomeName: {
-    fontSize: 24,
-    fontWeight: 900,
-    marginBottom: 6,
-  },
-  welcomeSub: {
-    fontSize: 13,
-    opacity: 0.85,
-  },
-  welcomeBadge: {
-    display: 'inline-block',
-    background: 'rgba(255,255,255,0.2)',
-    borderRadius: 20,
-    padding: '4px 14px',
-    fontSize: 12,
-    fontWeight: 700,
-    marginTop: 14,
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: 14,
-    marginBottom: 24,
-  },
-  statCard: {
-    background: C.card,
-    borderRadius: 14,
-    padding: '18px 20px',
-    boxShadow: '0 2px 12px rgba(91,53,197,0.06)',
-    border: `1px solid ${C.border}`,
-  },
-  statIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  statValue: {
-    fontSize: 26,
-    fontWeight: 900,
-    lineHeight: 1,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: C.textMuted,
-    fontWeight: 700,
-    marginTop: 4,
-  },
-  grid2: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: 18,
-    marginBottom: 18,
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-  },
-  th: {
-    textAlign: 'left',
-    fontSize: 10,
-    fontWeight: 800,
-    color: C.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: '0.07em',
-    padding: '0 0 12px',
-    borderBottom: `2px solid ${C.border}`,
-  },
-  td: {
-    padding: '11px 0',
-    fontSize: 13,
-    borderBottom: `1px solid ${C.border}`,
-    verticalAlign: 'middle',
-  },
-  avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: '50%',
-    background: `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`,
-    color: C.white,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 900,
-    fontSize: 14,
-    cursor: 'pointer',
-    flexShrink: 0,
-  },
-  logoutBtn: {
-    background: 'none',
-    border: `1px solid ${C.border}`,
-    borderRadius: 8,
-    padding: '7px 14px',
-    fontSize: 12,
-    fontWeight: 700,
-    color: C.textMuted,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-  },
-  horarioItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    padding: '14px 0',
-    borderBottom: `1px solid ${C.border}`,
-  },
-  horarioTime: {
-    background: C.purpleLight,
-    color: C.purple,
-    borderRadius: 10,
-    padding: '6px 12px',
-    fontSize: 12,
-    fontWeight: 800,
-    minWidth: 96,
-    textAlign: 'center',
-    flexShrink: 0,
-  },
-  notifItem: {
-    display: 'flex',
-    gap: 12,
-    alignItems: 'flex-start',
-    padding: '12px 0',
-    borderBottom: `1px solid ${C.border}`,
-    cursor: 'pointer',
-  },
-  centered: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '32px 0',
-    color: C.textMuted,
-    fontSize: 13,
-  },
-}
-
-// badge y notaCircle son funciones (reciben parámetros)
-const badge = (color: string): React.CSSProperties => ({
-  display: 'inline-block',
-  background: color + '1A',
-  color,
-  borderRadius: 20,
-  padding: '3px 10px',
-  fontSize: 11,
-  fontWeight: 800,
-})
-
-const notaCircle = (nota: number): React.CSSProperties => ({
-  width: 38,
-  height: 38,
-  borderRadius: '50%',
-  background: notaColor(nota) + '1A',
-  color: notaColor(nota),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontWeight: 900,
-  fontSize: 14,
-  flexShrink: 0,
-})
 
 // ═══════════════════════════════════════════════════════════════
 //  SECCIONES DE NAVEGACIÓN
@@ -512,79 +213,32 @@ function LoginScreen() {
     setLoading(false)
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '13px 16px',
-    borderRadius: 12,
-    border: `2px solid ${C.border}`,
-    fontSize: 14,
-    fontFamily: 'inherit',
-    outline: 'none',
-    boxSizing: 'border-box',
-    color: C.text,
-  }
-
   return (
-    <div
-      style={{
-        ...S.root,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        background: `radial-gradient(ellipse at 60% 0%, ${C.purpleLight} 0%, ${C.bg} 60%)`,
-      }}
+    <div className="font-[Nunito,_'Segoe_UI',_sans-serif] bg-bg min-h-screen text-text flex items-center justify-center"
+      style={{ background: 'radial-gradient(ellipse at 60% 0%, #EEE9FF 0%, #F5F4FB 60%)' }}
     >
-      <div
-        style={{
-          background: C.white,
-          borderRadius: 24,
-          padding: '44px 40px',
-          width: '100%',
-          maxWidth: 400,
-          boxShadow: '0 8px 48px rgba(91,53,197,0.14)',
-          border: `1px solid ${C.border}`,
-        }}
-      >
+      <div className="bg-white rounded-[24px] px-10 py-11 w-full max-w-[400px] border border-border shadow-[0_8px_48px_rgba(91,53,197,0.14)]">
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div className="text-center mb-8">
           <img
             src='/logo.png'
             alt='Educar Para Transformar'
-            style={{ height: 80, marginBottom: 12 }}
+            className="h-20 mb-3 mx-auto"
             onError={(e) => {
               ;(e.target as HTMLImageElement).style.display = 'none'
             }}
           />
-          <div style={{ fontSize: 17, fontWeight: 900, color: C.purple }}>
+          <div className="text-[17px] font-black text-purple-700">
             Educar Para Transformar
           </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: C.textMuted,
-              letterSpacing: '0.08em',
-              marginTop: 4,
-            }}
-          >
+          <div className="text-xs text-textMuted tracking-[0.08em] mt-1">
             PORTAL ESTUDIANTIL
           </div>
         </div>
 
-        <form
-          onSubmit={handleLogin}
-          style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
-        >
+        <form onSubmit={handleLogin} className="flex flex-col gap-3.5">
           <div>
-            <label
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                color: C.textMuted,
-                display: 'block',
-                marginBottom: 6,
-              }}
-            >
+            <label className="text-xs font-extrabold text-textMuted block mb-1.5">
               Correo electrónico
             </label>
             <input
@@ -593,19 +247,11 @@ function LoginScreen() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder='tu@email.com'
               required
-              style={inputStyle}
+              className="w-full px-4 py-3 rounded-input border-2 border-border text-sm font-[inherit] outline-none box-border text-text"
             />
           </div>
           <div>
-            <label
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                color: C.textMuted,
-                display: 'block',
-                marginBottom: 6,
-              }}
-            >
+            <label className="text-xs font-extrabold text-textMuted block mb-1.5">
               Contraseña
             </label>
             <input
@@ -614,22 +260,12 @@ function LoginScreen() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder='••••••••'
               required
-              style={inputStyle}
+              className="w-full px-4 py-3 rounded-input border-2 border-border text-sm font-[inherit] outline-none box-border text-text"
             />
           </div>
 
           {error && (
-            <div
-              style={{
-                background: C.red + '12',
-                border: `1px solid ${C.red}40`,
-                borderRadius: 10,
-                padding: '10px 14px',
-                fontSize: 13,
-                color: C.red,
-                fontWeight: 700,
-              }}
-            >
+            <div className="bg-red/[0.07] border border-red/25 rounded-[10px] px-3.5 py-2.5 text-sm text-red font-bold">
               ⚠️ {error}
             </div>
           )}
@@ -637,20 +273,11 @@ function LoginScreen() {
           <button
             type='submit'
             disabled={loading}
-            style={{
-              background: loading
-                ? C.border
-                : `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`,
-              color: loading ? C.textMuted : C.white,
-              border: 'none',
-              borderRadius: 12,
-              padding: '14px',
-              fontSize: 15,
-              fontWeight: 800,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit',
-              marginTop: 6,
-            }}
+            className={`border-none rounded-[12px] py-3.5 text-[15px] font-extrabold font-[inherit] mt-1.5 transition-all
+              ${loading
+                ? 'bg-border text-textMuted cursor-not-allowed'
+                : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white cursor-pointer'
+              }`}
           >
             {loading ? 'Ingresando...' : 'Ingresar al portal'}
           </button>
@@ -706,8 +333,6 @@ export default function StudentPortal() {
   }, [user])
 
   // ── Data loading ─────────────────────────────────────────────
-  // Resuelve el rol del usuario y el/los alumno/s a los que tiene
-  // acceso: el propio (estudiante) o sus hijos (padre/tutor).
   const loadAll = useCallback(async (userId: string) => {
     setLoading(true)
     const { data: usuario } = await supabase
@@ -735,8 +360,6 @@ export default function StudentPortal() {
     setLoading(false)
   }, [])
 
-  // Carga todos los datos del alumno activo (más las notificaciones
-  // del usuario logueado, que valen tanto para el padre como el hijo).
   async function loadDatosAlumno(a: Alumno | null, userId: string) {
     await Promise.all([
       loadNotificaciones(userId),
@@ -748,7 +371,6 @@ export default function StudentPortal() {
     ])
   }
 
-  // Cambia el hijo/a activo (solo aplica al perfil padre/tutor)
   async function seleccionarHijo(id: number) {
     const a = hijos.find((h) => h.id_alumno === id) ?? null
     setAlumno(a)
@@ -917,26 +539,10 @@ export default function StudentPortal() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          ...S.root,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <div style={{ textAlign: 'center', color: C.purple }}>
-          <div
-            style={{
-              fontSize: 36,
-              marginBottom: 12,
-              animation: 'spin 1s linear infinite',
-            }}
-          >
-            ⟳
-          </div>
-          <p style={{ fontWeight: 800 }}>Cargando tu portal...</p>
+      <div className="font-[Nunito,_'Segoe_UI',_sans-serif] bg-bg min-h-screen text-text flex items-center justify-center">
+        <div className="text-center text-purple-700">
+          <div className="text-[36px] mb-3 animate-spin">⟳</div>
+          <p className="font-extrabold">Cargando tu portal...</p>
         </div>
       </div>
     )
@@ -945,27 +551,19 @@ export default function StudentPortal() {
   // Usuario autenticado pero sin alumno/hijos vinculados
   if (!alumno) {
     return (
-      <div
-        style={{
-          ...S.root,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <div style={{ textAlign: 'center', maxWidth: 420, padding: 24 }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>🔍</div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: C.purple }}>
+      <div className="font-[Nunito,_'Segoe_UI',_sans-serif] bg-bg min-h-screen text-text flex items-center justify-center">
+        <div className="text-center max-w-[420px] p-6">
+          <div className="text-[44px] mb-3">🔍</div>
+          <div className="text-lg font-black text-purple-700">
             No hay datos para mostrar
           </div>
-          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6 }}>
+          <p className="text-sm text-textMuted leading-relaxed">
             {esTutor
               ? 'Tu usuario de padre/tutor no tiene alumnos vinculados. Comunicate con la administración del centro educativo.'
               : 'Tu usuario no está vinculado a un legajo de alumno. Comunicate con la administración del centro educativo.'}
           </p>
           <button
-            style={{ ...S.logoutBtn, marginTop: 12 }}
+            className="mt-3 bg-transparent border border-border rounded-[8px] px-3.5 py-[7px] text-xs font-bold text-textMuted cursor-pointer font-[inherit]"
             onClick={() => supabase.auth.signOut()}
           >
             Salir
@@ -979,50 +577,38 @@ export default function StudentPortal() {
   //  RENDER PRINCIPAL
   // ═══════════════════════════════════════════════════════════
   return (
-    <div style={S.root}>
+    <div className="font-[Nunito,_'Segoe_UI',_sans-serif] bg-bg min-h-screen text-text">
       {/* ── HEADER ── */}
-      <header style={S.header}>
-        <div style={S.logo}>
+      <header className="bg-white border-b-[3px] border-b-purple-700 px-8 flex items-center justify-between h-[70px] sticky top-0 z-[100] shadow-[0_2px_16px_rgba(91,53,197,0.08)]">
+        <div className="flex items-center gap-3">
           <img
             src='/logo.png'
             alt='Educar Para Transformar'
-            style={S.logoImg}
+            className="h-[50px] w-auto"
             onError={(e) => {
               ;(e.target as HTMLImageElement).style.display = 'none'
             }}
           />
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={S.logoTitle}>Educar Para Transformar</span>
-            <span style={S.logoSub}>Centro Educativo</span>
+          <div className="flex flex-col">
+            <span className="text-[13px] font-black text-purple-700 tracking-[0.04em] uppercase leading-tight">
+              Educar Para Transformar
+            </span>
+            <span className="text-[10px] text-textMuted tracking-[0.1em] uppercase">
+              Centro Educativo
+            </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+        <div className="flex items-center gap-[18px]">
           {/* Campana notificaciones */}
           <div
-            style={{ position: 'relative', cursor: 'pointer' }}
+            className="relative cursor-pointer"
             onClick={() => setActiveNav('notificaciones')}
             title='Ver notificaciones'
           >
-            <span style={{ fontSize: 22 }}>🔔</span>
+            <span className="text-[22px]">🔔</span>
             {notifNoLeidas > 0 && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: -6,
-                  right: -6,
-                  background: C.red,
-                  color: C.white,
-                  borderRadius: '50%',
-                  width: 18,
-                  height: 18,
-                  fontSize: 10,
-                  fontWeight: 900,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+              <span className="absolute -top-1.5 -right-1.5 bg-red text-white rounded-full w-[18px] h-[18px] text-[10px] font-black flex items-center justify-center">
                 {notifNoLeidas}
               </span>
             )}
@@ -1030,7 +616,7 @@ export default function StudentPortal() {
 
           {/* Avatar */}
           <div
-            style={S.avatar}
+            className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-purple-700 to-purpleMid text-white flex items-center justify-center font-black text-sm cursor-pointer shrink-0"
             title={alumno ? `${alumno.nombre} ${alumno.apellido}` : ''}
           >
             {initials}
@@ -1038,17 +624,9 @@ export default function StudentPortal() {
 
           {/* Nombre / perfil */}
           {alumno && (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="flex flex-col">
               {esTutor && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: C.purple,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                  }}
-                >
+                <span className="text-[10px] font-extrabold text-purple-700 uppercase tracking-[0.06em]">
                   Perfil padre/tutor · viendo a
                 </span>
               )}
@@ -1056,16 +634,7 @@ export default function StudentPortal() {
                 <select
                   value={alumno.id_alumno}
                   onChange={(e) => seleccionarHijo(Number(e.target.value))}
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 800,
-                    color: C.text,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: 8,
-                    padding: '4px 8px',
-                    fontFamily: 'inherit',
-                    cursor: 'pointer',
-                  }}
+                  className="text-[13px] font-extrabold text-text border border-border rounded-[8px] px-2 py-1 font-[inherit] cursor-pointer"
                 >
                   {hijos.map((h) => (
                     <option key={h.id_alumno} value={h.id_alumno}>
@@ -1074,7 +643,7 @@ export default function StudentPortal() {
                   ))}
                 </select>
               ) : (
-                <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>
+                <span className="text-[13px] font-extrabold text-text">
                   {alumno.nombre} {alumno.apellido}
                 </span>
               )}
@@ -1082,52 +651,40 @@ export default function StudentPortal() {
           )}
 
           {/* Logout */}
-          <button style={S.logoutBtn} onClick={() => supabase.auth.signOut()}>
+          <button
+            className="bg-transparent border border-border rounded-[8px] px-3.5 py-[7px] text-xs font-bold text-textMuted cursor-pointer font-[inherit]"
+            onClick={() => supabase.auth.signOut()}
+          >
             Salir
           </button>
         </div>
       </header>
 
-      <div style={S.layout}>
+      <div className="flex min-h-[calc(100vh-70px)]">
         {/* ── SIDEBAR ── */}
-        <aside style={S.sidebar}>
-          <span style={S.sidebarLabel}>Portal Estudiantil</span>
+        <aside className="w-[230px] bg-white border-r border-border py-5 shrink-0">
+          <span className="text-[10px] text-textMuted font-extrabold uppercase tracking-[0.1em] px-6 pb-4 block border-b border-border mb-2">
+            Portal Estudiantil
+          </span>
           {NAV_ITEMS.map((item) => (
             <div
               key={item.key}
-              style={{
-                ...S.navItem,
-                ...(activeNav === item.key ? S.navActive : {}),
-              }}
+              className={`flex items-center gap-2.5 px-6 py-[11px] cursor-pointer text-sm font-semibold transition-all duration-150 border-l-[3px]
+                ${activeNav === item.key
+                  ? 'text-purple-700 bg-purpleLight border-l-purple-700 font-extrabold'
+                  : 'text-textMuted border-l-transparent hover:text-purple-700 hover:bg-purpleLight'
+                }`}
               onClick={() => setActiveNav(item.key)}
             >
               <span>{item.icon}</span>
-              <span style={{ flex: 1 }}>{item.label}</span>
+              <span className="flex-1">{item.label}</span>
               {item.key === 'notificaciones' && notifNoLeidas > 0 && (
-                <span
-                  style={{
-                    background: C.purple,
-                    color: C.white,
-                    borderRadius: 20,
-                    padding: '1px 8px',
-                    fontSize: 11,
-                    fontWeight: 900,
-                  }}
-                >
+                <span className="bg-purple-700 text-white rounded-[20px] px-2 py-px text-[11px] font-black">
                   {notifNoLeidas}
                 </span>
               )}
               {item.key === 'cuotas' && cuotas.length > 0 && (
-                <span
-                  style={{
-                    background: C.red,
-                    color: C.white,
-                    borderRadius: 20,
-                    padding: '1px 8px',
-                    fontSize: 11,
-                    fontWeight: 900,
-                  }}
-                >
+                <span className="bg-red text-white rounded-[20px] px-2 py-px text-[11px] font-black">
                   {cuotas.length}
                 </span>
               )}
@@ -1136,30 +693,20 @@ export default function StudentPortal() {
         </aside>
 
         {/* ── CONTENIDO PRINCIPAL ── */}
-        <main style={S.main}>
+        <main className="flex-1 p-7 overflow-y-auto">
           {/* ━━━━━ INICIO ━━━━━ */}
           {activeNav === 'inicio' && (
             <>
               {/* Banner bienvenida */}
-              <div style={S.welcome}>
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: -30,
-                    top: -30,
-                    width: 200,
-                    height: 200,
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.05)',
-                  }}
-                />
-                <div style={{ position: 'relative' }}>
-                  <div style={S.welcomeName}>
+              <div className="bg-gradient-to-br from-purple-700 to-purpleMid rounded-[20px] px-8 py-7 text-white mb-6 relative overflow-hidden">
+                <div className="absolute -right-[30px] -top-[30px] w-[200px] h-[200px] rounded-full bg-white/5" />
+                <div className="relative">
+                  <div className="text-2xl font-black mb-1.5">
                     {esTutor
                       ? `Portal de ${alumno?.nombre} ${alumno?.apellido}`
                       : `Bienvenido/a, ${alumno?.nombre} 👋`}
                   </div>
-                  <div style={S.welcomeSub}>
+                  <div className="text-[13px] opacity-85">
                     {new Date().toLocaleDateString('es-AR', {
                       weekday: 'long',
                       year: 'numeric',
@@ -1168,7 +715,7 @@ export default function StudentPortal() {
                     })}
                   </div>
                   {alumno?.cursos && (
-                    <div style={S.welcomeBadge}>
+                    <div className="inline-block bg-white/20 rounded-[20px] px-3.5 py-1 text-xs font-bold mt-3.5">
                       {alumno.cursos.nivel} · {alumno.cursos.grado_anio}{' '}
                       División {alumno.cursos.division}
                     </div>
@@ -1177,106 +724,85 @@ export default function StudentPortal() {
               </div>
 
               {/* Stats */}
-              <div style={S.statsGrid}>
+              <div className="grid grid-cols-4 gap-3.5 mb-6">
                 {/* Asistencia */}
-                <div style={S.statCard}>
-                  <div style={{ ...S.statIcon, background: C.purpleLight }}>
+                <div className="bg-white rounded-[14px] px-5 py-[18px] shadow-[0_2px_12px_rgba(91,53,197,0.06)] border border-border">
+                  <div className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl mb-2.5 bg-purpleLight">
                     📅
                   </div>
                   <div
-                    style={{
-                      ...S.statValue,
-                      color:
-                        pctAsistencia !== null && pctAsistencia < 75
-                          ? C.red
-                          : C.green,
-                    }}
+                    className="text-[26px] font-black leading-none"
+                    style={{ color: pctAsistencia !== null && pctAsistencia < 75 ? '#E74C3C' : '#27AE60' }}
                   >
                     {pctAsistencia !== null ? `${pctAsistencia}%` : '—'}
                   </div>
-                  <div style={S.statLabel}>Asistencia</div>
+                  <div className="text-[11px] text-textMuted font-bold mt-1">Asistencia</div>
                 </div>
                 {/* Promedio */}
-                <div style={S.statCard}>
-                  <div style={{ ...S.statIcon, background: '#27AE601A' }}>
+                <div className="bg-white rounded-[14px] px-5 py-[18px] shadow-[0_2px_12px_rgba(91,53,197,0.06)] border border-border">
+                  <div className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl mb-2.5 bg-[#27AE601A]">
                     📊
                   </div>
-                  <div style={{ ...S.statValue, color: C.purple }}>
+                  <div className="text-[26px] font-black leading-none text-purple-700">
                     {promedio}
                   </div>
-                  <div style={S.statLabel}>Promedio general</div>
+                  <div className="text-[11px] text-textMuted font-bold mt-1">Promedio general</div>
                 </div>
                 {/* Cuotas */}
-                <div style={S.statCard}>
-                  <div style={{ ...S.statIcon, background: '#E74C3C1A' }}>
+                <div className="bg-white rounded-[14px] px-5 py-[18px] shadow-[0_2px_12px_rgba(91,53,197,0.06)] border border-border">
+                  <div className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl mb-2.5 bg-[#E74C3C1A]">
                     💳
                   </div>
                   <div
-                    style={{
-                      ...S.statValue,
-                      color: cuotas.length > 0 ? C.red : C.green,
-                    }}
+                    className="text-[26px] font-black leading-none"
+                    style={{ color: cuotas.length > 0 ? '#E74C3C' : '#27AE60' }}
                   >
                     {cuotas.length}
                   </div>
-                  <div style={S.statLabel}>Cuotas pendientes</div>
+                  <div className="text-[11px] text-textMuted font-bold mt-1">Cuotas pendientes</div>
                 </div>
                 {/* Notificaciones */}
-                <div style={S.statCard}>
-                  <div style={{ ...S.statIcon, background: '#E67E221A' }}>
+                <div className="bg-white rounded-[14px] px-5 py-[18px] shadow-[0_2px_12px_rgba(91,53,197,0.06)] border border-border">
+                  <div className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl mb-2.5 bg-[#E67E221A]">
                     🔔
                   </div>
                   <div
-                    style={{
-                      ...S.statValue,
-                      color: notifNoLeidas > 0 ? C.orange : C.textMuted,
-                    }}
+                    className="text-[26px] font-black leading-none"
+                    style={{ color: notifNoLeidas > 0 ? '#E67E22' : '#6B6B8A' }}
                   >
                     {notifNoLeidas}
                   </div>
-                  <div style={S.statLabel}>Notificaciones nuevas</div>
+                  <div className="text-[11px] text-textMuted font-bold mt-1">Notificaciones nuevas</div>
                 </div>
               </div>
 
               {/* Horario hoy + Notificaciones */}
-              <div style={S.grid2}>
+              <div className="grid grid-cols-2 gap-[18px] mb-[18px]">
                 {/* Clases de hoy */}
-                <div style={S.card}>
-                  <div style={S.cardTitle}>
+                <div className="bg-white rounded-card p-6 shadow-card border border-border">
+                  <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
                     🕐 Clases de hoy · {diaActual()}
                   </div>
                   {horarioHoy.length === 0 ? (
-                    <div style={S.centered}>
+                    <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
                       No hay clases programadas para hoy
                     </div>
                   ) : (
                     horarioHoy.map((h) => (
-                      <div key={h.id_horario} style={S.horarioItem}>
-                        <div style={S.horarioTime}>
+                      <div key={h.id_horario} className="flex items-center gap-3.5 py-3.5 border-b border-border">
+                        <div className="bg-purpleLight text-purple-700 rounded-[10px] px-3 py-1.5 text-xs font-extrabold min-w-[96px] text-center shrink-0">
                           {h.hora_inicio.slice(0, 5)}
                           <br />
                           {h.hora_fin.slice(0, 5)}
                         </div>
                         <div
-                          style={{
-                            width: 3,
-                            height: 44,
-                            borderRadius: 4,
-                            background: C.purple,
-                            flexShrink: 0,
-                          }}
+                          className="w-[3px] h-11 rounded-[4px] shrink-0 bg-purple-700"
                         />
                         <div>
-                          <div style={{ fontWeight: 800, fontSize: 14 }}>
+                          <div className="font-extrabold text-sm">
                             {h.asignaciones?.materias?.nombre}
                           </div>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: C.textMuted,
-                              marginTop: 2,
-                            }}
-                          >
+                          <div className="text-xs text-textMuted mt-0.5">
                             Prof. {h.asignaciones?.docentes?.apellido} ·{' '}
                             {h.aula ?? 'Aula s/d'}
                           </div>
@@ -1287,51 +813,42 @@ export default function StudentPortal() {
                 </div>
 
                 {/* Notificaciones recientes */}
-                <div style={S.card}>
-                  <div style={S.cardTitle}>🔔 Notificaciones recientes</div>
+                <div className="bg-white rounded-card p-6 shadow-card border border-border">
+                  <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
+                    🔔 Notificaciones recientes
+                  </div>
                   {notificaciones.slice(0, 5).length === 0 ? (
-                    <div style={S.centered}>Sin notificaciones</div>
+                    <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
+                      Sin notificaciones
+                    </div>
                   ) : (
                     notificaciones.slice(0, 5).map((n) => (
                       <div
                         key={n.id_notificacion}
-                        style={{ ...S.notifItem, opacity: n.leida ? 0.6 : 1 }}
+                        className={`flex gap-3 items-start py-3 border-b border-border cursor-pointer transition-opacity ${n.leida ? 'opacity-60' : 'opacity-100'}`}
                         onClick={() =>
                           !n.leida && marcarLeida(n.id_notificacion)
                         }
                       >
                         <div
-                          style={{
-                            width: 9,
-                            height: 9,
-                            borderRadius: '50%',
-                            marginTop: 5,
-                            background: n.leida
-                              ? C.border
-                              : (NOTIF_COLOR[n.tipo] ?? C.purple),
-                            flexShrink: 0,
-                          }}
+                          className="w-[9px] h-[9px] rounded-full mt-[5px] shrink-0"
+                          style={{ background: n.leida ? '#E8E6F5' : (NOTIF_COLOR[n.tipo] ?? '#5B35C5') }}
                         />
-                        <div style={{ flex: 1 }}>
-                          <div
-                            style={{
-                              fontSize: 13,
-                              fontWeight: n.leida ? 600 : 800,
-                            }}
-                          >
+                        <div className="flex-1">
+                          <div className={`text-[13px] ${n.leida ? 'font-semibold' : 'font-extrabold'}`}>
                             {n.titulo}
                           </div>
-                          <div
-                            style={{
-                              fontSize: 11,
-                              color: C.textMuted,
-                              marginTop: 2,
-                            }}
-                          >
+                          <div className="text-[11px] text-textMuted mt-0.5">
                             {formatFecha(n.fecha_envio)}
                           </div>
                         </div>
-                        <span style={badge(NOTIF_COLOR[n.tipo] ?? C.purple)}>
+                        <span
+                          className="inline-block rounded-[20px] px-2.5 py-[3px] text-[11px] font-extrabold"
+                          style={{
+                            background: (NOTIF_COLOR[n.tipo] ?? '#5B35C5') + '1A',
+                            color: NOTIF_COLOR[n.tipo] ?? '#5B35C5',
+                          }}
+                        >
                           {n.tipo}
                         </span>
                       </div>
@@ -1341,40 +858,52 @@ export default function StudentPortal() {
               </div>
 
               {/* Últimas calificaciones */}
-              <div style={S.card}>
-                <div style={S.cardTitle}>📊 Últimas calificaciones</div>
+              <div className="bg-white rounded-card p-6 shadow-card border border-border">
+                <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
+                  📊 Últimas calificaciones
+                </div>
                 {calificaciones.length === 0 ? (
-                  <div style={S.centered}>Sin calificaciones registradas</div>
+                  <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
+                    Sin calificaciones registradas
+                  </div>
                 ) : (
-                  <table style={S.table}>
+                  <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th style={S.th}>Materia</th>
-                        <th style={S.th}>Tipo</th>
-                        <th style={S.th}>Trimestre</th>
-                        <th style={S.th}>Fecha</th>
-                        <th style={S.th}>Nota</th>
+                        {['Materia', 'Tipo', 'Trimestre', 'Fecha', 'Nota'].map((h) => (
+                          <th key={h} className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 border-b-2 border-border">
+                            {h}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
                       {calificaciones.slice(0, 6).map((c) => (
                         <tr key={c.id_calificacion}>
-                          <td style={{ ...S.td, fontWeight: 800 }}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle font-extrabold">
                             {c.asignaciones?.materias?.nombre}
                           </td>
-                          <td style={S.td}>
-                            <span style={badge(C.purple)}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle">
+                            <span
+                              className="inline-block rounded-[20px] px-2.5 py-[3px] text-[11px] font-extrabold"
+                              style={{ background: '#5B35C51A', color: '#5B35C5' }}
+                            >
                               {c.tipo_evaluacion}
                             </span>
                           </td>
-                          <td style={{ ...S.td, color: C.textMuted }}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle text-textMuted">
                             Trimestre {c.trimestre}
                           </td>
-                          <td style={{ ...S.td, color: C.textMuted }}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle text-textMuted">
                             {formatFecha(c.fecha_carga)}
                           </td>
-                          <td style={S.td}>
-                            <div style={notaCircle(c.nota)}>{c.nota}</div>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle">
+                            <div
+                              className="w-[38px] h-[38px] rounded-full flex items-center justify-center font-black text-sm shrink-0"
+                              style={{ background: notaColor(c.nota) + '1A', color: notaColor(c.nota) }}
+                            >
+                              {c.nota}
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1387,121 +916,59 @@ export default function StudentPortal() {
 
           {/* ━━━━━ ASISTENCIAS ━━━━━ */}
           {activeNav === 'asistencias' && (
-            <div style={S.card}>
-              <div style={S.cardTitle}>📅 Mis Asistencias</div>
+            <div className="bg-white rounded-card p-6 shadow-card border border-border">
+              <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
+                📅 Mis Asistencias
+              </div>
               {!asistStats ? (
-                <div style={S.centered}>Cargando...</div>
+                <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
+                  Cargando...
+                </div>
               ) : (
                 <>
                   {/* Counters */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(5, 1fr)',
-                      gap: 12,
-                      marginBottom: 28,
-                    }}
-                  >
+                  <div className="grid grid-cols-5 gap-3 mb-7">
                     {[
-                      {
-                        label: 'Presentes',
-                        value: asistStats.presentes,
-                        color: C.green,
-                      },
-                      {
-                        label: 'Ausentes',
-                        value: asistStats.ausentes,
-                        color: C.red,
-                      },
-                      {
-                        label: 'Tarde',
-                        value: asistStats.tarde,
-                        color: C.orange,
-                      },
-                      {
-                        label: 'Justific.',
-                        value: asistStats.justificados,
-                        color: C.blue,
-                      },
-                      {
-                        label: 'Total',
-                        value: asistStats.total,
-                        color: C.purple,
-                      },
+                      { label: 'Presentes', value: asistStats.presentes, color: '#27AE60' },
+                      { label: 'Ausentes', value: asistStats.ausentes, color: '#E74C3C' },
+                      { label: 'Tarde', value: asistStats.tarde, color: '#E67E22' },
+                      { label: 'Justific.', value: asistStats.justificados, color: '#2980B9' },
+                      { label: 'Total', value: asistStats.total, color: '#5B35C5' },
                     ].map((item) => (
                       <div
                         key={item.label}
-                        style={{
-                          ...S.statCard,
-                          borderTop: `3px solid ${item.color}`,
-                          textAlign: 'center',
-                        }}
+                        className="bg-white rounded-[14px] px-5 py-[18px] shadow-[0_2px_12px_rgba(91,53,197,0.06)] border border-border text-center"
+                        style={{ borderTop: `3px solid ${item.color}` }}
                       >
-                        <div style={{ ...S.statValue, color: item.color }}>
+                        <div className="text-[26px] font-black leading-none" style={{ color: item.color }}>
                           {item.value}
                         </div>
-                        <div style={S.statLabel}>{item.label}</div>
+                        <div className="text-[11px] text-textMuted font-bold mt-1">{item.label}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Barra de progreso */}
-                  <div style={{ marginBottom: 8 }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        fontSize: 13,
-                        fontWeight: 800,
-                        marginBottom: 10,
-                      }}
-                    >
+                  <div className="mb-2">
+                    <div className="flex justify-between text-[13px] font-extrabold mb-2.5">
                       <span>Porcentaje de asistencia</span>
-                      <span
-                        style={{
-                          color:
-                            pctAsistencia !== null && pctAsistencia < 75
-                              ? C.red
-                              : C.green,
-                        }}
-                      >
+                      <span style={{ color: pctAsistencia !== null && pctAsistencia < 75 ? '#E74C3C' : '#27AE60' }}>
                         {pctAsistencia ?? 0}%
                       </span>
                     </div>
-                    <div
-                      style={{
-                        background: C.border,
-                        borderRadius: 8,
-                        height: 14,
-                        overflow: 'hidden',
-                      }}
-                    >
+                    <div className="bg-border rounded-[8px] h-3.5 overflow-hidden">
                       <div
+                        className="h-full rounded-[8px] transition-[width] duration-[0.8s] ease-in-out"
                         style={{
                           width: `${pctAsistencia ?? 0}%`,
-                          height: '100%',
-                          background:
-                            pctAsistencia !== null && pctAsistencia < 75
-                              ? `linear-gradient(90deg, ${C.red}, ${C.orange})`
-                              : `linear-gradient(90deg, ${C.purple}, ${C.green})`,
-                          borderRadius: 8,
-                          transition: 'width 0.8s ease',
+                          background: pctAsistencia !== null && pctAsistencia < 75
+                            ? 'linear-gradient(90deg, #E74C3C, #E67E22)'
+                            : 'linear-gradient(90deg, #5B35C5, #27AE60)',
                         }}
                       />
                     </div>
                     {pctAsistencia !== null && pctAsistencia < 75 && (
-                      <div
-                        style={{
-                          marginTop: 12,
-                          background: C.red + '12',
-                          border: `1px solid ${C.red}40`,
-                          borderRadius: 10,
-                          padding: '10px 14px',
-                          color: C.red,
-                          fontWeight: 700,
-                          fontSize: 13,
-                        }}
-                      >
+                      <div className="mt-3 bg-red/[0.07] border border-red/25 rounded-[10px] px-3.5 py-2.5 text-red font-bold text-[13px]">
                         ⚠️ Tu asistencia está por debajo del 75% mínimo
                         requerido. Por favor comunicate con la institución.
                       </div>
@@ -1514,67 +981,62 @@ export default function StudentPortal() {
 
           {/* ━━━━━ CALIFICACIONES ━━━━━ */}
           {activeNav === 'calificaciones' && (
-            <div style={S.card}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: 20,
-                }}
-              >
-                <div style={S.cardTitle}>📊 Todas mis Calificaciones</div>
+            <div className="bg-white rounded-card p-6 shadow-card border border-border">
+              <div className="flex justify-between items-center mb-5">
+                <div className="text-[15px] font-extrabold text-text flex items-center gap-2">
+                  📊 Todas mis Calificaciones
+                </div>
                 {calificaciones.length > 0 && (
-                  <div
-                    style={{
-                      background: C.purpleLight,
-                      color: C.purple,
-                      borderRadius: 12,
-                      padding: '8px 18px',
-                      fontWeight: 900,
-                      fontSize: 16,
-                    }}
-                  >
+                  <div className="bg-purpleLight text-purple-700 rounded-[12px] px-[18px] py-2 font-black text-base">
                     Promedio: {promedio}
                   </div>
                 )}
               </div>
               {calificaciones.length === 0 ? (
-                <div style={S.centered}>Sin calificaciones registradas</div>
+                <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
+                  Sin calificaciones registradas
+                </div>
               ) : (
-                <table style={S.table}>
+                <table className="w-full border-collapse">
                   <thead>
                     <tr>
-                      <th style={S.th}>Materia</th>
-                      <th style={S.th}>Tipo</th>
-                      <th style={S.th}>Trimestre</th>
-                      <th style={S.th}>Fecha</th>
-                      <th style={S.th}>Descripción</th>
-                      <th style={S.th}>Nota</th>
+                      {['Materia', 'Tipo', 'Trimestre', 'Fecha', 'Descripción', 'Nota'].map((h) => (
+                        <th key={h} className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 border-b-2 border-border">
+                          {h}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {calificaciones.map((c) => (
                       <tr key={c.id_calificacion}>
-                        <td style={{ ...S.td, fontWeight: 800 }}>
+                        <td className="py-[11px] text-[13px] border-b border-border align-middle font-extrabold">
                           {c.asignaciones?.materias?.nombre}
                         </td>
-                        <td style={S.td}>
-                          <span style={badge(C.purple)}>
+                        <td className="py-[11px] text-[13px] border-b border-border align-middle">
+                          <span
+                            className="inline-block rounded-[20px] px-2.5 py-[3px] text-[11px] font-extrabold"
+                            style={{ background: '#5B35C51A', color: '#5B35C5' }}
+                          >
                             {c.tipo_evaluacion}
                           </span>
                         </td>
-                        <td style={{ ...S.td, color: C.textMuted }}>
+                        <td className="py-[11px] text-[13px] border-b border-border align-middle text-textMuted">
                           T{c.trimestre}
                         </td>
-                        <td style={{ ...S.td, color: C.textMuted }}>
+                        <td className="py-[11px] text-[13px] border-b border-border align-middle text-textMuted">
                           {formatFecha(c.fecha_carga)}
                         </td>
-                        <td style={{ ...S.td, color: C.textMuted }}>
+                        <td className="py-[11px] text-[13px] border-b border-border align-middle text-textMuted">
                           {c.descripcion ?? '—'}
                         </td>
-                        <td style={S.td}>
-                          <div style={notaCircle(c.nota)}>{c.nota}</div>
+                        <td className="py-[11px] text-[13px] border-b border-border align-middle">
+                          <div
+                            className="w-[38px] h-[38px] rounded-full flex items-center justify-center font-black text-sm shrink-0"
+                            style={{ background: notaColor(c.nota) + '1A', color: notaColor(c.nota) }}
+                          >
+                            {c.nota}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1586,73 +1048,51 @@ export default function StudentPortal() {
 
           {/* ━━━━━ CUOTAS ━━━━━ */}
           {activeNav === 'cuotas' && (
-            <div style={S.card}>
-              <div style={S.cardTitle}>💳 Mis Cuotas Pendientes</div>
+            <div className="bg-white rounded-card p-6 shadow-card border border-border">
+              <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
+                💳 Mis Cuotas Pendientes
+              </div>
               {cuotas.length === 0 ? (
-                <div
-                  style={{ ...S.centered, flexDirection: 'column', gap: 10 }}
-                >
-                  <span style={{ fontSize: 44 }}>✅</span>
-                  <span
-                    style={{ color: C.green, fontWeight: 800, fontSize: 15 }}
-                  >
+                <div className="flex flex-col items-center justify-center py-8 text-textMuted text-[13px] gap-2.5">
+                  <span className="text-[44px]">✅</span>
+                  <span className="text-green font-extrabold text-[15px]">
                     ¡Estás al día con todas tus cuotas!
                   </span>
                 </div>
               ) : (
                 <>
-                  <div
-                    style={{
-                      background: C.red + '10',
-                      border: `1px solid ${C.red}30`,
-                      borderRadius: 12,
-                      padding: '12px 16px',
-                      marginBottom: 20,
-                      fontSize: 13,
-                      color: C.red,
-                      fontWeight: 700,
-                    }}
-                  >
+                  <div className="bg-red/[0.06] border border-red/[0.19] rounded-[12px] px-4 py-3 mb-5 text-[13px] text-red font-bold">
                     ⚠️ Tenés {cuotas.length} cuota{cuotas.length > 1 ? 's' : ''}{' '}
                     sin abonar. Regularizá tu situación para evitar recargos.
                   </div>
-                  <table style={S.table}>
+                  <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th style={S.th}>Período</th>
-                        <th style={S.th}>Monto base</th>
-                        <th style={S.th}>Recargo</th>
-                        <th style={S.th}>Total a pagar</th>
-                        <th style={S.th}>Vencimiento</th>
-                        <th style={S.th}>Estado</th>
+                        {['Período', 'Monto base', 'Recargo', 'Total a pagar', 'Vencimiento', 'Estado'].map((h) => (
+                          <th key={h} className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 border-b-2 border-border">
+                            {h}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
                       {cuotas.map((c) => (
                         <tr key={c.id_cuota}>
-                          <td style={{ ...S.td, fontWeight: 800 }}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle font-extrabold">
                             {MESES[c.mes - 1]} {c.anio}
                           </td>
-                          <td style={S.td}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle">
                             ${c.monto_base.toLocaleString('es-AR')}
                           </td>
                           <td
-                            style={{
-                              ...S.td,
-                              color: c.recargo > 0 ? C.red : C.textMuted,
-                            }}
+                            className="py-[11px] text-[13px] border-b border-border align-middle"
+                            style={{ color: c.recargo > 0 ? '#E74C3C' : '#6B6B8A' }}
                           >
                             {c.recargo > 0
                               ? `+$${c.recargo.toLocaleString('es-AR')}`
                               : '—'}
                           </td>
-                          <td
-                            style={{
-                              ...S.td,
-                              fontWeight: 900,
-                              color: C.purple,
-                            }}
-                          >
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle font-black text-purple-700">
                             $
                             {(
                               c.monto_base +
@@ -1660,14 +1100,16 @@ export default function StudentPortal() {
                               c.descuento
                             ).toLocaleString('es-AR')}
                           </td>
-                          <td style={{ ...S.td, color: C.textMuted }}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle text-textMuted">
                             {formatFecha(c.fecha_vencimiento)}
                           </td>
-                          <td style={S.td}>
+                          <td className="py-[11px] text-[13px] border-b border-border align-middle">
                             <span
-                              style={badge(
-                                CUOTA_COLOR[c.estado] ?? C.textMuted,
-                              )}
+                              className="inline-block rounded-[20px] px-2.5 py-[3px] text-[11px] font-extrabold"
+                              style={{
+                                background: (CUOTA_COLOR[c.estado] ?? '#6B6B8A') + '1A',
+                                color: CUOTA_COLOR[c.estado] ?? '#6B6B8A',
+                              }}
                             >
                               {c.estado}
                             </span>
@@ -1683,63 +1125,35 @@ export default function StudentPortal() {
 
           {/* ━━━━━ HORARIO ━━━━━ */}
           {activeNav === 'horario' && (
-            <div style={S.card}>
-              <div style={S.cardTitle}>
+            <div className="bg-white rounded-card p-6 shadow-card border border-border">
+              <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
                 🕐 Mi Horario de hoy · {diaActual()}
               </div>
               {horarioHoy.length === 0 ? (
-                <div
-                  style={{ ...S.centered, flexDirection: 'column', gap: 10 }}
-                >
-                  <span style={{ fontSize: 36 }}>🎉</span>
-                  <span style={{ fontWeight: 700, color: C.textMuted }}>
+                <div className="flex flex-col items-center justify-center py-8 text-textMuted text-[13px] gap-2.5">
+                  <span className="text-[36px]">🎉</span>
+                  <span className="font-bold text-textMuted">
                     No tenés clases registradas para hoy
                   </span>
                 </div>
               ) : (
                 horarioHoy.map((h) => (
-                  <div key={h.id_horario} style={S.horarioItem}>
-                    <div
-                      style={{
-                        ...S.horarioTime,
-                        fontSize: 13,
-                        lineHeight: 1.5,
-                      }}
-                    >
+                  <div key={h.id_horario} className="flex items-center gap-3.5 py-3.5 border-b border-border">
+                    <div className="bg-purpleLight text-purple-700 rounded-[10px] px-3 py-1.5 text-[13px] font-extrabold min-w-[96px] text-center shrink-0 leading-[1.5]">
                       {h.hora_inicio.slice(0, 5)}
                       <br />
                       {h.hora_fin.slice(0, 5)}
                     </div>
-                    <div
-                      style={{
-                        width: 4,
-                        height: 52,
-                        borderRadius: 4,
-                        background: C.purple,
-                        flexShrink: 0,
-                      }}
-                    />
+                    <div className="w-1 h-[52px] rounded-[4px] shrink-0 bg-purple-700" />
                     <div>
-                      <div style={{ fontWeight: 900, fontSize: 15 }}>
+                      <div className="font-black text-[15px]">
                         {h.asignaciones?.materias?.nombre}
                       </div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: C.textMuted,
-                          marginTop: 3,
-                        }}
-                      >
+                      <div className="text-[13px] text-textMuted mt-0.5">
                         Prof. {h.asignaciones?.docentes?.nombre}{' '}
                         {h.asignaciones?.docentes?.apellido}
                       </div>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: C.textMuted,
-                          marginTop: 2,
-                        }}
-                      >
+                      <div className="text-xs text-textMuted mt-0.5">
                         📍 {h.aula ?? 'Aula a confirmar'}
                       </div>
                     </div>
@@ -1749,36 +1163,20 @@ export default function StudentPortal() {
             </div>
           )}
 
-          {/* ━━━━━ NOTIFICACIONES ━━━━━ */}
+          {/* ━━━━━ ACTIVIDADES ━━━━━ */}
           {activeNav === 'actividades' && (
-            <div style={S.card}>
-              <div style={S.cardTitle}>🎨 Servicios extracurriculares</div>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: C.textMuted,
-                  margin: '0 0 20px',
-                  lineHeight: 1.5,
-                }}
-              >
+            <div className="bg-white rounded-card p-6 shadow-card border border-border">
+              <div className="text-[15px] font-extrabold text-text mb-5 flex items-center gap-2">
+                🎨 Servicios extracurriculares
+              </div>
+              <p className="text-[13px] text-textMuted m-0 mb-5 leading-relaxed">
                 Inscribite a los talleres de idiomas y a las disciplinas
                 deportivas. Las actividades sin cupo disponible quedan
                 bloqueadas.
               </p>
 
               {actMsg && (
-                <div
-                  style={{
-                    background: '#E74C3C12',
-                    border: `1px solid ${C.red}40`,
-                    borderRadius: 8,
-                    padding: '10px 14px',
-                    fontSize: 12,
-                    color: C.red,
-                    fontWeight: 700,
-                    marginBottom: 16,
-                  }}
-                >
+                <div className="bg-[#E74C3C12] border border-red/25 rounded-[8px] px-3.5 py-2.5 text-xs text-red font-bold mb-4">
                   ⚠️ {actMsg}
                 </div>
               )}
@@ -1787,71 +1185,42 @@ export default function StudentPortal() {
                 const items = actividades.filter((a) => a.tipo === tipo)
                 if (items.length === 0) return null
                 return (
-                  <div key={tipo} style={{ marginBottom: 24 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 900,
-                        color: C.purple,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        marginBottom: 12,
-                      }}
-                    >
+                  <div key={tipo} className="mb-6">
+                    <div className="text-xs font-black text-purple-700 uppercase tracking-[0.08em] mb-3">
                       {tipo === 'Idioma'
                         ? '🗣️ Idiomas'
                         : '⚽ Disciplinas deportivas'}
                     </div>
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: 12,
-                      }}
-                    >
+                    <div className="grid grid-cols-2 gap-3">
                       {items.map((a) => {
                         const disponibles = a.cupo_maximo - a.inscriptos
                         const completo = disponibles <= 0
                         return (
                           <div
                             key={a.id_actividad}
-                            style={{
-                              border: `1px solid ${C.border}`,
-                              borderRadius: 12,
-                              padding: 16,
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: 8,
-                            }}
+                            className="border border-border rounded-[12px] p-4 flex flex-col gap-2"
                           >
-                            <div
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'flex-start',
-                                gap: 8,
-                              }}
-                            >
-                              <span style={{ fontSize: 15, fontWeight: 900 }}>
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="text-[15px] font-black">
                                 {a.nombre}
                               </span>
                               {a.inscripto && (
-                                <span style={badge(C.green)}>Inscripto</span>
+                                <span
+                                  className="inline-block rounded-[20px] px-2.5 py-[3px] text-[11px] font-extrabold"
+                                  style={{ background: '#27AE601A', color: '#27AE60' }}
+                                >
+                                  Inscripto
+                                </span>
                               )}
                             </div>
                             {a.descripcion && (
-                              <span
-                                style={{ fontSize: 12, color: C.textMuted }}
-                              >
+                              <span className="text-xs text-textMuted">
                                 {a.descripcion}
                               </span>
                             )}
                             <span
-                              style={{
-                                fontSize: 12,
-                                fontWeight: 800,
-                                color: completo ? C.red : C.green,
-                              }}
+                              className="text-xs font-extrabold"
+                              style={{ color: completo ? '#E74C3C' : '#27AE60' }}
                             >
                               {completo
                                 ? 'Cupo completo'
@@ -1859,12 +1228,7 @@ export default function StudentPortal() {
                             </span>
                             {a.inscripto ? (
                               <button
-                                style={{
-                                  ...S.logoutBtn,
-                                  color: C.red,
-                                  borderColor: C.red,
-                                  marginTop: 4,
-                                }}
+                                className="mt-1 bg-transparent border border-red rounded-[8px] px-3.5 py-[7px] text-xs font-bold text-red cursor-pointer font-[inherit]"
                                 onClick={() =>
                                   cancelarActividad(a.id_actividad)
                                 }
@@ -1874,18 +1238,11 @@ export default function StudentPortal() {
                             ) : (
                               <button
                                 disabled={completo}
-                                style={{
-                                  ...S.logoutBtn,
-                                  marginTop: 4,
-                                  color: completo ? C.textMuted : C.white,
-                                  background: completo
-                                    ? C.border
-                                    : C.purple,
-                                  borderColor: completo ? C.border : C.purple,
-                                  cursor: completo
-                                    ? 'not-allowed'
-                                    : 'pointer',
-                                }}
+                                className={`mt-1 border rounded-[8px] px-3.5 py-[7px] text-xs font-bold font-[inherit] transition-all
+                                  ${completo
+                                    ? 'bg-border border-border text-textMuted cursor-not-allowed'
+                                    : 'bg-purple-700 border-purple-700 text-white cursor-pointer'
+                                  }`}
                                 onClick={() =>
                                   inscribirseActividad(a.id_actividad)
                                 }
@@ -1902,31 +1259,23 @@ export default function StudentPortal() {
               })}
 
               {actividades.length === 0 && (
-                <div style={S.centered}>
+                <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
                   No hay actividades disponibles por el momento.
                 </div>
               )}
             </div>
           )}
 
+          {/* ━━━━━ NOTIFICACIONES ━━━━━ */}
           {activeNav === 'notificaciones' && (
-            <div style={S.card}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: 20,
-                }}
-              >
-                <div style={S.cardTitle}>🔔 Todas mis Notificaciones</div>
+            <div className="bg-white rounded-card p-6 shadow-card border border-border">
+              <div className="flex justify-between items-center mb-5">
+                <div className="text-[15px] font-extrabold text-text flex items-center gap-2">
+                  🔔 Todas mis Notificaciones
+                </div>
                 {notifNoLeidas > 0 && (
                   <button
-                    style={{
-                      ...S.logoutBtn,
-                      color: C.purple,
-                      borderColor: C.purple,
-                    }}
+                    className="bg-transparent border border-purple-700 rounded-[8px] px-3.5 py-[7px] text-xs font-bold text-purple-700 cursor-pointer font-[inherit]"
                     onClick={async () => {
                       await supabase
                         .from('notificaciones')
@@ -1942,77 +1291,44 @@ export default function StudentPortal() {
                 )}
               </div>
               {notificaciones.length === 0 ? (
-                <div style={S.centered}>Sin notificaciones</div>
+                <div className="flex items-center justify-center py-8 text-textMuted text-[13px]">
+                  Sin notificaciones
+                </div>
               ) : (
                 notificaciones.map((n) => (
                   <div
                     key={n.id_notificacion}
-                    style={{ ...S.notifItem, opacity: n.leida ? 0.55 : 1 }}
+                    className={`flex gap-3 items-start py-3 border-b border-border cursor-pointer transition-opacity ${n.leida ? 'opacity-[0.55]' : 'opacity-100'}`}
                     onClick={() => !n.leida && marcarLeida(n.id_notificacion)}
                   >
                     <div
-                      style={{
-                        width: 9,
-                        height: 9,
-                        borderRadius: '50%',
-                        marginTop: 6,
-                        flexShrink: 0,
-                        background: n.leida
-                          ? C.border
-                          : (NOTIF_COLOR[n.tipo] ?? C.purple),
-                      }}
+                      className="w-[9px] h-[9px] rounded-full mt-[6px] shrink-0"
+                      style={{ background: n.leida ? '#E8E6F5' : (NOTIF_COLOR[n.tipo] ?? '#5B35C5') }}
                     />
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 8,
-                          marginBottom: 4,
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: 14,
-                            fontWeight: n.leida ? 600 : 900,
-                          }}
-                        >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-sm ${n.leida ? 'font-semibold' : 'font-black'}`}>
                           {n.titulo}
                         </span>
-                        <span style={badge(NOTIF_COLOR[n.tipo] ?? C.purple)}>
+                        <span
+                          className="inline-block rounded-[20px] px-2.5 py-[3px] text-[11px] font-extrabold"
+                          style={{
+                            background: (NOTIF_COLOR[n.tipo] ?? '#5B35C5') + '1A',
+                            color: NOTIF_COLOR[n.tipo] ?? '#5B35C5',
+                          }}
+                        >
                           {n.tipo}
                         </span>
                       </div>
-                      <p
-                        style={{
-                          fontSize: 13,
-                          color: C.textMuted,
-                          margin: 0,
-                          lineHeight: 1.5,
-                        }}
-                      >
+                      <p className="text-[13px] text-textMuted m-0 leading-relaxed">
                         {n.mensaje}
                       </p>
-                      <span
-                        style={{
-                          fontSize: 11,
-                          color: C.textMuted,
-                          marginTop: 4,
-                          display: 'block',
-                        }}
-                      >
+                      <span className="text-[11px] text-textMuted mt-1 block">
                         {formatFecha(n.fecha_envio)}
                       </span>
                     </div>
                     {!n.leida && (
-                      <span
-                        style={{
-                          fontSize: 11,
-                          color: C.purple,
-                          fontWeight: 800,
-                          flexShrink: 0,
-                        }}
-                      >
+                      <span className="text-[11px] text-purple-700 font-extrabold shrink-0">
                         Marcar leída
                       </span>
                     )}

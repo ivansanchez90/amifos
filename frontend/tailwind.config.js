@@ -32,6 +32,7 @@ export default {
         orange: '#E67E22',
         red: '#E74C3C',
         blue: '#2980B9',
+        pink: '#E91E8C',
       },
       fontFamily: {
         sans: ['Nunito', 'Segoe UI', 'sans-serif'],

@@ -25,30 +25,23 @@ interface Noticia {
   destacada: boolean
 }
 
+interface Empleo {
+  id_empleo: number
+  titulo: string
+  descripcion: string | null
+  area: string | null
+  requisitos: string | null
+  modalidad: string | null
+  tipo_contrato: string | null
+  fecha_publicacion: string
+  fecha_cierre: string | null
+}
+
 interface ImagenGaleria {
   id_imagen: number
   titulo: string | null
   url_imagen: string
   categoria: string | null
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PALETA
-// ═══════════════════════════════════════════════════════════════
-const C = {
-  purple: '#5B35C5',
-  purpleLight: '#EEE9FF',
-  purpleDark: '#3D2092',
-  purpleMid: '#7B55E8',
-  white: '#FFFFFF',
-  bg: '#F7F6FC',
-  text: '#1A1A2E',
-  textMuted: '#6B6B8A',
-  border: '#E8E6F5',
-  pink: '#E91E8C',
-  green: '#27AE60',
-  orange: '#E67E22',
-  blue: '#2980B9',
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -115,21 +108,21 @@ const CONTACTO = {
 //  CAROUSEL DATA
 // ═══════════════════════════════════════════════════════════════
 const CAROUSEL_ITEMS = [
-  { label: 'Instalaciones', color: C.purple, img: PLACEHOLDERS.instalaciones },
-  { label: 'Idiomas', color: C.blue, img: PLACEHOLDERS.idiomas },
-  { label: 'Deportes', color: C.green, img: PLACEHOLDERS.deportes },
-  { label: 'Tecnología', color: C.orange, img: PLACEHOLDERS.tecnologia },
-  { label: 'Arte', color: C.pink, img: PLACEHOLDERS.arte },
+  { label: 'Instalaciones', color: '#5B35C5', img: PLACEHOLDERS.instalaciones },
+  { label: 'Idiomas', color: '#2980B9', img: PLACEHOLDERS.idiomas },
+  { label: 'Deportes', color: '#27AE60', img: PLACEHOLDERS.deportes },
+  { label: 'Tecnología', color: '#E67E22', img: PLACEHOLDERS.tecnologia },
+  { label: 'Arte', color: '#E91E8C', img: PLACEHOLDERS.arte },
 ]
 
 const INFO_CARDS = [
   {
     label: 'Perfil de los alumnos',
-    color: C.pink,
+    color: '#E91E8C',
     img: 'https://images.ecestaticos.com/CKUfRzWT3KFUBKN7Ho1h4N9P9io=/189x5:2202x1515/1200x900/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2Fa3d%2F216%2F63b%2Fa3d21663bc3dc3a57cf5f0dfb50a2d18.jpg',
   },
-  { label: 'Planta docente', color: C.green, img: PLACEHOLDERS.docentes },
-  { label: 'Niveles educativos', color: C.orange, img: PLACEHOLDERS.niveles },
+  { label: 'Planta docente', color: '#27AE60', img: PLACEHOLDERS.docentes },
+  { label: 'Niveles educativos', color: '#E67E22', img: PLACEHOLDERS.niveles },
 ]
 
 // ═══════════════════════════════════════════════════════════════
@@ -139,6 +132,7 @@ export default function Home() {
   const navigate = useNavigate()
   const [noticias, setNoticias] = useState<Noticia[]>([])
   const [galeria, setGaleria] = useState<ImagenGaleria[]>([])
+  const [empleos, setEmpleos] = useState<Empleo[]>([])
   const [carouselIdx, setCarouselIdx] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchVal, setSearchVal] = useState('')
@@ -147,6 +141,7 @@ export default function Home() {
   useEffect(() => {
     loadNoticias()
     loadGaleria()
+    loadEmpleos()
   }, [])
 
   // Verificar el rol del usuario para redirección correcta
@@ -190,6 +185,16 @@ export default function Home() {
     if (data) setGaleria(data as ImagenGaleria[])
   }
 
+  async function loadEmpleos() {
+    const { data } = await supabase
+      .from('empleos')
+      .select('id_empleo, titulo, descripcion, area, requisitos, modalidad, tipo_contrato, fecha_publicacion, fecha_cierre')
+      .eq('activo', true)
+      .order('fecha_publicacion', { ascending: false })
+      .limit(6)
+    if (data) setEmpleos(data as Empleo[])
+  }
+
   const prevCarousel = () =>
     setCarouselIdx(
       (i) => (i - 1 + CAROUSEL_ITEMS.length) % CAROUSEL_ITEMS.length,
@@ -215,94 +220,39 @@ export default function Home() {
   )
 
   return (
-    <div
-      style={{
-        fontFamily: "'Nunito', 'Segoe UI', sans-serif",
-        color: C.text,
-        background: C.bg,
-      }}
-    >
+    <div className="text-text bg-bg">
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           NAVBAR
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <header
-        style={{
-          background: C.white,
-          borderBottom: `3px solid ${C.purple}`,
-          position: 'sticky',
-          top: 0,
-          zIndex: 200,
-          boxShadow: '0 2px 16px rgba(91,53,197,0.08)',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: '0 auto',
-            padding: '0 24px',
-            height: 70,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-          }}
-        >
+      <header className="bg-white border-b-[3px] border-b-purple-700 sticky top-0 z-[200] shadow-[0_2px_16px_rgba(91,53,197,0.08)]">
+        <div className="max-w-[1200px] mx-auto px-6 h-[70px] flex items-center justify-between gap-4">
           {/* Logo */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              flexShrink: 0,
-            }}
-          >
+          <div className="flex items-center gap-[10px] shrink-0">
             <img
               src='/logo.png'
               alt='Logo'
-              style={{ height: 50, width: 'auto' }}
+              className="h-[50px] w-auto"
               onError={(e) => {
                 ;(e.target as HTMLImageElement).style.display = 'none'
               }}
             />
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 900,
-                  color: C.purple,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  lineHeight: 1.2,
-                }}
-              >
+              <div className="text-xs font-black text-purple-700 uppercase tracking-wide leading-tight">
                 Educar Para Transformar
               </div>
-              <div
-                style={{
-                  fontSize: 9,
-                  color: C.textMuted,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                }}
-              >
+              <div className="text-[9px] text-textMuted uppercase tracking-wider">
                 Centro Educativo
               </div>
             </div>
           </div>
 
           {/* Nav links — desktop */}
-          <nav
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              flexWrap: 'wrap',
-            }}
-          >
+          <nav className="flex items-center gap-1 flex-wrap">
             {[
               { label: 'Nosotros', href: '#nosotros' },
               { label: 'Ingresantes', href: '#ingresantes' },
               { label: 'Novedades', href: '#novedades' },
+              { label: 'Empleos', href: '#empleos' },
               { label: 'Galerías', href: '#galeria' },
               {
                 label: 'Campus Virtual',
@@ -315,28 +265,11 @@ export default function Home() {
                 key={item.label}
                 href={item.isRoute ? undefined : item.href}
                 onClick={item.isRoute ? () => navigate(item.href) : undefined}
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: item.isRoute ? C.white : C.textMuted,
-                  background: item.isRoute
-                    ? `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`
-                    : 'none',
-                  padding: item.isRoute ? '7px 14px' : '7px 10px',
-                  borderRadius: item.isRoute ? 8 : 0,
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                  whiteSpace: 'nowrap',
-                }}
-                onMouseEnter={(e) => {
-                  if (!item.isRoute)
-                    (e.target as HTMLElement).style.color = C.purple
-                }}
-                onMouseLeave={(e) => {
-                  if (!item.isRoute)
-                    (e.target as HTMLElement).style.color = C.textMuted
-                }}
+                className={
+                  item.isRoute
+                    ? 'text-[13px] font-bold text-white bg-gradient-to-br from-purple-700 to-purpleMid py-[7px] px-[14px] rounded-lg no-underline cursor-pointer whitespace-nowrap'
+                    : 'text-[13px] font-bold text-textMuted hover:text-purple-700 transition-colors duration-200 py-[7px] px-[10px] no-underline cursor-pointer whitespace-nowrap'
+                }
               >
                 {item.label}
               </a>
@@ -344,26 +277,15 @@ export default function Home() {
           </nav>
 
           {/* Buscador */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="flex items-center gap-2">
             <input
               type='text'
               placeholder='Buscar...'
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
-              style={{
-                border: `2px solid ${C.border}`,
-                borderRadius: 20,
-                padding: '7px 16px',
-                fontSize: 13,
-                outline: 'none',
-                fontFamily: 'inherit',
-                color: C.text,
-                width: 160,
-              }}
+              className="border-2 border-border rounded-full py-[7px] px-4 text-[13px] outline-none text-text w-40"
             />
-            <span style={{ fontSize: 18, cursor: 'pointer', color: C.purple }}>
-              🔍
-            </span>
+            <span className="text-lg cursor-pointer text-purple-700">🔍</span>
           </div>
         </div>
       </header>
@@ -371,106 +293,39 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           HERO
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section
-        style={{
-          position: 'relative',
-          height: 420,
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+      <section className="relative h-[420px] overflow-hidden flex items-center">
         <img
           src={PLACEHOLDERS.hero}
           alt='Hero'
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+          className="absolute inset-0 w-full h-full object-cover"
         />
         <div
+          className="absolute inset-0"
           style={{
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(135deg, ${C.purpleDark}CC 0%, ${C.purple}99 50%, transparent 100%)`,
+            background: 'linear-gradient(135deg, #3D2092CC 0%, #5B35C599 50%, transparent 100%)',
           }}
         />
-        <div
-          style={{
-            position: 'relative',
-            maxWidth: 1200,
-            margin: '0 auto',
-            padding: '0 40px',
-            color: C.white,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              opacity: 0.8,
-              marginBottom: 12,
-            }}
-          >
+        <div className="relative max-w-[1200px] mx-auto px-10 text-white">
+          <div className="text-[11px] font-extrabold tracking-[0.15em] uppercase opacity-80 mb-3">
             Centro Educativo
           </div>
-          <h1
-            style={{
-              fontSize: 44,
-              fontWeight: 900,
-              lineHeight: 1.15,
-              margin: '0 0 16px',
-              maxWidth: 580,
-            }}
-          >
+          <h1 className="text-[44px] font-black leading-[1.15] mt-0 mb-4 max-w-[580px]">
             Educamos para transformar el mundo
           </h1>
-          <p
-            style={{
-              fontSize: 16,
-              opacity: 0.9,
-              maxWidth: 460,
-              lineHeight: 1.6,
-              margin: '0 0 28px',
-            }}
-          >
+          <p className="text-base opacity-90 max-w-[460px] leading-relaxed mt-0 mb-7">
             Inspiramos, desafiamos y empoderamos a nuestros alumnos a ser
             agentes de cambio en su comunidad.
           </p>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="flex gap-3">
             <a
               href='#ingresantes'
-              style={{
-                background: C.white,
-                color: C.purple,
-                borderRadius: 10,
-                padding: '12px 28px',
-                fontWeight: 800,
-                fontSize: 14,
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
+              className="bg-white text-purple-700 rounded-btn py-3 px-7 font-extrabold text-sm no-underline cursor-pointer"
             >
               Quiero inscribirme
             </a>
             <a
               href='#nosotros'
-              style={{
-                background: 'rgba(255,255,255,0.15)',
-                color: C.white,
-                borderRadius: 10,
-                padding: '12px 28px',
-                fontWeight: 800,
-                fontSize: 14,
-                textDecoration: 'none',
-                border: '2px solid rgba(255,255,255,0.4)',
-                cursor: 'pointer',
-              }}
+              className="bg-white/15 text-white rounded-btn py-3 px-7 font-extrabold text-sm no-underline border-2 border-white/40 cursor-pointer"
             >
               Conocenos
             </a>
@@ -481,97 +336,33 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           INFORMACIÓN GENERAL
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section
-        id='nosotros'
-        style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 24px 40px' }}
-      >
-        <div style={{ marginBottom: 36 }}>
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: C.purple,
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-            }}
-          >
+      <section id='nosotros' className="max-w-[1200px] mx-auto px-6 pt-[60px] pb-10">
+        <div className="mb-9">
+          <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
             Quiénes somos
           </span>
-          <h2
-            style={{
-              fontSize: 30,
-              fontWeight: 900,
-              margin: '8px 0 0',
-              color: C.text,
-            }}
-          >
+          <h2 className="text-[30px] font-black mt-2 mb-0 text-text">
             Información general del Instituto
           </h2>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 20,
-          }}
-        >
+        <div className="grid grid-cols-3 gap-5">
           {INFO_CARDS.map((card) => (
             <div
               key={card.label}
-              style={{
-                position: 'relative',
-                borderRadius: 16,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                height: 260,
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget.querySelector(
-                  '.overlay',
-                ) as HTMLElement
-                if (el) el.style.opacity = '0.45'
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget.querySelector(
-                  '.overlay',
-                ) as HTMLElement
-                if (el) el.style.opacity = '0.15'
-              }}
+              className="group relative rounded-card overflow-hidden cursor-pointer h-[260px]"
             >
               <img
                 src={card.img}
                 alt={card.label}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
+                className="w-full h-full object-cover block"
               />
               <div
-                className='overlay'
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: card.color,
-                  opacity: 0.15,
-                  transition: 'opacity 0.3s',
-                }}
+                className="overlay absolute inset-0 opacity-[0.15] group-hover:opacity-[0.45] transition-opacity duration-300"
+                style={{ background: card.color }}
               />
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: '20px 24px',
-                  color: C.white,
-                }}
-              >
-                <div style={{ fontSize: 18, fontWeight: 900 }}>
-                  {card.label}
-                </div>
+              <div className="absolute bottom-0 left-0 right-0 p-5 px-6 text-white">
+                <div className="text-lg font-black">{card.label}</div>
               </div>
             </div>
           ))}
@@ -581,105 +372,47 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           CONTAMOS CON (CAROUSEL)
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section style={{ background: C.white, padding: '60px 0' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ marginBottom: 36 }}>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: C.purple,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}
-            >
+      <section className="bg-white py-[60px]">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="mb-9">
+            <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
               Nuestra oferta
             </span>
-            <h2
-              style={{
-                fontSize: 30,
-                fontWeight: 900,
-                margin: '8px 0 0',
-                color: C.text,
-              }}
-            >
+            <h2 className="text-[30px] font-black mt-2 mb-0 text-text">
               Contamos con:
             </h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div className="flex items-center gap-4">
             {/* Flecha izq */}
             <button
               onClick={prevCarousel}
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                border: `2px solid ${C.border}`,
-                background: C.white,
-                cursor: 'pointer',
-                fontSize: 20,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                color: C.purple,
-                boxShadow: '0 2px 8px rgba(91,53,197,0.1)',
-              }}
+              className="w-11 h-11 rounded-full border-2 border-border bg-white cursor-pointer text-[20px] flex items-center justify-center shrink-0 text-purple-700 shadow-[0_2px_8px_rgba(91,53,197,0.1)]"
             >
               ‹
             </button>
 
             {/* Cards */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 20,
-                flex: 1,
-              }}
-            >
+            <div className="grid grid-cols-3 gap-5 flex-1">
               {visibleItems.map((item, i) => (
                 <div
                   key={i}
-                  style={{
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 20px rgba(91,53,197,0.1)',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.transform = 'translateY(-4px)')
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform = 'translateY(0)')
-                  }
+                  className="rounded-card overflow-hidden shadow-[0_4px_20px_rgba(91,53,197,0.1)] cursor-pointer hover:-translate-y-1 transition-transform duration-200"
                 >
-                  <div style={{ position: 'relative', height: 200 }}>
+                  <div className="relative h-[200px]">
                     <img
                       src={item.img}
                       alt={item.label}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div
-                    style={{
-                      padding: '16px 20px',
-                      borderTop: `3px solid ${item.color}`,
-                      background: C.white,
-                    }}
+                    className="py-4 px-5 bg-white"
+                    style={{ borderTop: `3px solid ${item.color}` }}
                   >
                     <div
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 900,
-                        color: item.color,
-                      }}
+                      className="text-base font-black"
+                      style={{ color: item.color }}
                     >
                       {item.label}
                     </div>
@@ -691,49 +424,24 @@ export default function Home() {
             {/* Flecha der */}
             <button
               onClick={nextCarousel}
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                border: `2px solid ${C.border}`,
-                background: C.white,
-                cursor: 'pointer',
-                fontSize: 20,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                color: C.purple,
-                boxShadow: '0 2px 8px rgba(91,53,197,0.1)',
-              }}
+              className="w-11 h-11 rounded-full border-2 border-border bg-white cursor-pointer text-[20px] flex items-center justify-center shrink-0 text-purple-700 shadow-[0_2px_8px_rgba(91,53,197,0.1)]"
             >
               ›
             </button>
           </div>
 
           {/* Dots */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 8,
-              marginTop: 24,
-            }}
-          >
+          <div className="flex justify-center gap-2 mt-6">
             {CAROUSEL_ITEMS.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCarouselIdx(i)}
-                style={{
-                  width: i === carouselIdx ? 24 : 8,
-                  height: 8,
-                  borderRadius: 4,
-                  background: i === carouselIdx ? C.purple : C.border,
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  padding: 0,
-                }}
+                className={[
+                  'h-2 rounded border-0 cursor-pointer transition-all duration-300 p-0',
+                  i === carouselIdx
+                    ? 'w-6 bg-purple-700'
+                    : 'w-2 bg-border',
+                ].join(' ')}
               />
             ))}
           </div>
@@ -743,67 +451,17 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           MISIÓN
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section
-        style={{
-          background: `linear-gradient(135deg, ${C.purpleDark} 0%, ${C.purple} 60%, ${C.purpleMid} 100%)`,
-          padding: '80px 24px',
-          textAlign: 'center',
-          color: C.white,
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
+      <section className="bg-gradient-to-br from-purpleDark via-purple-700 to-purpleMid py-20 px-6 text-center text-white relative overflow-hidden">
         {/* Círculos decorativos */}
-        <div
-          style={{
-            position: 'absolute',
-            right: -60,
-            top: -60,
-            width: 300,
-            height: 300,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.04)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            left: -80,
-            bottom: -80,
-            width: 400,
-            height: 400,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.03)',
-          }}
-        />
+        <div className="absolute right-[-60px] top-[-60px] w-[300px] h-[300px] rounded-full bg-white/[0.04]" />
+        <div className="absolute left-[-80px] bottom-[-80px] w-[400px] h-[400px] rounded-full bg-white/[0.03]" />
 
-        <div style={{ position: 'relative', maxWidth: 700, margin: '0 auto' }}>
-          <div
-            style={{
-              display: 'inline-block',
-              background: 'rgba(255,255,255,0.15)',
-              borderRadius: 20,
-              padding: '6px 20px',
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginBottom: 20,
-            }}
-          >
+        <div className="relative max-w-[700px] mx-auto">
+          <div className="inline-block bg-white/15 rounded-[20px] py-[6px] px-5 text-[11px] font-extrabold tracking-[0.12em] uppercase mb-5">
             Nuestra filosofía
           </div>
-          <h2 style={{ fontSize: 36, fontWeight: 900, margin: '0 0 24px' }}>
-            Nuestra misión
-          </h2>
-          <p
-            style={{
-              fontSize: 18,
-              lineHeight: 1.8,
-              opacity: 0.92,
-              margin: '0 0 32px',
-            }}
-          >
+          <h2 className="text-4xl font-black mt-0 mb-6">Nuestra misión</h2>
+          <p className="text-lg leading-loose opacity-[0.92] mt-0 mb-8">
             Inspiramos, desafiamos y empoderamos a todos nuestros alumnos a ser
             miembros comprometidos y éticos de una comunidad global, para que se
             conviertan en agentes de cambio conscientes de sí mismos, seguros,
@@ -811,17 +469,7 @@ export default function Home() {
           </p>
           <a
             href='#nosotros'
-            style={{
-              display: 'inline-block',
-              background: C.white,
-              color: C.purple,
-              borderRadius: 10,
-              padding: '12px 32px',
-              fontWeight: 900,
-              fontSize: 14,
-              textDecoration: 'none',
-              cursor: 'pointer',
-            }}
+            className="inline-block bg-white text-purple-700 rounded-btn py-3 px-8 font-black text-sm no-underline cursor-pointer"
           >
             Conocé más sobre nosotros
           </a>
@@ -831,50 +479,20 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           NOVEDADES (desde Supabase)
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section
-        id='novedades'
-        style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 24px' }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: 36,
-          }}
-        >
+      <section id='novedades' className="max-w-[1200px] mx-auto px-6 py-[60px]">
+        <div className="flex justify-between items-end mb-9">
           <div>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: C.purple,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}
-            >
+            <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
               Últimas noticias
             </span>
-            <h2
-              style={{
-                fontSize: 30,
-                fontWeight: 900,
-                margin: '8px 0 0',
-                color: C.text,
-              }}
-            >
+            <h2 className="text-[30px] font-black mt-2 mb-0 text-text">
               Novedades
             </h2>
           </div>
           {noticias.length > 0 && (
             <a
               href='#novedades'
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: C.purple,
-                textDecoration: 'none',
-              }}
+              className="text-[13px] font-extrabold text-purple-700 no-underline"
             >
               Ver todas →
             </a>
@@ -883,157 +501,54 @@ export default function Home() {
 
         {noticias.length === 0 ? (
           /* Placeholder si no hay noticias cargadas aún */
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 20,
-            }}
-          >
+          <div className="grid grid-cols-3 gap-5">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  background: C.white,
-                  boxShadow: '0 2px 16px rgba(91,53,197,0.06)',
-                  border: `1px solid ${C.border}`,
-                }}
+                className="rounded-card overflow-hidden bg-white shadow-card border border-border"
               >
-                <div
-                  style={{
-                    height: 180,
-                    background: C.purpleLight,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <span style={{ fontSize: 32 }}>📰</span>
+                <div className="h-[180px] bg-purpleLight flex items-center justify-center">
+                  <span className="text-3xl">📰</span>
                 </div>
-                <div style={{ padding: 20 }}>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: C.textMuted,
-                      fontWeight: 700,
-                      marginBottom: 8,
-                    }}
-                  >
+                <div className="p-5">
+                  <div className="text-[11px] text-textMuted font-bold mb-2">
                     Próximamente
                   </div>
-                  <div
-                    style={{
-                      height: 16,
-                      background: C.border,
-                      borderRadius: 4,
-                      marginBottom: 8,
-                      width: '80%',
-                    }}
-                  />
-                  <div
-                    style={{
-                      height: 12,
-                      background: C.border,
-                      borderRadius: 4,
-                      width: '60%',
-                    }}
-                  />
+                  <div className="h-4 bg-border rounded mb-2 w-4/5" />
+                  <div className="h-3 bg-border rounded w-3/5" />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 20,
-            }}
-          >
+          <div className="grid grid-cols-3 gap-5">
             {noticias.slice(0, 6).map((n) => (
               <div
                 key={n.id_noticia}
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  background: C.white,
-                  boxShadow: '0 2px 16px rgba(91,53,197,0.06)',
-                  border: `1px solid ${C.border}`,
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)'
-                  e.currentTarget.style.boxShadow =
-                    '0 8px 32px rgba(91,53,197,0.14)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow =
-                    '0 2px 16px rgba(91,53,197,0.06)'
-                }}
+                className="rounded-card overflow-hidden bg-white shadow-card border border-border cursor-pointer hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(91,53,197,0.14)] transition-all duration-200"
               >
                 <img
                   src={n.url_imagen ?? PLACEHOLDERS.noticia}
                   alt={n.titulo}
-                  style={{
-                    width: '100%',
-                    height: 180,
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
+                  className="w-full h-[180px] object-cover block"
                   onError={(e) => {
                     ;(e.target as HTMLImageElement).src = PLACEHOLDERS.noticia
                   }}
                 />
                 {n.destacada && (
-                  <div
-                    style={{
-                      background: C.purple,
-                      color: C.white,
-                      fontSize: 10,
-                      fontWeight: 800,
-                      padding: '4px 12px',
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
+                  <div className="bg-purple-700 text-white text-[10px] font-extrabold py-1 px-3 tracking-[0.08em] uppercase">
                     ⭐ Destacado
                   </div>
                 )}
-                <div style={{ padding: 20 }}>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: C.textMuted,
-                      fontWeight: 700,
-                      marginBottom: 8,
-                    }}
-                  >
+                <div className="p-5">
+                  <div className="text-[11px] text-textMuted font-bold mb-2">
                     {formatFecha(n.fecha_publicacion)}
                   </div>
-                  <h3
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 900,
-                      margin: '0 0 8px',
-                      color: C.text,
-                      lineHeight: 1.4,
-                    }}
-                  >
+                  <h3 className="text-[15px] font-black mt-0 mb-2 text-text leading-snug">
                     {n.titulo}
                   </h3>
                   {n.resumen && (
-                    <p
-                      style={{
-                        fontSize: 13,
-                        color: C.textMuted,
-                        margin: 0,
-                        lineHeight: 1.6,
-                      }}
-                    >
+                    <p className="text-[13px] text-textMuted m-0 leading-relaxed">
                       {n.resumen.slice(0, 100)}...
                     </p>
                   )}
@@ -1045,116 +560,142 @@ export default function Home() {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          EMPLEOS (desde Supabase)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section id='empleos' className="bg-bg py-[60px]">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="mb-9">
+            <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
+              Sumate al equipo
+            </span>
+            <h2 className="text-[30px] font-black mt-2 mb-0 text-text">
+              Empleos disponibles
+            </h2>
+          </div>
+
+          {empleos.length === 0 ? (
+            <div className="grid grid-cols-3 gap-5">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-card shadow-card border border-border p-6 flex flex-col gap-3"
+                >
+                  <div className="h-4 bg-border rounded w-3/4" />
+                  <div className="h-3 bg-border rounded w-1/3" />
+                  <div className="h-3 bg-border rounded" />
+                  <div className="h-3 bg-border rounded w-5/6" />
+                  <div className="mt-2 h-3 bg-border rounded w-2/5" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-5">
+              {empleos.map((emp) => (
+                <div
+                  key={emp.id_empleo}
+                  className="bg-white rounded-card shadow-card border border-border overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-200"
+                >
+                  {/* Header de color */}
+                  <div className="bg-gradient-to-br from-purple-700 to-purpleMid px-6 py-5">
+                    <div className="flex gap-2 flex-wrap mb-2">
+                      {emp.modalidad && (
+                        <span className="inline-block bg-white/20 text-white px-[8px] py-[2px] rounded-full text-[10px] font-extrabold">
+                          {emp.modalidad}
+                        </span>
+                      )}
+                      {emp.tipo_contrato && (
+                        <span className="inline-block bg-white/20 text-white px-[8px] py-[2px] rounded-full text-[10px] font-extrabold">
+                          {emp.tipo_contrato}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-white font-black text-[17px] leading-snug m-0">
+                      {emp.titulo}
+                    </h3>
+                    {emp.area && (
+                      <div className="text-white/80 text-[12px] mt-1">📍 {emp.area}</div>
+                    )}
+                  </div>
+
+                  {/* Cuerpo */}
+                  <div className="p-6 flex flex-col flex-1 gap-3">
+                    {emp.descripcion && (
+                      <p className="text-[13px] text-text leading-relaxed m-0">
+                        {emp.descripcion.slice(0, 120)}{emp.descripcion.length > 120 ? '...' : ''}
+                      </p>
+                    )}
+                    {emp.requisitos && (
+                      <div>
+                        <div className="text-[10px] font-extrabold text-textMuted uppercase tracking-wider mb-1">
+                          Requisitos
+                        </div>
+                        <p className="text-[12px] text-textMuted leading-relaxed m-0">
+                          {emp.requisitos.slice(0, 100)}{emp.requisitos.length > 100 ? '...' : ''}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="mt-auto pt-3 flex items-center justify-between border-t border-border">
+                      <span className="text-[11px] text-textMuted">
+                        {emp.fecha_cierre
+                          ? `Cierre: ${emp.fecha_cierre}`
+                          : `Publicado: ${emp.fecha_publicacion}`}
+                      </span>
+                      <a
+                        href={`mailto:${CONTACTO.email}?subject=Postulación: ${emp.titulo}`}
+                        className="inline-block bg-gradient-to-br from-purple-700 to-purpleMid text-white text-[12px] font-extrabold px-4 py-[7px] rounded-btn no-underline"
+                      >
+                        Postularme →
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           GALERÍA (desde Supabase)
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section id='galeria' style={{ background: C.white, padding: '60px 0' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ marginBottom: 36 }}>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: C.purple,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}
-            >
+      <section id='galeria' className="bg-white py-[60px]">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="mb-9">
+            <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
               Imágenes
             </span>
-            <h2
-              style={{
-                fontSize: 30,
-                fontWeight: 900,
-                margin: '8px 0 0',
-                color: C.text,
-              }}
-            >
+            <h2 className="text-[30px] font-black mt-2 mb-0 text-text">
               Galería
             </h2>
           </div>
 
           {galeria.length === 0 ? (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: 12,
-              }}
-            >
+            <div className="grid grid-cols-4 gap-3">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div
                   key={i}
-                  style={{
-                    height: 180,
-                    borderRadius: 12,
-                    background: C.purpleLight,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 28,
-                  }}
+                  className="h-[180px] rounded-xl bg-purpleLight flex items-center justify-center text-[28px]"
                 >
                   🖼️
                 </div>
               ))}
             </div>
           ) : (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: 12,
-              }}
-            >
+            <div className="grid grid-cols-4 gap-3">
               {galeria.map((img) => (
                 <div
                   key={img.id_imagen}
-                  style={{
-                    position: 'relative',
-                    height: 180,
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => {
-                    const overlay = e.currentTarget.querySelector(
-                      '.gal-overlay',
-                    ) as HTMLElement
-                    if (overlay) overlay.style.opacity = '1'
-                  }}
-                  onMouseLeave={(e) => {
-                    const overlay = e.currentTarget.querySelector(
-                      '.gal-overlay',
-                    ) as HTMLElement
-                    if (overlay) overlay.style.opacity = '0'
-                  }}
+                  className="group relative h-[180px] rounded-xl overflow-hidden cursor-pointer"
                 >
                   <img
                     src={img.url_imagen}
                     alt={img.titulo ?? ''}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
+                    className="w-full h-full object-cover"
                   />
                   <div
-                    className='gal-overlay'
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: `${C.purple}CC`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: 0,
-                      transition: 'opacity 0.3s',
-                      color: C.white,
-                      fontWeight: 800,
-                      fontSize: 13,
-                      textAlign: 'center',
-                      padding: 12,
-                    }}
+                    className="gal-overlay absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white font-extrabold text-[13px] text-center p-3"
+                    style={{ background: '#5B35C5CC' }}
                   >
                     {img.titulo ?? img.categoria ?? 'Ver imagen'}
                   </div>
@@ -1168,111 +709,40 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           INGRESANTES / INSCRIPCIÓN
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section
-        id='ingresantes'
-        style={{
-          background: C.bg,
-          padding: '60px 24px',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 48,
-              alignItems: 'center',
-            }}
-          >
+      <section id='ingresantes' className="bg-bg py-[60px] px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid grid-cols-2 gap-12 items-center">
             <div>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: C.purple,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                }}
-              >
+              <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
                 Inscripciones abiertas
               </span>
-              <h2
-                style={{
-                  fontSize: 32,
-                  fontWeight: 900,
-                  margin: '8px 0 16px',
-                  color: C.text,
-                }}
-              >
+              <h2 className="text-3xl font-black mt-2 mb-4 text-text">
                 ¿Querés ser parte de nuestra comunidad?
               </h2>
-              <p
-                style={{
-                  fontSize: 15,
-                  color: C.textMuted,
-                  lineHeight: 1.7,
-                  margin: '0 0 28px',
-                }}
-              >
+              <p className="text-[15px] text-textMuted leading-[1.7] mt-0 mb-7">
                 Ofrecemos los niveles Inicial, Primario y Secundario. Completá
                 el formulario y nos pondremos en contacto con vos a la brevedad
                 para guiarte en el proceso.
               </p>
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
-              >
+              <div className="flex flex-col gap-3">
                 {[
                   'Nivel Inicial (3, 4 y 5 años)',
                   'Nivel Primario (1º a 7º grado)',
                   'Nivel Secundario (1º a 5º año)',
                 ].map((nivel) => (
-                  <div
-                    key={nivel}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10 }}
-                  >
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        background: C.purpleLight,
-                        color: C.purple,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 12,
-                        fontWeight: 900,
-                        flexShrink: 0,
-                      }}
-                    >
+                  <div key={nivel} className="flex items-center gap-[10px]">
+                    <div className="w-6 h-6 rounded-full bg-purpleLight text-purple-700 flex items-center justify-center text-xs font-black shrink-0">
                       ✓
                     </div>
-                    <span style={{ fontSize: 14, fontWeight: 600 }}>
-                      {nivel}
-                    </span>
+                    <span className="text-sm font-semibold">{nivel}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Formulario de inscripción */}
-            <div
-              style={{
-                background: C.white,
-                borderRadius: 20,
-                padding: 32,
-                boxShadow: '0 4px 32px rgba(91,53,197,0.1)',
-                border: `1px solid ${C.border}`,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 18,
-                  fontWeight: 900,
-                  margin: '0 0 20px',
-                  color: C.text,
-                }}
-              >
+            <div className="bg-white rounded-[20px] p-8 shadow-[0_4px_32px_rgba(91,53,197,0.1)] border border-border">
+              <h3 className="text-lg font-black mt-0 mb-5 text-text">
                 Solicitar inscripción
               </h3>
               <InscripcionForm />
@@ -1284,70 +754,24 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           CONTACTO
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section
-        id='contacto'
-        style={{ background: C.white, padding: '60px 24px' }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ marginBottom: 36 }}>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: C.purple,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}
-            >
+      <section id='contacto' className="bg-white py-[60px] px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="mb-9">
+            <span className="text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]">
               Estamos para ayudarte
             </span>
-            <h2
-              style={{
-                fontSize: 30,
-                fontWeight: 900,
-                margin: '8px 0 0',
-                color: C.text,
-              }}
-            >
+            <h2 className="text-[30px] font-black mt-2 mb-0 text-text">
               Contacto
             </h2>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1.2fr 1fr',
-              gap: 40,
-              alignItems: 'start',
-            }}
-          >
+          <div className="grid grid-cols-[1.2fr_1fr] gap-10 items-start">
             {/* Formulario de contacto */}
-            <div
-              style={{
-                background: C.bg,
-                borderRadius: 20,
-                padding: 32,
-                border: `1px solid ${C.border}`,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 18,
-                  fontWeight: 900,
-                  margin: '0 0 6px',
-                  color: C.text,
-                }}
-              >
+            <div className="bg-bg rounded-[20px] p-8 border border-border">
+              <h3 className="text-lg font-black mt-0 mb-[6px] text-text">
                 Escribinos
               </h3>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: C.textMuted,
-                  margin: '0 0 20px',
-                  lineHeight: 1.6,
-                }}
-              >
+              <p className="text-[13px] text-textMuted mt-0 mb-5 leading-relaxed">
                 Dejanos tu consulta y el equipo de la institución te responderá
                 a la brevedad.
               </p>
@@ -1355,112 +779,53 @@ export default function Home() {
             </div>
 
             {/* Canales directos */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="flex flex-col gap-[14px]">
               <a
                 href={`https://wa.me/${CONTACTO.whatsapp}`}
                 target='_blank'
                 rel='noreferrer'
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  background: '#25D36612',
-                  border: '1px solid #25D36640',
-                  borderRadius: 14,
-                  padding: '16px 18px',
-                  textDecoration: 'none',
-                  color: C.text,
-                }}
+                className="flex items-center gap-[14px] bg-[#25D36612] border border-[#25D36640] rounded-[14px] py-4 px-[18px] no-underline text-text"
               >
-                <span style={{ fontSize: 26 }}>💬</span>
+                <span className="text-[26px]">💬</span>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 900 }}>WhatsApp</div>
-                  <div style={{ fontSize: 12, color: C.textMuted }}>
+                  <div className="text-sm font-black">WhatsApp</div>
+                  <div className="text-xs text-textMuted">
                     {CONTACTO.whatsappLabel}
                   </div>
                 </div>
               </a>
               <a
                 href={`mailto:${CONTACTO.email}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  background: C.purpleLight,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 14,
-                  padding: '16px 18px',
-                  textDecoration: 'none',
-                  color: C.text,
-                }}
+                className="flex items-center gap-[14px] bg-purpleLight border border-border rounded-[14px] py-4 px-[18px] no-underline text-text"
               >
-                <span style={{ fontSize: 26 }}>✉️</span>
+                <span className="text-[26px]">✉️</span>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 900 }}>
-                    Correo electrónico
-                  </div>
-                  <div style={{ fontSize: 12, color: C.textMuted }}>
-                    {CONTACTO.email}
-                  </div>
+                  <div className="text-sm font-black">Correo electrónico</div>
+                  <div className="text-xs text-textMuted">{CONTACTO.email}</div>
                 </div>
               </a>
-              <div style={{ display: 'flex', gap: 14 }}>
+              <div className="flex gap-[14px]">
                 <a
                   href={CONTACTO.instagram}
                   target='_blank'
                   rel='noreferrer'
-                  style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    background: '#E91E8C12',
-                    border: '1px solid #E91E8C40',
-                    borderRadius: 14,
-                    padding: '14px 16px',
-                    textDecoration: 'none',
-                    color: C.text,
-                  }}
+                  className="flex-1 flex items-center gap-[10px] bg-[#E91E8C12] border border-[#E91E8C40] rounded-[14px] py-[14px] px-4 no-underline text-text"
                 >
-                  <span style={{ fontSize: 22 }}>📸</span>
-                  <span style={{ fontSize: 13, fontWeight: 800 }}>
-                    Instagram
-                  </span>
+                  <span className="text-[22px]">📸</span>
+                  <span className="text-[13px] font-extrabold">Instagram</span>
                 </a>
                 <a
                   href={CONTACTO.facebook}
                   target='_blank'
                   rel='noreferrer'
-                  style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    background: '#2980B912',
-                    border: '1px solid #2980B940',
-                    borderRadius: 14,
-                    padding: '14px 16px',
-                    textDecoration: 'none',
-                    color: C.text,
-                  }}
+                  className="flex-1 flex items-center gap-[10px] bg-[#2980B912] border border-[#2980B940] rounded-[14px] py-[14px] px-4 no-underline text-text"
                 >
-                  <span style={{ fontSize: 22 }}>📘</span>
-                  <span style={{ fontSize: 13, fontWeight: 800 }}>
-                    Facebook
-                  </span>
+                  <span className="text-[22px]">📘</span>
+                  <span className="text-[13px] font-extrabold">Facebook</span>
                 </a>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: '16px 18px',
-                  color: C.textMuted,
-                  fontSize: 13,
-                }}
-              >
-                <span style={{ fontSize: 22 }}>📍</span>
+              <div className="flex items-center gap-[14px] py-4 px-[18px] text-textMuted text-[13px]">
+                <span className="text-[22px]">📍</span>
                 {CONTACTO.direccion}
               </div>
             </div>
@@ -1471,73 +836,31 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           FOOTER
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <footer
-        style={{
-          background: C.text,
-          color: C.white,
-          padding: '48px 24px 28px',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr 1fr',
-              gap: 40,
-              marginBottom: 40,
-            }}
-          >
+      <footer className="bg-text text-white pt-12 px-6 pb-7">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-10">
             {/* Info */}
             <div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  marginBottom: 16,
-                }}
-              >
+              <div className="flex items-center gap-[10px] mb-4">
                 <img
                   src='/logo.png'
                   alt='Logo'
-                  style={{
-                    width: 'auto',
-                    height: 44,
-                    filter: 'brightness(0) invert(1)',
-                  }}
+                  className="w-auto h-11"
+                  style={{ filter: 'brightness(0) invert(1)' }}
                   onError={(e) => {
                     ;(e.target as HTMLImageElement).style.display = 'none'
                   }}
                 />
                 <div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 900,
-                      letterSpacing: '0.04em',
-                    }}
-                  >
+                  <div className="text-xs font-black tracking-[0.04em]">
                     Educar Para Transformar
                   </div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      opacity: 0.6,
-                      letterSpacing: '0.08em',
-                    }}
-                  >
+                  <div className="text-[10px] opacity-60 tracking-[0.08em]">
                     CENTRO EDUCATIVO
                   </div>
                 </div>
               </div>
-              <p
-                style={{
-                  fontSize: 13,
-                  opacity: 0.7,
-                  lineHeight: 1.7,
-                  margin: 0,
-                }}
-              >
+              <p className="text-[13px] opacity-70 leading-[1.7] m-0">
                 Formando líderes del mañana con valores, conocimiento y
                 compromiso social.
               </p>
@@ -1545,16 +868,7 @@ export default function Home() {
 
             {/* Navegación */}
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 800,
-                  opacity: 0.5,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  marginBottom: 16,
-                }}
-              >
+              <div className="text-xs font-extrabold opacity-50 uppercase tracking-wider mb-4">
                 Navegación
               </div>
               {['Nosotros', 'Ingresantes', 'Novedades', 'Galerías'].map(
@@ -1562,15 +876,7 @@ export default function Home() {
                   <a
                     key={item}
                     href={`#${item.toLowerCase()}`}
-                    style={{
-                      display: 'block',
-                      fontSize: 13,
-                      opacity: 0.7,
-                      textDecoration: 'none',
-                      color: C.white,
-                      marginBottom: 10,
-                      fontWeight: 600,
-                    }}
+                    className="block text-[13px] opacity-70 no-underline text-white mb-[10px] font-semibold"
                   >
                     {item}
                   </a>
@@ -1580,16 +886,7 @@ export default function Home() {
 
             {/* Contacto */}
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 800,
-                  opacity: 0.5,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  marginBottom: 16,
-                }}
-              >
+              <div className="text-xs font-extrabold opacity-50 uppercase tracking-wider mb-4">
                 Datos de contacto
               </div>
               {[
@@ -1610,18 +907,13 @@ export default function Home() {
                   href={item.href}
                   target={item.href?.startsWith('http') ? '_blank' : undefined}
                   rel='noreferrer'
-                  style={{
-                    display: 'flex',
-                    gap: 8,
-                    alignItems: 'flex-start',
-                    marginBottom: 12,
-                    textDecoration: 'none',
-                    color: C.white,
-                    cursor: item.href ? 'pointer' : 'default',
-                  }}
+                  className={[
+                    'flex gap-2 items-start mb-3 no-underline text-white',
+                    item.href ? 'cursor-pointer' : 'cursor-default',
+                  ].join(' ')}
                 >
-                  <span style={{ fontSize: 14 }}>{item.icon}</span>
-                  <span style={{ fontSize: 12, opacity: 0.7, lineHeight: 1.5 }}>
+                  <span className="text-sm">{item.icon}</span>
+                  <span className="text-xs opacity-70 leading-[1.5]">
                     {item.text}
                   </span>
                 </a>
@@ -1630,16 +922,7 @@ export default function Home() {
 
             {/* Redes */}
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 800,
-                  opacity: 0.5,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  marginBottom: 16,
-                }}
-              >
+              <div className="text-xs font-extrabold opacity-50 uppercase tracking-wider mb-4">
                 Redes sociales
               </div>
               {[
@@ -1661,37 +944,14 @@ export default function Home() {
                   href={red.href}
                   target='_blank'
                   rel='noreferrer'
-                  style={{
-                    display: 'flex',
-                    gap: 10,
-                    alignItems: 'center',
-                    marginBottom: 14,
-                    cursor: 'pointer',
-                    textDecoration: 'none',
-                    color: C.white,
-                  }}
+                  className="flex gap-[10px] items-center mb-[14px] cursor-pointer no-underline text-white"
                 >
-                  <div
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      background: 'rgba(255,255,255,0.1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 16,
-                    }}
-                  >
+                  <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-base">
                     {red.icon}
                   </div>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 700 }}>
-                      {red.label}
-                    </div>
-                    <div style={{ fontSize: 11, opacity: 0.6 }}>
-                      {red.handle}
-                    </div>
+                    <div className="text-xs font-bold">{red.label}</div>
+                    <div className="text-[11px] opacity-60">{red.handle}</div>
                   </div>
                 </a>
               ))}
@@ -1699,32 +959,14 @@ export default function Home() {
           </div>
 
           {/* Bottom bar */}
-          <div
-            style={{
-              borderTop: '1px solid rgba(255,255,255,0.1)',
-              paddingTop: 20,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <span style={{ fontSize: 12, opacity: 0.5 }}>
+          <div className="border-t border-white/10 pt-5 flex justify-between items-center">
+            <span className="text-xs opacity-50">
               © {new Date().getFullYear()} Educar Para Transformar. Todos los
               derechos reservados.
             </span>
             <button
               onClick={() => navigate(getCorrectRoute())}
-              style={{
-                background: C.purple,
-                color: C.white,
-                border: 'none',
-                borderRadius: 8,
-                padding: '8px 18px',
-                fontSize: 12,
-                fontWeight: 800,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
+              className="bg-purple-700 text-white border-0 rounded-lg py-2 px-[18px] text-xs font-extrabold cursor-pointer"
             >
               Acceder al Campus Virtual →
             </button>
@@ -1772,41 +1014,20 @@ function InscripcionForm() {
     setLoading(false)
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '11px 14px',
-    borderRadius: 10,
-    border: `2px solid ${C.border}`,
-    fontSize: 13,
-    fontFamily: 'inherit',
-    outline: 'none',
-    color: C.text,
-    boxSizing: 'border-box',
-  }
+  const inputCls =
+    'w-full py-[11px] px-[14px] rounded-input border-2 border-border text-[13px] outline-none text-text box-border'
 
-  const labelStyle: React.CSSProperties = {
-    fontSize: 11,
-    fontWeight: 800,
-    color: C.textMuted,
-    display: 'block',
-    marginBottom: 5,
-  }
+  const labelCls =
+    'text-[11px] font-extrabold text-textMuted block mb-[5px]'
 
   if (success) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px 0' }}>
-        <div style={{ fontSize: 44, marginBottom: 12 }}>✅</div>
-        <div
-          style={{
-            fontSize: 16,
-            fontWeight: 900,
-            color: C.purple,
-            marginBottom: 8,
-          }}
-        >
+      <div className="text-center py-5">
+        <div className="text-[44px] mb-3">✅</div>
+        <div className="text-base font-black text-purple-700 mb-2">
           ¡Solicitud enviada!
         </div>
-        <p style={{ fontSize: 13, color: C.textMuted }}>
+        <p className="text-[13px] text-textMuted">
           Nos pondremos en contacto con vos a la brevedad.
         </p>
       </div>
@@ -1814,72 +1035,69 @@ function InscripcionForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
-    >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label style={labelStyle}>Nombre del aspirante</label>
+          <label className={labelCls}>Nombre del aspirante</label>
           <input
             name='nombre_aspirante'
             required
             value={form.nombre_aspirante}
             onChange={handleChange}
             placeholder='Juan'
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
         <div>
-          <label style={labelStyle}>Apellido del aspirante</label>
+          <label className={labelCls}>Apellido del aspirante</label>
           <input
             name='apellido_aspirante'
             required
             value={form.apellido_aspirante}
             onChange={handleChange}
             placeholder='Pérez'
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label style={labelStyle}>DNI del aspirante</label>
+          <label className={labelCls}>DNI del aspirante</label>
           <input
             name='dni_aspirante'
             required
             value={form.dni_aspirante}
             onChange={handleChange}
             placeholder='12345678'
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
         <div>
-          <label style={labelStyle}>Fecha de nacimiento</label>
+          <label className={labelCls}>Fecha de nacimiento</label>
           <input
             type='date'
             name='fecha_nacimiento_aspirante'
             required
             value={form.fecha_nacimiento_aspirante}
             onChange={handleChange}
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
       </div>
       <div>
-        <label style={labelStyle}>Nombre del tutor / padre</label>
+        <label className={labelCls}>Nombre del tutor / padre</label>
         <input
           name='nombre_tutor'
           required
           value={form.nombre_tutor}
           onChange={handleChange}
           placeholder='María García'
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label style={labelStyle}>Email de contacto</label>
+          <label className={labelCls}>Email de contacto</label>
           <input
             type='email'
             name='email_tutor'
@@ -1887,28 +1105,28 @@ function InscripcionForm() {
             value={form.email_tutor}
             onChange={handleChange}
             placeholder='mail@gmail.com'
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
         <div>
-          <label style={labelStyle}>Teléfono</label>
+          <label className={labelCls}>Teléfono</label>
           <input
             name='telefono_tutor'
             value={form.telefono_tutor}
             onChange={handleChange}
             placeholder='+54 9 362...'
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
       </div>
       <div>
-        <label style={labelStyle}>Nivel solicitado</label>
+        <label className={labelCls}>Nivel solicitado</label>
         <select
           name='nivel_solicitado'
           required
           value={form.nivel_solicitado}
           onChange={handleChange}
-          style={{ ...inputStyle, appearance: 'none' as const }}
+          className={`${inputCls} appearance-none`}
         >
           <option value=''>Seleccioná un nivel...</option>
           <option value='Inicial'>Inicial</option>
@@ -1918,17 +1136,7 @@ function InscripcionForm() {
       </div>
 
       {error && (
-        <div
-          style={{
-            background: '#E74C3C12',
-            border: '1px solid #E74C3C40',
-            borderRadius: 8,
-            padding: '10px 14px',
-            fontSize: 12,
-            color: '#E74C3C',
-            fontWeight: 700,
-          }}
-        >
+        <div className="bg-[#E74C3C12] border border-[#E74C3C40] rounded-lg py-[10px] px-[14px] text-xs text-red font-bold">
           ⚠️ {error}
         </div>
       )}
@@ -1936,20 +1144,12 @@ function InscripcionForm() {
       <button
         type='submit'
         disabled={loading}
-        style={{
-          background: loading
-            ? C.border
-            : `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`,
-          color: loading ? C.textMuted : C.white,
-          border: 'none',
-          borderRadius: 10,
-          padding: '13px',
-          fontSize: 14,
-          fontWeight: 800,
-          cursor: loading ? 'not-allowed' : 'pointer',
-          fontFamily: 'inherit',
-          marginTop: 4,
-        }}
+        className={[
+          'border-0 rounded-btn p-[13px] text-sm font-extrabold mt-1',
+          loading
+            ? 'bg-border cursor-not-allowed text-textMuted'
+            : 'bg-gradient-to-br from-purple-700 to-purpleMid cursor-pointer text-white',
+        ].join(' ')}
       >
         {loading ? 'Enviando...' : 'Enviar solicitud'}
       </button>
@@ -1987,40 +1187,20 @@ function ContactoForm() {
     setLoading(false)
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '11px 14px',
-    borderRadius: 10,
-    border: `2px solid ${C.border}`,
-    fontSize: 13,
-    fontFamily: 'inherit',
-    outline: 'none',
-    color: C.text,
-    boxSizing: 'border-box',
-  }
-  const labelStyle: React.CSSProperties = {
-    fontSize: 11,
-    fontWeight: 800,
-    color: C.textMuted,
-    display: 'block',
-    marginBottom: 5,
-  }
+  const inputCls =
+    'w-full py-[11px] px-[14px] rounded-input border-2 border-border text-[13px] outline-none text-text box-border'
+
+  const labelCls =
+    'text-[11px] font-extrabold text-textMuted block mb-[5px]'
 
   if (success) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px 0' }}>
-        <div style={{ fontSize: 44, marginBottom: 12 }}>✅</div>
-        <div
-          style={{
-            fontSize: 16,
-            fontWeight: 900,
-            color: C.purple,
-            marginBottom: 8,
-          }}
-        >
+      <div className="text-center py-5">
+        <div className="text-[44px] mb-3">✅</div>
+        <div className="text-base font-black text-purple-700 mb-2">
           ¡Mensaje enviado!
         </div>
-        <p style={{ fontSize: 13, color: C.textMuted }}>
+        <p className="text-[13px] text-textMuted">
           Recibimos tu consulta. Te responderemos a la brevedad.
         </p>
       </div>
@@ -2028,23 +1208,20 @@ function ContactoForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <div>
-        <label style={labelStyle}>Nombre</label>
+        <label className={labelCls}>Nombre</label>
         <input
           name='nombre'
           required
           value={form.nombre}
           onChange={handleChange}
           placeholder='Tu nombre'
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
       <div>
-        <label style={labelStyle}>Correo electrónico</label>
+        <label className={labelCls}>Correo electrónico</label>
         <input
           type='email'
           name='email'
@@ -2052,11 +1229,11 @@ function ContactoForm() {
           value={form.email}
           onChange={handleChange}
           placeholder='mail@gmail.com'
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
       <div>
-        <label style={labelStyle}>Mensaje</label>
+        <label className={labelCls}>Mensaje</label>
         <textarea
           name='mensaje'
           required
@@ -2064,22 +1241,12 @@ function ContactoForm() {
           onChange={handleChange}
           placeholder='Escribí tu consulta...'
           rows={4}
-          style={{ ...inputStyle, resize: 'vertical' as const }}
+          className={`${inputCls} resize-y`}
         />
       </div>
 
       {error && (
-        <div
-          style={{
-            background: '#E74C3C12',
-            border: '1px solid #E74C3C40',
-            borderRadius: 8,
-            padding: '10px 14px',
-            fontSize: 12,
-            color: '#E74C3C',
-            fontWeight: 700,
-          }}
-        >
+        <div className="bg-[#E74C3C12] border border-[#E74C3C40] rounded-lg py-[10px] px-[14px] text-xs text-red font-bold">
           ⚠️ {error}
         </div>
       )}
@@ -2087,20 +1254,12 @@ function ContactoForm() {
       <button
         type='submit'
         disabled={loading}
-        style={{
-          background: loading
-            ? C.border
-            : `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`,
-          color: loading ? C.textMuted : C.white,
-          border: 'none',
-          borderRadius: 10,
-          padding: '13px',
-          fontSize: 14,
-          fontWeight: 800,
-          cursor: loading ? 'not-allowed' : 'pointer',
-          fontFamily: 'inherit',
-          marginTop: 4,
-        }}
+        className={[
+          'border-0 rounded-btn p-[13px] text-sm font-extrabold mt-1',
+          loading
+            ? 'bg-border cursor-not-allowed text-textMuted'
+            : 'bg-gradient-to-br from-purple-700 to-purpleMid cursor-pointer text-white',
+        ].join(' ')}
       >
         {loading ? 'Enviando...' : 'Enviar mensaje'}
       </button>

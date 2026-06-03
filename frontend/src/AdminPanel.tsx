@@ -106,6 +106,8 @@ interface Cuota {
   descuento: number
   estado: string
   fecha_vencimiento: string
+  fecha_pago: string | null
+  metodo_pago: string | null
   alumnos: { nombre: string; apellido: string } | null
 }
 
@@ -208,24 +210,19 @@ interface Noticia {
   destacada: boolean
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  COLORES
-// ═══════════════════════════════════════════════════════════════
-const C = {
-  purple: '#5B35C5',
-  purpleLight: '#EEE9FF',
-  purpleDark: '#3D2092',
-  purpleMid: '#7B55E8',
-  white: '#FFFFFF',
-  bg: '#F5F4FB',
-  text: '#1A1A2E',
-  textMuted: '#6B6B8A',
-  border: '#E8E6F5',
-  green: '#27AE60',
-  orange: '#E67E22',
-  red: '#E74C3C',
-  blue: '#2980B9',
+interface Empleo {
+  id_empleo: number
+  titulo: string
+  descripcion: string | null
+  area: string | null
+  requisitos: string | null
+  modalidad: string | null
+  tipo_contrato: string | null
+  activo: boolean
+  fecha_publicacion: string
+  fecha_cierre: string | null
 }
+
 
 const MESES = [
   'Enero',
@@ -242,91 +239,8 @@ const MESES = [
   'Diciembre',
 ]
 
-// ═══════════════════════════════════════════════════════════════
-//  ESTILOS REUTILIZABLES
-// ═══════════════════════════════════════════════════════════════
-const card: React.CSSProperties = {
-  background: C.white,
-  borderRadius: 16,
-  padding: 24,
-  boxShadow: '0 2px 16px rgba(91,53,197,0.06)',
-  border: `1px solid ${C.border}`,
-}
-const cardTitle: React.CSSProperties = {
-  fontSize: 15,
-  fontWeight: 800,
-  color: C.text,
-  marginBottom: 20,
-}
-const th: React.CSSProperties = {
-  textAlign: 'left',
-  fontSize: 10,
-  fontWeight: 800,
-  color: C.textMuted,
-  textTransform: 'uppercase',
-  letterSpacing: '0.07em',
-  padding: '0 12px 12px 0',
-  borderBottom: `2px solid ${C.border}`,
-}
-const td: React.CSSProperties = {
-  padding: '11px 12px 11px 0',
-  fontSize: 13,
-  borderBottom: `1px solid ${C.border}`,
-  verticalAlign: 'middle',
-}
-const input: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 14px',
-  borderRadius: 10,
-  border: `2px solid ${C.border}`,
-  fontSize: 13,
-  fontFamily: 'inherit',
-  outline: 'none',
-  color: C.text,
-  boxSizing: 'border-box',
-}
-const label: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 800,
-  color: C.textMuted,
-  display: 'block',
-  marginBottom: 5,
-}
-const btnPrimary: React.CSSProperties = {
-  background: `linear-gradient(135deg, ${C.purple}, ${C.purpleMid})`,
-  color: C.white,
-  border: 'none',
-  borderRadius: 10,
-  padding: '10px 20px',
-  fontSize: 13,
-  fontWeight: 800,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-}
-const btnSecondary: React.CSSProperties = {
-  background: C.purpleLight,
-  color: C.purple,
-  border: 'none',
-  borderRadius: 10,
-  padding: '10px 20px',
-  fontSize: 13,
-  fontWeight: 800,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-}
-const btnDanger: React.CSSProperties = {
-  background: '#E74C3C1A',
-  color: C.red,
-  border: 'none',
-  borderRadius: 8,
-  padding: '6px 12px',
-  fontSize: 12,
-  fontWeight: 800,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-}
-const badge = (color: string): React.CSSProperties => ({
-  display: 'inline-block',
+const badge = (color: string) => ({
+  display: 'inline-block' as const,
   background: color + '1A',
   color,
   borderRadius: 20,
@@ -347,6 +261,7 @@ const NAV_ADMIN = [
   { key: 'materias', icon: '📚', label: 'Materias' },
   { key: 'asignaciones', icon: '🔗', label: 'Asignaciones' },
   { key: 'cuotas', icon: '💳', label: 'Cuotas' },
+  { key: 'pagos', icon: '💰', label: 'Registrar pagos' },
   { key: 'becas', icon: '🎟️', label: 'Becas' },
   { key: 'sueldos', icon: '💼', label: 'Sueldos' },
   { key: 'compras', icon: '🧪', label: 'Compras insumos' },
@@ -355,6 +270,7 @@ const NAV_ADMIN = [
   { key: 'reservas', icon: '🏟️', label: 'Reservas' },
   { key: 'mensajes', icon: '✉️', label: 'Mensajes' },
   { key: 'noticias', icon: '📰', label: 'Noticias' },
+  { key: 'empleos', icon: '💼', label: 'Empleos' },
   { key: 'galeria', icon: '🖼️', label: 'Galería' },
 ]
 
@@ -427,13 +343,13 @@ export default function AdminPanel() {
       >
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🚫</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: C.red }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#E74C3C' }}>
             Sin acceso
           </div>
-          <p style={{ color: C.textMuted }}>
+          <p style={{ color: '#6B6B8A' }}>
             Tu usuario no tiene permisos para este panel.
           </p>
-          <button style={btnPrimary} onClick={() => supabase.auth.signOut()}>
+          <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => supabase.auth.signOut()}>
             Salir
           </button>
         </div>
@@ -449,16 +365,16 @@ export default function AdminPanel() {
     <div
       style={{
         fontFamily: "'Nunito','Segoe UI',sans-serif",
-        background: C.bg,
+        background: '#F5F4FB',
         minHeight: '100vh',
-        color: C.text,
+        color: '#1A1A2E',
       }}
     >
       {/* ── HEADER ── */}
       <header
         style={{
-          background: C.white,
-          borderBottom: `3px solid ${C.purple}`,
+          background: '#FFFFFF',
+          borderBottom: `3px solid ${'#5B35C5'}`,
           padding: '0 28px',
           height: 68,
           display: 'flex',
@@ -484,14 +400,14 @@ export default function AdminPanel() {
               style={{
                 fontSize: 12,
                 fontWeight: 900,
-                color: C.purple,
+                color: '#5B35C5',
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em',
               }}
             >
               Educar Para Transformar
             </div>
-            <div style={{ fontSize: 10, color: C.textMuted }}>
+            <div style={{ fontSize: 10, color: '#6B6B8A' }}>
               Panel {perfil.rol}
             </div>
           </div>
@@ -502,8 +418,8 @@ export default function AdminPanel() {
               width: 36,
               height: 36,
               borderRadius: '50%',
-              background: `linear-gradient(135deg,${C.purple},${C.purpleMid})`,
-              color: C.white,
+              background: `linear-gradient(135deg,${'#5B35C5'},${'#7B55E8'})`,
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -517,10 +433,10 @@ export default function AdminPanel() {
             <div style={{ fontSize: 13, fontWeight: 800 }}>
               {perfil.nombre} {perfil.apellido}
             </div>
-            <div style={{ fontSize: 11, color: C.textMuted }}>{perfil.rol}</div>
+            <div style={{ fontSize: 11, color: '#6B6B8A' }}>{perfil.rol}</div>
           </div>
           <button
-            style={{ ...btnSecondary, padding: '7px 14px', fontSize: 12 }}
+            className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[7px] !px-[14px] !text-xs"
             onClick={() => supabase.auth.signOut()}
           >
             Salir
@@ -533,8 +449,8 @@ export default function AdminPanel() {
         <aside
           style={{
             width: 220,
-            background: C.white,
-            borderRight: `1px solid ${C.border}`,
+            background: '#FFFFFF',
+            borderRight: `1px solid ${'#E8E6F5'}`,
             padding: '20px 0',
             flexShrink: 0,
           }}
@@ -542,12 +458,12 @@ export default function AdminPanel() {
           <div
             style={{
               fontSize: 10,
-              color: C.textMuted,
+              color: '#6B6B8A',
               fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               padding: '0 20px 14px',
-              borderBottom: `1px solid ${C.border}`,
+              borderBottom: `1px solid ${'#E8E6F5'}`,
               marginBottom: 6,
             }}
           >
@@ -564,11 +480,11 @@ export default function AdminPanel() {
                 cursor: 'pointer',
                 fontSize: 13,
                 fontWeight: activeNav === item.key ? 800 : 600,
-                color: activeNav === item.key ? C.purple : C.textMuted,
-                background: activeNav === item.key ? C.purpleLight : 'none',
+                color: activeNav === item.key ? '#5B35C5' : '#6B6B8A',
+                background: activeNav === item.key ? '#EEE9FF' : 'none',
                 borderLeft:
                   activeNav === item.key
-                    ? `3px solid ${C.purple}`
+                    ? `3px solid ${'#5B35C5'}`
                     : '3px solid transparent',
                 transition: 'all 0.15s',
               }}
@@ -597,6 +513,7 @@ export default function AdminPanel() {
           {activeNav === 'materias' && esAdmin && <GestionMaterias />}
           {activeNav === 'asignaciones' && esAdmin && <GestionAsignaciones />}
           {activeNav === 'cuotas' && esAdmin && <GestionCuotas />}
+          {activeNav === 'pagos' && esAdmin && <RegistrarPagos />}
           {activeNav === 'becas' && esAdmin && <GestionBecas />}
           {activeNav === 'sueldos' && esAdmin && <GestionSueldos />}
           {activeNav === 'compras' && esAdmin && <GestionCompras />}
@@ -609,6 +526,7 @@ export default function AdminPanel() {
           {activeNav === 'noticias' && esAdmin && (
             <GestionNoticias userId={user.id} />
           )}
+          {activeNav === 'empleos' && esAdmin && <GestionEmpleos />}
           {activeNav === 'galeria' && esAdmin && (
              <GestionGaleria userId={user.id} />
            )}
@@ -653,7 +571,7 @@ function LoginAdmin({
           fontFamily: "'Nunito',sans-serif",
         }}
       >
-        <p style={{ color: C.purple, fontWeight: 800 }}>Cargando...</p>
+        <p style={{ color: '#5B35C5', fontWeight: 800 }}>Cargando...</p>
       </div>
     )
 
@@ -682,11 +600,11 @@ function LoginAdmin({
         justifyContent: 'center',
         minHeight: '100vh',
         fontFamily: "'Nunito',sans-serif",
-        background: `radial-gradient(ellipse at 60% 0%, ${C.purpleLight} 0%, ${C.bg} 60%)`,
+        background: `radial-gradient(ellipse at 60% 0%, ${'#EEE9FF'} 0%, ${'#F5F4FB'} 60%)`,
       }}
     >
       <div
-        style={{ ...card, width: '100%', maxWidth: 380, padding: '44px 36px' }}
+        className="bg-white rounded-card p-6 shadow-card border border-border w-full max-w-[380px] px-[36px] py-[44px]"
       >
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <img
@@ -697,10 +615,10 @@ function LoginAdmin({
               ;(e.target as HTMLImageElement).style.display = 'none'
             }}
           />
-          <div style={{ fontSize: 17, fontWeight: 900, color: C.purple }}>
+          <div style={{ fontSize: 17, fontWeight: 900, color: '#5B35C5' }}>
             Panel Administrativo
           </div>
-          <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: '#6B6B8A', marginTop: 4 }}>
             Educar Para Transformar
           </div>
         </div>
@@ -709,22 +627,22 @@ function LoginAdmin({
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
         >
           <div>
-            <span style={label}>Email</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Email</span>
             <input
               type='email'
               required
-              style={input}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder='admin@email.com'
             />
           </div>
           <div>
-            <span style={label}>Contraseña</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Contraseña</span>
             <input
               type='password'
               required
-              style={input}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder='••••••••'
@@ -738,7 +656,7 @@ function LoginAdmin({
                 borderRadius: 8,
                 padding: '10px 14px',
                 fontSize: 12,
-                color: C.red,
+                color: '#E74C3C',
                 fontWeight: 700,
               }}
             >
@@ -748,12 +666,7 @@ function LoginAdmin({
           <button
             type='submit'
             disabled={busy}
-            style={{
-              ...btnPrimary,
-              padding: 14,
-              fontSize: 14,
-              opacity: busy ? 0.6 : 1,
-            }}
+            className={busy ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn p-[14px] text-sm font-extrabold cursor-pointer opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn p-[14px] text-sm font-extrabold cursor-pointer'}
           >
             {busy ? 'Ingresando...' : 'Ingresar'}
           </button>
@@ -815,25 +728,25 @@ function Dashboard({
           icon: '🎓',
           label: 'Alumnos activos',
           value: stats.alumnos,
-          color: C.purple,
+          color: '#5B35C5',
         },
         {
           icon: '👨‍🏫',
           label: 'Docentes activos',
           value: stats.docentes,
-          color: C.blue,
+          color: '#2980B9',
         },
         {
           icon: '📋',
           label: 'Inscripciones pendientes',
           value: stats.inscripciones,
-          color: C.orange,
+          color: '#E67E22',
         },
         {
           icon: '💳',
           label: 'Cuotas sin pagar',
           value: stats.cuotasPendientes,
-          color: C.red,
+          color: '#E74C3C',
         },
       ]
     : []
@@ -844,7 +757,7 @@ function Dashboard({
         <h2 style={{ fontSize: 24, fontWeight: 900, margin: '0 0 6px' }}>
           Bienvenido/a, {perfil.nombre} 👋
         </h2>
-        <p style={{ color: C.textMuted, margin: 0, fontSize: 14 }}>
+        <p style={{ color: '#6B6B8A', margin: 0, fontSize: 14 }}>
           {new Date().toLocaleDateString('es-AR', {
             weekday: 'long',
             year: 'numeric',
@@ -866,7 +779,7 @@ function Dashboard({
           {statItems.map((s) => (
             <div
               key={s.label}
-              style={{ ...card, borderTop: `3px solid ${s.color}` }}
+              className="bg-white rounded-card p-6 shadow-card border border-border" style={{ borderTop: `3px solid ${s.color}` }}
             >
               <div style={{ fontSize: 28, marginBottom: 8 }}>{s.icon}</div>
               <div style={{ fontSize: 30, fontWeight: 900, color: s.color }}>
@@ -875,7 +788,7 @@ function Dashboard({
               <div
                 style={{
                   fontSize: 12,
-                  color: C.textMuted,
+                  color: '#6B6B8A',
                   fontWeight: 700,
                   marginTop: 4,
                 }}
@@ -887,35 +800,18 @@ function Dashboard({
         </div>
       )}
 
-      <div style={{ ...card }}>
-        <div style={cardTitle}>Accesos rápidos</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Accesos rápidos</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
           {(esAdmin ? NAV_ADMIN : NAV_DOCENTE)
             .filter((n) => n.key !== 'dashboard')
             .map((item) => (
               <div
                 key={item.key}
-                style={{
-                  ...card,
-                  padding: '16px 20px',
-                  cursor: 'pointer',
-                  minWidth: 140,
-                  textAlign: 'center',
-                  transition: 'transform 0.15s, box-shadow 0.15s',
-                  flex: 1,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)'
-                  e.currentTarget.style.boxShadow =
-                    '0 6px 24px rgba(91,53,197,0.12)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = ''
-                }}
+                className="bg-white rounded-card px-5 py-4 shadow-card border border-border cursor-pointer min-w-[140px] text-center transition-all duration-200 flex-1 hover:-translate-y-[3px] hover:shadow-card-hover"
               >
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{item.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: C.purple }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#5B35C5' }}>
                   {item.label}
                 </div>
               </div>
@@ -1142,23 +1038,23 @@ function GestionUsuarios({
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           👥 Usuarios
         </h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Nuevo usuario'}
         </button>
       </div>
 
       {/* Formulario */}
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>Crear nuevo usuario</div>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">Crear nuevo usuario</div>
           <form
             onSubmit={handleCreate}
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}
           >
             <div>
-              <span style={label}>Nombre</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.nombre}
                 onChange={(e) =>
@@ -1167,9 +1063,9 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span style={label}>Apellido</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Apellido</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.apellido}
                 onChange={(e) =>
@@ -1178,10 +1074,10 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span style={label}>Email</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Email</span>
               <input
                 type='email'
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.email}
                 onChange={(e) =>
@@ -1190,10 +1086,10 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span style={label}>Contraseña</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Contraseña</span>
               <input
                 type='password'
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 minLength={6}
                 value={form.password}
@@ -1203,9 +1099,9 @@ function GestionUsuarios({
               />
             </div>
             <div>
-              <span style={label}>Rol</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Rol</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 value={form.rol}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, rol: e.target.value }))
@@ -1223,12 +1119,12 @@ function GestionUsuarios({
               <div
                 style={{
                   gridColumn: '1/-1',
-                  borderTop: `1px solid ${C.border}`,
+                  borderTop: `1px solid ${'#E8E6F5'}`,
                   paddingTop: 16,
                   marginTop: 4,
                 }}
               >
-                <div style={cardTitle}>Datos del alumno asociado</div>
+                <div className="text-[15px] font-extrabold text-text mb-5">Datos del alumno asociado</div>
                 <div
                   style={{
                     display: 'grid',
@@ -1237,9 +1133,9 @@ function GestionUsuarios({
                   }}
                 >
                   <div>
-                    <span style={label}>Nombre del alumno</span>
+                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre del alumno</span>
                     <input
-                      style={input}
+                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                       required
                       value={alumnoForm.nombre}
                       onChange={(e) =>
@@ -1248,9 +1144,9 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span style={label}>Apellido del alumno</span>
+                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Apellido del alumno</span>
                     <input
-                      style={input}
+                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                       required
                       value={alumnoForm.apellido}
                       onChange={(e) =>
@@ -1262,9 +1158,9 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span style={label}>DNI del alumno</span>
+                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">DNI del alumno</span>
                     <input
-                      style={input}
+                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                       required
                       value={alumnoForm.dni}
                       onChange={(e) =>
@@ -1273,10 +1169,10 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span style={label}>Fecha de nacimiento</span>
+                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de nacimiento</span>
                     <input
                       type='date'
-                      style={input}
+                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                       value={alumnoForm.fecha_nacimiento}
                       onChange={(e) =>
                         setAlumnoForm((p) => ({
@@ -1287,9 +1183,9 @@ function GestionUsuarios({
                     />
                   </div>
                   <div>
-                    <span style={label}>Curso</span>
+                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Curso</span>
                     <select
-                      style={{ ...input, appearance: 'none' as const }}
+                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                       value={alumnoForm.id_curso}
                       onChange={(e) =>
                         setAlumnoForm((p) => ({
@@ -1307,9 +1203,9 @@ function GestionUsuarios({
                     </select>
                   </div>
                   <div>
-                    <span style={label}>Obra social</span>
+                    <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Obra social</span>
                     <input
-                      style={input}
+                      className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                       value={alumnoForm.obra_social}
                       onChange={(e) =>
                         setAlumnoForm((p) => ({
@@ -1324,8 +1220,8 @@ function GestionUsuarios({
                   style={{
                     marginTop: 12,
                     fontSize: 12,
-                    color: C.textMuted,
-                    background: C.purpleLight,
+                    color: '#6B6B8A',
+                    background: '#EEE9FF',
                     borderRadius: 8,
                     padding: '8px 12px',
                   }}
@@ -1345,11 +1241,7 @@ function GestionUsuarios({
               <button
                 type='submit'
                 disabled={loading}
-                style={{
-                  ...btnPrimary,
-                  width: '100%',
-                  opacity: loading ? 0.6 : 1,
-                }}
+                className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full'}
               >
                 {loading
                   ? 'Creando...'
@@ -1364,7 +1256,7 @@ function GestionUsuarios({
                   gridColumn: '1/-1',
                   fontSize: 13,
                   fontWeight: 700,
-                  color: msg.startsWith('✅') ? C.green : C.red,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                 }}
               >
                 {msg}
@@ -1375,51 +1267,43 @@ function GestionUsuarios({
       )}
 
       {/* Tabla */}
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Nombre</th>
-              <th style={th}>Email</th>
-              <th style={th}>Rol</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nombre</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Email</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Rol</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {usuarios.map((u) => (
               <tr key={u.id_usuario}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {u.apellido}, {u.nombre}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>{u.email}</td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">{u.email}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <span
                     style={badge(
                       u.rol === 'Admin' || u.rol === 'Directivo'
-                        ? C.purple
-                        : C.blue,
+                        ? '#5B35C5'
+                        : '#2980B9',
                     )}
                   >
                     {u.rol}
                   </span>
                 </td>
-                <td style={td}>
-                  <span style={badge(u.activo ? C.green : C.red)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(u.activo ? '#27AE60' : '#E74C3C')}>
                     {u.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <button
-                    style={
-                      u.activo
-                        ? btnDanger
-                        : {
-                            ...btnDanger,
-                            background: '#27AE601A',
-                            color: C.green,
-                          }
-                    }
+                    className={u.activo ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
                     onClick={() => toggleActivo(u.id_usuario, u.activo)}
                   >
                     {u.activo ? 'Desactivar' : 'Activar'}
@@ -1518,22 +1402,22 @@ function GestionAlumnos() {
         }}
       >
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🎓 Alumnos</h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Nuevo alumno'}
         </button>
       </div>
 
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>Registrar alumno</div>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">Registrar alumno</div>
           <form
             onSubmit={handleCreate}
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}
           >
             <div>
-              <span style={label}>Nombre</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.nombre}
                 onChange={(e) =>
@@ -1542,9 +1426,9 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span style={label}>Apellido</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Apellido</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.apellido}
                 onChange={(e) =>
@@ -1553,9 +1437,9 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span style={label}>DNI</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">DNI</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.dni}
                 onChange={(e) =>
@@ -1564,10 +1448,10 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span style={label}>Fecha de nacimiento</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de nacimiento</span>
               <input
                 type='date'
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.fecha_nacimiento}
                 onChange={(e) =>
@@ -1576,9 +1460,9 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span style={label}>Curso</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Curso</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 value={form.id_curso}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, id_curso: e.target.value }))
@@ -1593,10 +1477,10 @@ function GestionAlumnos() {
               </select>
             </div>
             <div>
-              <span style={label}>Email del padre/tutor</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Email del padre/tutor</span>
               <input
                 type='email'
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.email_padre}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, email_padre: e.target.value }))
@@ -1605,9 +1489,9 @@ function GestionAlumnos() {
               />
             </div>
             <div>
-              <span style={label}>Obra social</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Obra social</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.obra_social}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, obra_social: e.target.value }))
@@ -1618,11 +1502,7 @@ function GestionAlumnos() {
               <button
                 type='submit'
                 disabled={loading}
-                style={{
-                  ...btnPrimary,
-                  width: '100%',
-                  opacity: loading ? 0.6 : 1,
-                }}
+                className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer w-full'}
               >
                 {loading ? 'Guardando...' : 'Registrar alumno'}
               </button>
@@ -1633,7 +1513,7 @@ function GestionAlumnos() {
                   gridColumn: '1/-1',
                   fontSize: 13,
                   fontWeight: 700,
-                  color: msg.startsWith('✅') ? C.green : C.red,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                 }}
               >
                 {msg}
@@ -1643,39 +1523,39 @@ function GestionAlumnos() {
         </div>
       )}
 
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Alumno</th>
-              <th style={th}>DNI</th>
-              <th style={th}>Curso</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Legajo</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">DNI</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Curso</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Legajo</th>
             </tr>
           </thead>
           <tbody>
             {alumnos.map((a) => (
               <tr key={a.id_alumno}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {a.apellido}, {a.nombre}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>{a.dni}</td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">{a.dni}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {a.cursos ? (
                     `${a.cursos.nivel} — ${a.cursos.grado_anio} "${a.cursos.division}"`
                   ) : (
-                    <span style={{ color: C.textMuted }}>Sin asignar</span>
+                    <span style={{ color: '#6B6B8A' }}>Sin asignar</span>
                   )}
                 </td>
-                <td style={td}>
-                  <span style={badge(a.activo ? C.green : C.red)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(a.activo ? '#27AE60' : '#E74C3C')}>
                     {a.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <button
-                    style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                    className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
                     onClick={() => setLegajoId(a.id_alumno)}
                   >
                     Ver legajo
@@ -1849,7 +1729,7 @@ function LegajoAlumno({
 
   const dato = (etiqueta: string, valor: string) => (
     <div>
-      <div style={{ ...label, marginBottom: 2 }}>{etiqueta}</div>
+      <div className="text-[11px] font-extrabold text-textMuted block mb-[2px]">{etiqueta}</div>
       <div style={{ fontSize: 14, fontWeight: 700 }}>{valor}</div>
     </div>
   )
@@ -1867,14 +1747,14 @@ function LegajoAlumno({
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           📁 Legajo del alumno
         </h2>
-        <button style={btnSecondary} onClick={onClose}>
+        <button className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={onClose}>
           ← Volver a la lista
         </button>
       </div>
 
       {/* Datos personales */}
-      <div style={{ ...card, marginBottom: 20 }}>
-        <div style={cardTitle}>Datos personales</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+        <div className="text-[15px] font-extrabold text-text mb-5">Datos personales</div>
         {alumno ? (
           <div
             style={{
@@ -1903,7 +1783,7 @@ function LegajoAlumno({
             {dato('Estado', alumno.activo ? 'Activo' : 'Inactivo')}
           </div>
         ) : (
-          <div style={{ color: C.textMuted, fontSize: 13 }}>Cargando...</div>
+          <div style={{ color: '#6B6B8A', fontSize: 13 }}>Cargando...</div>
         )}
       </div>
 
@@ -1916,76 +1796,76 @@ function LegajoAlumno({
           marginBottom: 20,
         }}
       >
-        <div style={card}>
-          <div style={label}>Promedio general</div>
-          <div style={{ fontSize: 30, fontWeight: 900, color: C.purple }}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border">
+          <div className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Promedio general</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: '#5B35C5' }}>
             {promedioGeneral}
           </div>
-          <div style={{ fontSize: 12, color: C.textMuted }}>
+          <div style={{ fontSize: 12, color: '#6B6B8A' }}>
             {califs.length} calificaciones registradas
           </div>
         </div>
-        <div style={card}>
-          <div style={label}>Asistencia</div>
-          <div style={{ fontSize: 30, fontWeight: 900, color: C.green }}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border">
+          <div className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Asistencia</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: '#27AE60' }}>
             {pctPresente !== null ? `${pctPresente}%` : '—'}
           </div>
-          <div style={{ fontSize: 12, color: C.textMuted }}>
+          <div style={{ fontSize: 12, color: '#6B6B8A' }}>
             {asistResumen['Presente'] ?? 0} pres. · {asistResumen['Ausente'] ?? 0}{' '}
             aus. · {asistResumen['Tarde'] ?? 0} tarde
           </div>
         </div>
-        <div style={card}>
-          <div style={label}>Amonestaciones</div>
-          <div style={{ fontSize: 30, fontWeight: 900, color: C.orange }}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border">
+          <div className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Amonestaciones</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: '#E67E22' }}>
             {amonest.length}
           </div>
-          <div style={{ fontSize: 12, color: C.textMuted }}>
+          <div style={{ fontSize: 12, color: '#6B6B8A' }}>
             registradas en su trayectoria
           </div>
         </div>
       </div>
 
       {/* Historial de calificaciones */}
-      <div style={{ ...card, marginBottom: 20 }}>
-        <div style={cardTitle}>Historial de calificaciones</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+        <div className="text-[15px] font-extrabold text-text mb-5">Historial de calificaciones</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Materia</th>
-              <th style={th}>Trimestre</th>
-              <th style={th}>Evaluación</th>
-              <th style={th}>Nota</th>
-              <th style={th}>Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Materia</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Trimestre</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Evaluación</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nota</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
             </tr>
           </thead>
           <tbody>
             {califs.map((c) => (
               <tr key={c.id_calificacion}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {c.asignaciones?.materias?.nombre ?? '—'}
                 </td>
-                <td style={td}>{c.trimestre}°</td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{c.trimestre}°</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {c.tipo_evaluacion}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <span
                     style={badge(
-                      Number(c.nota) >= 6 ? C.green : C.red,
+                      Number(c.nota) >= 6 ? '#27AE60' : '#E74C3C',
                     )}
                   >
                     {c.nota}
                   </span>
                 </td>
-                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
                   {new Date(c.fecha_carga).toLocaleDateString('es-AR')}
                 </td>
               </tr>
             ))}
             {califs.length === 0 && (
               <tr>
-                <td style={{ ...td, color: C.textMuted }} colSpan={5}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={5}>
                   Sin calificaciones registradas.
                 </td>
               </tr>
@@ -1995,10 +1875,10 @@ function LegajoAlumno({
       </div>
 
       {/* Amonestaciones */}
-      <div style={{ ...card, marginBottom: 20 }}>
-        <div style={cardTitle}>Amonestaciones</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+        <div className="text-[15px] font-extrabold text-text mb-5">Amonestaciones</div>
         {amonest.length === 0 ? (
-          <div style={{ color: C.textMuted, fontSize: 13 }}>
+          <div style={{ color: '#6B6B8A', fontSize: 13 }}>
             Sin amonestaciones registradas.
           </div>
         ) : (
@@ -2007,7 +1887,7 @@ function LegajoAlumno({
               <div
                 key={a.id_amonestacion}
                 style={{
-                  border: `1px solid ${C.border}`,
+                  border: `1px solid ${'#E8E6F5'}`,
                   borderRadius: 10,
                   padding: 12,
                   display: 'flex',
@@ -2015,10 +1895,10 @@ function LegajoAlumno({
                   alignItems: 'flex-start',
                 }}
               >
-                <span style={badge(C.orange)}>{a.tipo}</span>
+                <span className="inline-block bg-[#E67E221A] text-orange rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{a.tipo}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13 }}>{a.descripcion}</div>
-                  <div style={{ fontSize: 11, color: C.textMuted }}>
+                  <div style={{ fontSize: 11, color: '#6B6B8A' }}>
                     {new Date(a.fecha).toLocaleDateString('es-AR')}
                   </div>
                 </div>
@@ -2029,8 +1909,8 @@ function LegajoAlumno({
       </div>
 
       {/* Documentación */}
-      <div style={card}>
-        <div style={cardTitle}>Documentación del legajo</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Documentación del legajo</div>
         <form
           onSubmit={subirDocumento}
           style={{
@@ -2042,18 +1922,18 @@ function LegajoAlumno({
           }}
         >
           <div style={{ flex: '1 1 200px' }}>
-            <span style={label}>Nombre del documento</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre del documento</span>
             <input
-              style={input}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
               value={docNombre}
               placeholder='Ej: DNI frente y dorso'
               onChange={(e) => setDocNombre(e.target.value)}
             />
           </div>
           <div>
-            <span style={label}>Tipo</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
             <select
-              style={{ ...input, width: 220, appearance: 'none' as const }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none w-[220px]"
               value={docTipo}
               onChange={(e) => setDocTipo(e.target.value)}
             >
@@ -2065,17 +1945,17 @@ function LegajoAlumno({
             </select>
           </div>
           <div>
-            <span style={label}>Archivo</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Archivo</span>
             <input
               type='file'
-              style={{ ...input, padding: 7 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border !p-[7px]"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </div>
           <button
             type='submit'
             disabled={subiendo}
-            style={{ ...btnPrimary, opacity: subiendo ? 0.6 : 1 }}
+            className={subiendo ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
           >
             {subiendo ? 'Subiendo...' : 'Subir documento'}
           </button>
@@ -2086,7 +1966,7 @@ function LegajoAlumno({
               fontSize: 12,
               fontWeight: 700,
               marginBottom: 14,
-              color: msg.startsWith('✅') ? C.green : C.red,
+              color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
             }}
           >
             {msg}
@@ -2095,39 +1975,34 @@ function LegajoAlumno({
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Documento</th>
-              <th style={th}>Tipo</th>
-              <th style={th}>Fecha</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Documento</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tipo</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {documentos.map((d) => (
               <tr key={d.id_documento}>
-                <td style={{ ...td, fontWeight: 700 }}>{d.nombre}</td>
-                <td style={td}>
-                  <span style={badge(C.blue)}>{d.tipo ?? 'Documento'}</span>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{d.nombre}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span className="inline-block bg-[#2980B91A] text-blue rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{d.tipo ?? 'Documento'}</span>
                 </td>
-                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
                   {new Date(d.fecha_carga).toLocaleDateString('es-AR')}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <div style={{ display: 'flex', gap: 6 }}>
                     <a
                       href={d.url_archivo}
                       target='_blank'
                       rel='noreferrer'
-                      style={{
-                        ...btnSecondary,
-                        padding: '6px 12px',
-                        fontSize: 12,
-                        textDecoration: 'none',
-                      }}
+                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[12px] !text-xs no-underline"
                     >
                       Ver
                     </a>
                     <button
-                      style={btnDanger}
+                      className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
                       onClick={() => eliminarDocumento(d)}
                     >
                       Eliminar
@@ -2138,7 +2013,7 @@ function LegajoAlumno({
             ))}
             {documentos.length === 0 && (
               <tr>
-                <td style={{ ...td, color: C.textMuted }} colSpan={4}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={4}>
                   Sin documentación cargada.
                 </td>
               </tr>
@@ -2171,35 +2046,35 @@ function GestionDocentes() {
       <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
         👨‍🏫 Docentes
       </h2>
-      <div style={{ ...card, marginBottom: 12 }}>
-        <p style={{ fontSize: 13, color: C.textMuted, margin: 0 }}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-3">
+        <p style={{ fontSize: 13, color: '#6B6B8A', margin: 0 }}>
           Para agregar docentes, primero creá el usuario desde{' '}
           <strong>Usuarios</strong> con rol <strong>Docente</strong>. El
           registro en esta tabla se crea automáticamente.
         </p>
       </div>
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Docente</th>
-              <th style={th}>Email</th>
-              <th style={th}>Especialidad</th>
-              <th style={th}>Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Docente</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Email</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Especialidad</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
             </tr>
           </thead>
           <tbody>
             {docentes.map((d) => (
               <tr key={d.id_docente}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {d.usuarios?.apellido}, {d.usuarios?.nombre}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {d.usuarios?.email}
                 </td>
-                <td style={td}>{d.especialidad ?? '—'}</td>
-                <td style={td}>
-                  <span style={badge(d.activo ? C.green : C.red)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{d.especialidad ?? '—'}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(d.activo ? '#27AE60' : '#E74C3C')}>
                     {d.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
@@ -2279,14 +2154,14 @@ function GestionCursos() {
         }}
       >
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🏫 Cursos</h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Nuevo curso'}
         </button>
       </div>
 
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>Crear curso</div>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">Crear curso</div>
           <form
             onSubmit={handleCreate}
             style={{
@@ -2296,9 +2171,9 @@ function GestionCursos() {
             }}
           >
             <div>
-              <span style={label}>Nivel</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nivel</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 value={form.nivel}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, nivel: e.target.value }))
@@ -2310,9 +2185,9 @@ function GestionCursos() {
               </select>
             </div>
             <div>
-              <span style={label}>Grado / Año</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Grado / Año</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.grado_anio}
                 placeholder='1er Grado'
@@ -2322,9 +2197,9 @@ function GestionCursos() {
               />
             </div>
             <div>
-              <span style={label}>División</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">División</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.division}
                 placeholder='A'
@@ -2334,10 +2209,10 @@ function GestionCursos() {
               />
             </div>
             <div>
-              <span style={label}>Capacidad máx.</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Capacidad máx.</span>
               <input
                 type='number'
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.capacidad_maxima}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, capacidad_maxima: e.target.value }))
@@ -2348,7 +2223,7 @@ function GestionCursos() {
               <button
                 type='submit'
                 disabled={loading}
-                style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}
+                className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
               >
                 {loading ? 'Guardando...' : 'Crear curso'}
               </button>
@@ -2359,7 +2234,7 @@ function GestionCursos() {
                   gridColumn: '1/-1',
                   fontSize: 13,
                   fontWeight: 700,
-                  color: msg.startsWith('✅') ? C.green : C.red,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                 }}
               >
                 {msg}
@@ -2369,35 +2244,35 @@ function GestionCursos() {
         </div>
       )}
 
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Nivel</th>
-              <th style={th}>Grado / Año</th>
-              <th style={th}>División</th>
-              <th style={th}>Capacidad</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nivel</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Grado / Año</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">División</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Capacidad</th>
             </tr>
           </thead>
           <tbody>
             {cursos.map((c) => (
               <tr key={c.id_curso}>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <span
                     style={badge(
                       c.nivel === 'Inicial'
-                        ? C.green
+                        ? '#27AE60'
                         : c.nivel === 'Primario'
-                          ? C.blue
-                          : C.purple,
+                          ? '#2980B9'
+                          : '#5B35C5',
                     )}
                   >
                     {c.nivel}
                   </span>
                 </td>
-                <td style={{ ...td, fontWeight: 700 }}>{c.grado_anio}</td>
-                <td style={td}>División {c.division}</td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{c.grado_anio}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">División {c.division}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {c.capacidad_maxima} alumnos
                 </td>
               </tr>
@@ -2456,20 +2331,20 @@ function GestionMaterias() {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           📚 Materias
         </h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Nueva materia'}
         </button>
       </div>
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
           <form
             onSubmit={handleCreate}
             style={{ display: 'flex', gap: 14, alignItems: 'flex-end' }}
           >
             <div style={{ flex: 2 }}>
-              <span style={label}>Nombre de la materia</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre de la materia</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.nombre}
                 onChange={(e) =>
@@ -2478,17 +2353,17 @@ function GestionMaterias() {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <span style={label}>Horas semanales</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Horas semanales</span>
               <input
                 type='number'
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.horas_semanales}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, horas_semanales: e.target.value }))
                 }
               />
             </div>
-            <button type='submit' style={btnPrimary}>
+            <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
               Guardar
             </button>
           </form>
@@ -2498,7 +2373,7 @@ function GestionMaterias() {
                 marginTop: 10,
                 fontSize: 13,
                 fontWeight: 700,
-                color: msg.startsWith('✅') ? C.green : C.red,
+                color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
               }}
             >
               {msg}
@@ -2506,22 +2381,22 @@ function GestionMaterias() {
           )}
         </div>
       )}
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Materia</th>
-              <th style={th}>Horas semanales</th>
-              <th style={th}>Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Materia</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Horas semanales</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
             </tr>
           </thead>
           <tbody>
             {materias.map((m) => (
               <tr key={m.id_materia}>
-                <td style={{ ...td, fontWeight: 700 }}>{m.nombre}</td>
-                <td style={td}>{m.horas_semanales} hs</td>
-                <td style={td}>
-                  <span style={badge(m.activo ? C.green : C.red)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{m.nombre}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{m.horas_semanales} hs</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(m.activo ? '#27AE60' : '#E74C3C')}>
                     {m.activo ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
@@ -2613,13 +2488,13 @@ function GestionAsignaciones() {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           🔗 Asignaciones
         </h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Nueva asignación'}
         </button>
       </div>
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>Asignar docente a materia y curso</div>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">Asignar docente a materia y curso</div>
           <form
             onSubmit={handleCreate}
             style={{
@@ -2629,9 +2504,9 @@ function GestionAsignaciones() {
             }}
           >
             <div>
-              <span style={label}>Docente</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Docente</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 required
                 value={form.id_docente}
                 onChange={(e) =>
@@ -2647,9 +2522,9 @@ function GestionAsignaciones() {
               </select>
             </div>
             <div>
-              <span style={label}>Materia</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Materia</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 required
                 value={form.id_materia}
                 onChange={(e) =>
@@ -2665,9 +2540,9 @@ function GestionAsignaciones() {
               </select>
             </div>
             <div>
-              <span style={label}>Curso</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Curso</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 required
                 value={form.id_curso}
                 onChange={(e) =>
@@ -2683,7 +2558,7 @@ function GestionAsignaciones() {
               </select>
             </div>
             <div style={{ gridColumn: '1/-1' }}>
-              <button type='submit' style={btnPrimary}>
+              <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
                 Crear asignación
               </button>
             </div>
@@ -2693,7 +2568,7 @@ function GestionAsignaciones() {
                   gridColumn: '1/-1',
                   fontSize: 13,
                   fontWeight: 700,
-                  color: msg.startsWith('✅') ? C.green : C.red,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                 }}
               >
                 {msg}
@@ -2702,24 +2577,24 @@ function GestionAsignaciones() {
           </form>
         </div>
       )}
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Docente</th>
-              <th style={th}>Materia</th>
-              <th style={th}>Curso</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Docente</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Materia</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Curso</th>
             </tr>
           </thead>
           <tbody>
             {asignaciones.map((a) => (
               <tr key={a.id_asignacion}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {a.docentes?.usuarios?.apellido},{' '}
                   {a.docentes?.usuarios?.nombre}
                 </td>
-                <td style={td}>{a.materias?.nombre}</td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{a.materias?.nombre}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {a.cursos?.nivel} — {a.cursos?.grado_anio} "
                   {a.cursos?.division}"
                 </td>
@@ -2896,9 +2771,9 @@ function GestionCuotas() {
   }
 
   const CUOTA_COLOR: Record<string, string> = {
-    Pendiente: C.orange,
-    Pagada: C.green,
-    Vencida: C.red,
+    Pendiente: '#E67E22',
+    Pagada: '#27AE60',
+    Vencida: '#E74C3C',
     'En mora': '#C0392B',
   }
 
@@ -2909,8 +2784,8 @@ function GestionCuotas() {
       </h2>
 
       {/* Generador */}
-      <div style={{ ...card, marginBottom: 24 }}>
-        <div style={cardTitle}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+        <div className="text-[15px] font-extrabold text-text mb-5">
           Generar cuotas automáticamente para todos los alumnos
         </div>
         <form
@@ -2923,9 +2798,9 @@ function GestionCuotas() {
           }}
         >
           <div>
-            <span style={label}>Mes</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Mes</span>
             <select
-              style={{ ...input, width: 160, appearance: 'none' as const }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px] appearance-none"
               value={form.mes}
               onChange={(e) => setForm((p) => ({ ...p, mes: e.target.value }))}
             >
@@ -2937,18 +2812,18 @@ function GestionCuotas() {
             </select>
           </div>
           <div>
-            <span style={label}>Año</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Año</span>
             <input
-              style={{ ...input, width: 100 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[100px]"
               value={form.anio}
               onChange={(e) => setForm((p) => ({ ...p, anio: e.target.value }))}
             />
           </div>
           <div>
-            <span style={label}>Monto base ($)</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Monto base ($)</span>
             <input
               type='number'
-              style={{ ...input, width: 160 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px]"
               required
               value={form.monto_base}
               onChange={(e) =>
@@ -2960,7 +2835,7 @@ function GestionCuotas() {
           <button
             type='submit'
             disabled={loading}
-            style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}
+            className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
           >
             {loading ? 'Generando...' : '⚡ Generar cuotas'}
           </button>
@@ -2968,7 +2843,7 @@ function GestionCuotas() {
             type='button'
             disabled={loading}
             onClick={procesarVencimientos}
-            style={{ ...btnSecondary, opacity: loading ? 0.6 : 1 }}
+            className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"
             title='Marca como vencidas las cuotas impagas pasadas de fecha y notifica a las familias'
           >
             ⏰ Procesar vencimientos
@@ -2980,7 +2855,7 @@ function GestionCuotas() {
               marginTop: 12,
               fontSize: 13,
               fontWeight: 700,
-              color: msg.startsWith('✅') ? C.green : C.red,
+              color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
             }}
           >
             {msg}
@@ -2989,18 +2864,18 @@ function GestionCuotas() {
       </div>
 
       {/* Tabla */}
-      <div style={card}>
-        <div style={cardTitle}>Últimas cuotas generadas</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Últimas cuotas generadas</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Alumno</th>
-              <th style={th}>Período</th>
-              <th style={th}>Monto base</th>
-              <th style={th}>Descuento beca</th>
-              <th style={th}>Neto a pagar</th>
-              <th style={th}>Vencimiento</th>
-              <th style={th}>Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Período</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Monto base</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descuento beca</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Neto a pagar</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Vencimiento</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -3008,26 +2883,26 @@ function GestionCuotas() {
               const desc = c.descuento ?? 0
               return (
                 <tr key={c.id_cuota}>
-                  <td style={{ ...td, fontWeight: 700 }}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                     {c.alumnos?.apellido}, {c.alumnos?.nombre}
                   </td>
-                  <td style={td}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                     {MESES[c.mes - 1]} {c.anio}
                   </td>
-                  <td style={td}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                     ${c.monto_base.toLocaleString('es-AR')}
                   </td>
-                  <td style={{ ...td, color: desc > 0 ? C.green : C.textMuted }}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle" style={{ color: desc > 0 ? '#27AE60' : '#6B6B8A' }}>
                     {desc > 0 ? `– $${desc.toLocaleString('es-AR')}` : '—'}
                   </td>
-                  <td style={{ ...td, fontWeight: 800, color: C.purple }}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
                     ${(c.monto_base - desc).toLocaleString('es-AR')}
                   </td>
-                  <td style={{ ...td, color: C.textMuted }}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                     {c.fecha_vencimiento}
                   </td>
-                  <td style={td}>
-                    <span style={badge(CUOTA_COLOR[c.estado] ?? C.textMuted)}>
+                  <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                    <span style={badge(CUOTA_COLOR[c.estado] ?? '#6B6B8A')}>
                       {c.estado}
                     </span>
                   </td>
@@ -3036,6 +2911,295 @@ function GestionCuotas() {
             })}
           </tbody>
         </table>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  REGISTRO DE PAGOS
+// ═══════════════════════════════════════════════════════════════
+const METODOS_PAGO = [
+  'Efectivo',
+  'Transferencia',
+  'Tarjeta de débito',
+  'Tarjeta de crédito',
+  'Cheque',
+  'Otro',
+]
+
+const CUOTA_ESTADO_COLOR: Record<string, string> = {
+  Pendiente: '#E67E22',
+  Vencida: '#E74C3C',
+  'En mora': '#C0392B',
+}
+
+function RegistrarPagos() {
+  const [cuotas, setCuotas] = useState<Cuota[]>([])
+  const [loading, setLoading] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [busqueda, setBusqueda] = useState('')
+  const [filtroMes, setFiltroMes] = useState('')
+  const [filtroAnio, setFiltroAnio] = useState(String(new Date().getFullYear()))
+  const [filtroEstado, setFiltroEstado] = useState('todos')
+  const [selCuota, setSelCuota] = useState<number | null>(null)
+  const [formPago, setFormPago] = useState({
+    fecha_pago: new Date().toISOString().split('T')[0],
+    metodo_pago: 'Efectivo',
+  })
+
+  const load = useCallback(async () => {
+    let q = supabase
+      .from('cuotas')
+      .select('*, alumnos(nombre, apellido)')
+      .in('estado', ['Pendiente', 'Vencida', 'En mora'])
+      .order('fecha_vencimiento', { ascending: true })
+
+    if (filtroAnio) q = q.eq('anio', Number(filtroAnio))
+    if (filtroMes) q = q.eq('mes', Number(filtroMes))
+
+    const { data } = await q
+    if (data) setCuotas(data as unknown as Cuota[])
+  }, [filtroAnio, filtroMes])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const registrarPago = async (c: Cuota) => {
+    setLoading(true)
+    setMsg('')
+    const { error } = await supabase
+      .from('cuotas')
+      .update({
+        estado: 'Pagada',
+        fecha_pago: formPago.fecha_pago,
+        metodo_pago: formPago.metodo_pago,
+      })
+      .eq('id_cuota', c.id_cuota)
+    if (error) {
+      setMsg('❌ Error al registrar: ' + error.message)
+    } else {
+      setMsg(`✅ Pago de ${c.alumnos?.apellido}, ${c.alumnos?.nombre} registrado correctamente.`)
+      setSelCuota(null)
+      load()
+    }
+    setLoading(false)
+  }
+
+  const cuotasFiltradas = cuotas.filter((c) => {
+    if (filtroEstado !== 'todos' && c.estado !== filtroEstado) return false
+    if (busqueda) {
+      const term = busqueda.toLowerCase()
+      const nombre = `${c.alumnos?.apellido} ${c.alumnos?.nombre}`.toLowerCase()
+      if (!nombre.includes(term)) return false
+    }
+    return true
+  })
+
+  const totalPendiente = cuotasFiltradas.reduce(
+    (acc, c) => acc + c.monto_base - (c.descuento ?? 0),
+    0,
+  )
+
+  return (
+    <div className="flex flex-col gap-6">
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>💰 Registro de pagos</h2>
+
+      {/* Filtros */}
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1" style={{ minWidth: 200 }}>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Buscar alumno</span>
+            <input
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              placeholder="Apellido o nombre..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+          </div>
+          <div>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Mes</span>
+            <select
+              className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+              value={filtroMes}
+              onChange={(e) => setFiltroMes(e.target.value)}
+            >
+              <option value=''>Todos</option>
+              {MESES.map((m, i) => (
+                <option key={i} value={i + 1}>{m}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Año</span>
+            <input
+              className="w-[90px] px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+              value={filtroAnio}
+              onChange={(e) => setFiltroAnio(e.target.value)}
+            />
+          </div>
+          <div>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Estado</span>
+            <select
+              className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+            >
+              <option value='todos'>Todos los pendientes</option>
+              <option value='Pendiente'>Pendiente</option>
+              <option value='Vencida'>Vencida</option>
+              <option value='En mora'>En mora</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: 'Total pendiente', value: `$${totalPendiente.toLocaleString('es-AR')}`, color: '#5B35C5' },
+          { label: 'Cuotas sin pagar', value: cuotasFiltradas.length, color: '#E67E22' },
+          { label: 'Vencidas', value: cuotasFiltradas.filter(c => c.estado === 'Vencida' || c.estado === 'En mora').length, color: '#E74C3C' },
+        ].map((s) => (
+          <div key={s.label} className="bg-white rounded-card p-6 shadow-card border border-border text-center">
+            <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.value}</div>
+            <div className="text-[12px] text-textMuted mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {msg && (
+        <div
+          className="text-[13px] font-bold px-4 py-3 rounded-lg border"
+          style={{
+            color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
+            background: msg.startsWith('✅') ? '#27AE6012' : '#E74C3C12',
+            borderColor: msg.startsWith('✅') ? '#27AE6040' : '#E74C3C40',
+          }}
+        >
+          {msg}
+        </div>
+      )}
+
+      {/* Tabla */}
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">
+          Cuotas pendientes de pago
+          {cuotasFiltradas.length > 0 && (
+            <span className="ml-2 text-[12px] font-bold text-textMuted">
+              ({cuotasFiltradas.length} resultado{cuotasFiltradas.length !== 1 ? 's' : ''})
+            </span>
+          )}
+        </div>
+
+        {cuotasFiltradas.length === 0 ? (
+          <div className="text-center text-textMuted py-10 text-[14px]">
+            🎉 No hay cuotas pendientes con los filtros seleccionados.
+          </div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
+                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Período</th>
+                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Neto a pagar</th>
+                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Vencimiento</th>
+                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cuotasFiltradas.map((c) => {
+                const neto = c.monto_base - (c.descuento ?? 0)
+                const isSelected = selCuota === c.id_cuota
+                const color = CUOTA_ESTADO_COLOR[c.estado] ?? '#6B6B8A'
+                return (
+                  <>
+                    <tr key={c.id_cuota}>
+                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
+                        {c.alumnos?.apellido}, {c.alumnos?.nombre}
+                      </td>
+                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                        {MESES[c.mes - 1]} {c.anio}
+                      </td>
+                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
+                        ${neto.toLocaleString('es-AR')}
+                      </td>
+                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
+                        {c.fecha_vencimiento}
+                      </td>
+                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                        <span style={badge(color)}>{c.estado}</span>
+                      </td>
+                      <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                        {isSelected ? (
+                          <button
+                            className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                            onClick={() => setSelCuota(null)}
+                          >
+                            Cancelar
+                          </button>
+                        ) : (
+                          <button
+                            className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                            onClick={() => {
+                              setSelCuota(c.id_cuota)
+                              setMsg('')
+                            }}
+                          >
+                            💳 Registrar pago
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                    {isSelected && (
+                      <tr key={`pago-${c.id_cuota}`}>
+                        <td colSpan={6} className="bg-purpleLight border-b border-border py-4 px-4">
+                          <div className="flex items-center gap-4 flex-wrap">
+                            <div>
+                              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de pago</span>
+                              <input
+                                type='date'
+                                className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                                value={formPago.fecha_pago}
+                                onChange={(e) => setFormPago((p) => ({ ...p, fecha_pago: e.target.value }))}
+                              />
+                            </div>
+                            <div>
+                              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Método de pago</span>
+                              <select
+                                className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                                value={formPago.metodo_pago}
+                                onChange={(e) => setFormPago((p) => ({ ...p, metodo_pago: e.target.value }))}
+                              >
+                                {METODOS_PAGO.map((m) => (
+                                  <option key={m} value={m}>{m}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="flex items-end">
+                              <button
+                                disabled={loading}
+                                className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'}
+                                onClick={() => registrarPago(c)}
+                              >
+                                {loading ? 'Guardando...' : '✅ Confirmar pago'}
+                              </button>
+                            </div>
+                            <div className="text-[12px] text-textMuted self-end pb-[10px]">
+                              Alumno: <strong>{c.alumnos?.apellido}, {c.alumnos?.nombre}</strong> · Neto: <strong>${neto.toLocaleString('es-AR')}</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   )
@@ -3119,16 +3283,16 @@ function GestionBecas() {
         🎟️ Becas
       </h2>
 
-      <div style={{ ...card, marginBottom: 24 }}>
-        <div style={cardTitle}>Otorgar / actualizar beca</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+        <div className="text-[15px] font-extrabold text-text mb-5">Otorgar / actualizar beca</div>
         <form
           onSubmit={guardar}
           style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}
         >
           <div style={{ flex: '1 1 240px' }}>
-            <span style={label}>Alumno</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Alumno</span>
             <select
-              style={{ ...input, appearance: 'none' as const }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
               required
               value={form.id_alumno}
               onChange={(e) =>
@@ -3144,9 +3308,9 @@ function GestionBecas() {
             </select>
           </div>
           <div>
-            <span style={label}>Descuento (%)</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descuento (%)</span>
             <input
-              style={{ ...input, width: 130 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[130px]"
               type='number'
               min={1}
               max={100}
@@ -3158,9 +3322,9 @@ function GestionBecas() {
             />
           </div>
           <div style={{ flex: '1 1 200px' }}>
-            <span style={label}>Motivo (opcional)</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Motivo (opcional)</span>
             <input
-              style={input}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
               value={form.motivo}
               placeholder='Ej: beca por hermanos'
               onChange={(e) =>
@@ -3168,58 +3332,58 @@ function GestionBecas() {
               }
             />
           </div>
-          <button type='submit' style={btnPrimary}>
+          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
             Guardar beca
           </button>
         </form>
         {msg && (
-          <div style={{ marginTop: 12, fontSize: 12, color: C.red, fontWeight: 700 }}>
+          <div style={{ marginTop: 12, fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
             {msg}
           </div>
         )}
-        <div style={{ marginTop: 10, fontSize: 12, color: C.textMuted }}>
+        <div style={{ marginTop: 10, fontSize: 12, color: '#6B6B8A' }}>
           El descuento se aplica automáticamente al generar las cuotas del mes.
         </div>
       </div>
 
-      <div style={card}>
-        <div style={cardTitle}>Becas otorgadas</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Becas otorgadas</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Alumno</th>
-              <th style={th}>Descuento</th>
-              <th style={th}>Motivo</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descuento</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Motivo</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {becas.map((b) => (
               <tr key={b.id_beca}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {b.alumnos?.apellido}, {b.alumnos?.nombre}
                 </td>
-                <td style={td}>
-                  <span style={badge(C.green)}>{b.porcentaje}%</span>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span className="inline-block bg-[#27AE601A] text-green rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{b.porcentaje}%</span>
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {b.motivo ?? '—'}
                 </td>
-                <td style={td}>
-                  <span style={badge(b.activo ? C.green : C.textMuted)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(b.activo ? '#27AE60' : '#6B6B8A')}>
                     {b.activo ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
-                      style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
                       onClick={() => toggleActivo(b)}
                     >
                       {b.activo ? 'Desactivar' : 'Activar'}
                     </button>
-                    <button style={btnDanger} onClick={() => eliminar(b.id_beca)}>
+                    <button className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer" onClick={() => eliminar(b.id_beca)}>
                       Eliminar
                     </button>
                   </div>
@@ -3228,7 +3392,7 @@ function GestionBecas() {
             ))}
             {becas.length === 0 && (
               <tr>
-                <td style={{ ...td, color: C.textMuted }} colSpan={5}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={5}>
                   No hay becas otorgadas.
                 </td>
               </tr>
@@ -3311,16 +3475,16 @@ function GestionSueldos() {
         💼 Sueldos del personal
       </h2>
 
-      <div style={{ ...card, marginBottom: 24 }}>
-        <div style={cardTitle}>Registrar pago de sueldo</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+        <div className="text-[15px] font-extrabold text-text mb-5">Registrar pago de sueldo</div>
         <form
           onSubmit={registrar}
           style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}
         >
           <div style={{ flex: '1 1 240px' }}>
-            <span style={label}>Personal</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Personal</span>
             <select
-              style={{ ...input, appearance: 'none' as const }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
               required
               value={form.id_usuario}
               onChange={(e) =>
@@ -3336,9 +3500,9 @@ function GestionSueldos() {
             </select>
           </div>
           <div>
-            <span style={label}>Mes</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Mes</span>
             <select
-              style={{ ...input, width: 150, appearance: 'none' as const }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[150px] appearance-none"
               value={form.mes}
               onChange={(e) => setForm((p) => ({ ...p, mes: e.target.value }))}
             >
@@ -3350,17 +3514,17 @@ function GestionSueldos() {
             </select>
           </div>
           <div>
-            <span style={label}>Año</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Año</span>
             <input
-              style={{ ...input, width: 100 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[100px]"
               value={form.anio}
               onChange={(e) => setForm((p) => ({ ...p, anio: e.target.value }))}
             />
           </div>
           <div>
-            <span style={label}>Monto ($)</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Monto ($)</span>
             <input
-              style={{ ...input, width: 150 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[150px]"
               type='number'
               required
               value={form.monto}
@@ -3368,66 +3532,66 @@ function GestionSueldos() {
               placeholder='350000'
             />
           </div>
-          <button type='submit' style={btnPrimary}>
+          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
             Registrar
           </button>
         </form>
         {msg && (
-          <div style={{ marginTop: 12, fontSize: 12, color: C.red, fontWeight: 700 }}>
+          <div style={{ marginTop: 12, fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
             {msg}
           </div>
         )}
       </div>
 
-      <div style={card}>
-        <div style={cardTitle}>Sueldos registrados</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Sueldos registrados</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Personal</th>
-              <th style={th}>Período</th>
-              <th style={th}>Monto</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Pagado el</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Personal</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Período</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Monto</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Pagado el</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {sueldos.map((s) => (
               <tr key={s.id_sueldo}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {s.usuarios
                     ? `${s.usuarios.apellido}, ${s.usuarios.nombre}`
                     : '—'}
                   {s.usuarios && (
                     <>
                       <br />
-                      <span style={{ fontSize: 11, color: C.textMuted }}>
+                      <span style={{ fontSize: 11, color: '#6B6B8A' }}>
                         {s.usuarios.rol}
                       </span>
                     </>
                   )}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {MESES[s.mes - 1]} {s.anio}
                 </td>
-                <td style={{ ...td, fontWeight: 800, color: C.purple }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
                   ${Number(s.monto).toLocaleString('es-AR')}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <span
-                    style={badge(s.estado === 'Pagado' ? C.green : C.orange)}
+                    style={badge(s.estado === 'Pagado' ? '#27AE60' : '#E67E22')}
                   >
                     {s.estado}
                   </span>
                 </td>
-                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
                   {s.fecha_pago ?? '—'}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {s.estado !== 'Pagado' && (
                     <button
-                      style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
                       onClick={() => marcarPagado(s.id_sueldo)}
                     >
                       Marcar pagado
@@ -3438,7 +3602,7 @@ function GestionSueldos() {
             ))}
             {sueldos.length === 0 && (
               <tr>
-                <td style={{ ...td, color: C.textMuted }} colSpan={6}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={6}>
                   No hay sueldos registrados.
                 </td>
               </tr>
@@ -3518,8 +3682,8 @@ function GestionCompras() {
         🧪 Compras de insumos
       </h2>
 
-      <div style={{ ...card, marginBottom: 24 }}>
-        <div style={cardTitle}>Registrar compra</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+        <div className="text-[15px] font-extrabold text-text mb-5">Registrar compra</div>
         <form
           onSubmit={registrar}
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
@@ -3532,9 +3696,9 @@ function GestionCompras() {
             }}
           >
             <div>
-              <span style={label}>Descripción</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.descripcion}
                 placeholder='Ej: 10 tubos de ensayo'
@@ -3544,9 +3708,9 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span style={label}>Destino</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Destino</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 value={form.destino}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, destino: e.target.value }))
@@ -3568,9 +3732,9 @@ function GestionCompras() {
             }}
           >
             <div>
-              <span style={label}>Cantidad</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Cantidad</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 type='number'
                 min={1}
                 required
@@ -3581,9 +3745,9 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span style={label}>Monto total ($)</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Monto total ($)</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 type='number'
                 required
                 value={form.monto}
@@ -3593,9 +3757,9 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span style={label}>Proveedor (opcional)</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Proveedor (opcional)</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.proveedor}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, proveedor: e.target.value }))
@@ -3603,9 +3767,9 @@ function GestionCompras() {
               />
             </div>
             <div>
-              <span style={label}>Fecha</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 type='date'
                 value={form.fecha_compra}
                 onChange={(e) =>
@@ -3615,17 +3779,17 @@ function GestionCompras() {
             </div>
           </div>
           {msg && (
-            <div style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+            <div style={{ fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
               {msg}
             </div>
           )}
-          <button type='submit' style={{ ...btnPrimary, alignSelf: 'flex-start' }}>
+          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start">
             Registrar compra
           </button>
         </form>
       </div>
 
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <div
           style={{
             display: 'flex',
@@ -3634,45 +3798,45 @@ function GestionCompras() {
             marginBottom: 20,
           }}
         >
-          <div style={{ ...cardTitle, marginBottom: 0 }}>
+          <div className="text-[15px] font-extrabold text-text mb-0">
             Compras registradas
           </div>
-          <span style={badge(C.purple)}>
+          <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">
             Total: ${totalGastado.toLocaleString('es-AR')}
           </span>
         </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Descripción</th>
-              <th style={th}>Destino</th>
-              <th style={th}>Cant.</th>
-              <th style={th}>Monto</th>
-              <th style={th}>Proveedor</th>
-              <th style={th}>Fecha</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descripción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Destino</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Cant.</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Monto</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Proveedor</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {compras.map((c) => (
               <tr key={c.id_compra}>
-                <td style={{ ...td, fontWeight: 700 }}>{c.descripcion}</td>
-                <td style={td}>
-                  <span style={badge(C.blue)}>{c.destino}</span>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">{c.descripcion}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span className="inline-block bg-[#2980B91A] text-blue rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{c.destino}</span>
                 </td>
-                <td style={td}>{c.cantidad}</td>
-                <td style={{ ...td, fontWeight: 800, color: C.purple }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{c.cantidad}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-extrabold text-purple-700">
                   ${Number(c.monto).toLocaleString('es-AR')}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {c.proveedor ?? '—'}
                 </td>
-                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
                   {c.fecha_compra}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <button
-                    style={btnDanger}
+                    className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
                     onClick={() => eliminar(c.id_compra)}
                   >
                     Eliminar
@@ -3682,7 +3846,7 @@ function GestionCompras() {
             ))}
             {compras.length === 0 && (
               <tr>
-                <td style={{ ...td, color: C.textMuted }} colSpan={7}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={7}>
                   No hay compras registradas.
                 </td>
               </tr>
@@ -3732,11 +3896,11 @@ function GestionInscripciones({
     'En lista de espera',
   ]
   const EST_COLOR: Record<string, string> = {
-    Pendiente: C.orange,
-    'En revisión': C.blue,
-    Aprobada: C.green,
-    Rechazada: C.red,
-    'En lista de espera': C.textMuted,
+    Pendiente: '#E67E22',
+    'En revisión': '#2980B9',
+    Aprobada: '#27AE60',
+    Rechazada: '#E74C3C',
+    'En lista de espera': '#6B6B8A',
   }
 
   return (
@@ -3744,25 +3908,25 @@ function GestionInscripciones({
       <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
         📋 Inscripciones
       </h2>
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Aspirante</th>
-              <th style={th}>Tutor</th>
-              <th style={th}>Nivel</th>
-              <th style={th}>Fecha</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Aspirante</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tutor</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nivel</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {inscripciones.map((i) => (
               <tr key={i.id_inscripcion}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {i.nombre_aspirante} {i.apellido_aspirante ?? ''}
                   <br />
-                  <span style={{ fontSize: 11, color: C.textMuted }}>
+                  <span style={{ fontSize: 11, color: '#6B6B8A' }}>
                     DNI: {i.dni_aspirante}
                     {i.fecha_nacimiento_aspirante &&
                       ` · Nac: ${new Date(
@@ -3770,25 +3934,25 @@ function GestionInscripciones({
                       ).toLocaleDateString('es-AR')}`}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {i.nombre_tutor}
                   <br />
-                  <span style={{ fontSize: 11, color: C.textMuted }}>
+                  <span style={{ fontSize: 11, color: '#6B6B8A' }}>
                     {i.email_tutor}
                   </span>
                 </td>
-                <td style={td}>
-                  <span style={badge(C.purple)}>{i.nivel_solicitado}</span>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{i.nivel_solicitado}</span>
                 </td>
-                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
                   {new Date(i.fecha_solicitud).toLocaleDateString('es-AR')}
                 </td>
-                <td style={td}>
-                  <span style={badge(EST_COLOR[i.estado] ?? C.textMuted)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(EST_COLOR[i.estado] ?? '#6B6B8A')}>
                     {i.estado}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <div
                     style={{
                       display: 'flex',
@@ -3797,12 +3961,7 @@ function GestionInscripciones({
                     }}
                   >
                     <select
-                      style={{
-                        ...input,
-                        width: 160,
-                        padding: '6px 10px',
-                        appearance: 'none' as const,
-                      }}
+                      className="rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px] px-[10px] py-[6px] appearance-none"
                       value={i.estado}
                       onChange={(e) =>
                         cambiarEstado(i.id_inscripcion, e.target.value)
@@ -3815,12 +3974,7 @@ function GestionInscripciones({
                       ))}
                     </select>
                     <button
-                      style={{
-                        ...btnPrimary,
-                        width: 160,
-                        padding: '6px 10px',
-                        fontSize: 12,
-                      }}
+                      className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer"
                       onClick={() => {
                         const partes = i.nombre_tutor.trim().split(/\s+/)
                         onRegistrar({
@@ -3938,16 +4092,16 @@ function GestionActividades() {
   const deportes = actividades.filter((a) => a.tipo === 'Deporte')
 
   const renderGrupo = (titulo: string, items: ActividadEx[]) => (
-    <div style={{ ...card, marginBottom: 20 }}>
-      <div style={cardTitle}>{titulo}</div>
+    <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+      <div className="text-[15px] font-extrabold text-text mb-5">{titulo}</div>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th style={th}>Actividad</th>
-            <th style={th}>Cupo</th>
-            <th style={th}>Inscriptos</th>
-            <th style={th}>Estado</th>
-            <th style={th}>Acción</th>
+            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Actividad</th>
+            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Cupo</th>
+            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Inscriptos</th>
+            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+            <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
           </tr>
         </thead>
         <tbody>
@@ -3956,43 +4110,43 @@ function GestionActividades() {
             const completo = ocupados >= a.cupo_maximo
             return (
               <tr key={a.id_actividad}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {a.nombre}
                   {a.descripcion && (
                     <>
                       <br />
-                      <span style={{ fontSize: 11, color: C.textMuted }}>
+                      <span style={{ fontSize: 11, color: '#6B6B8A' }}>
                         {a.descripcion}
                       </span>
                     </>
                   )}
                 </td>
-                <td style={td}>{a.cupo_maximo}</td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{a.cupo_maximo}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <span
                     style={badge(
-                      completo ? C.red : ocupados > 0 ? C.green : C.textMuted,
+                      completo ? '#E74C3C' : ocupados > 0 ? '#27AE60' : '#6B6B8A',
                     )}
                   >
                     {ocupados} / {a.cupo_maximo}
                     {completo ? ' · COMPLETO' : ''}
                   </span>
                 </td>
-                <td style={td}>
-                  <span style={badge(a.activo ? C.green : C.textMuted)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(a.activo ? '#27AE60' : '#6B6B8A')}>
                     {a.activo ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
-                      style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}
+                      className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs"
                       onClick={() => abrirEdicion(a)}
                     >
                       Editar
                     </button>
                     <button
-                      style={{ ...btnDanger }}
+                      className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
                       onClick={() => toggleActivo(a)}
                     >
                       {a.activo ? 'Desactivar' : 'Activar'}
@@ -4004,7 +4158,7 @@ function GestionActividades() {
           })}
           {items.length === 0 && (
             <tr>
-              <td style={{ ...td, color: C.textMuted }} colSpan={5}>
+              <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={5}>
                 Sin actividades cargadas.
               </td>
             </tr>
@@ -4027,14 +4181,14 @@ function GestionActividades() {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           🎨 Actividades extracurriculares
         </h2>
-        <button style={btnPrimary} onClick={abrirNueva}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={abrirNueva}>
           + Nueva actividad
         </button>
       </div>
 
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">
             {editId ? 'Editar actividad' : 'Nueva actividad'}
           </div>
           <form
@@ -4043,9 +4197,9 @@ function GestionActividades() {
           >
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 14 }}>
               <div>
-                <span style={label}>Nombre</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nombre</span>
                 <input
-                  style={input}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                   required
                   value={form.nombre}
                   onChange={(e) =>
@@ -4054,9 +4208,9 @@ function GestionActividades() {
                 />
               </div>
               <div>
-                <span style={label}>Tipo</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
                 <select
-                  style={{ ...input, appearance: 'none' as const }}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                   value={form.tipo}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, tipo: e.target.value }))
@@ -4067,9 +4221,9 @@ function GestionActividades() {
                 </select>
               </div>
               <div>
-                <span style={label}>Cupo máximo</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Cupo máximo</span>
                 <input
-                  style={input}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                   type='number'
                   min={1}
                   required
@@ -4084,9 +4238,9 @@ function GestionActividades() {
               </div>
             </div>
             <div>
-              <span style={label}>Descripción (opcional)</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción (opcional)</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.descripcion}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, descripcion: e.target.value }))
@@ -4094,17 +4248,17 @@ function GestionActividades() {
               />
             </div>
             {msg && (
-              <div style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+              <div style={{ fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
                 {msg}
               </div>
             )}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button type='submit' style={btnPrimary}>
+              <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
                 {editId ? 'Guardar cambios' : 'Crear actividad'}
               </button>
               <button
                 type='button'
-                style={btnSecondary}
+                className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"
                 onClick={() => setShowForm(false)}
               >
                 Cancelar
@@ -4202,8 +4356,8 @@ function GestionReservas({ userId }: { userId: string }) {
         🏟️ Reservas de instalaciones
       </h2>
 
-      <div style={{ ...card, marginBottom: 24 }}>
-        <div style={cardTitle}>Nueva reserva</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+        <div className="text-[15px] font-extrabold text-text mb-5">Nueva reserva</div>
         <form
           onSubmit={crear}
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
@@ -4216,9 +4370,9 @@ function GestionReservas({ userId }: { userId: string }) {
             }}
           >
             <div>
-              <span style={label}>Instalación</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Instalación</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 required
                 value={form.id_instalacion}
                 onChange={(e) =>
@@ -4234,9 +4388,9 @@ function GestionReservas({ userId }: { userId: string }) {
               </select>
             </div>
             <div>
-              <span style={label}>Fecha</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 type='date'
                 required
                 min={hoy}
@@ -4247,9 +4401,9 @@ function GestionReservas({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span style={label}>Hora inicio</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Hora inicio</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 type='time'
                 required
                 value={form.hora_inicio}
@@ -4259,9 +4413,9 @@ function GestionReservas({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span style={label}>Hora fin</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Hora fin</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 type='time'
                 required
                 value={form.hora_fin}
@@ -4272,9 +4426,9 @@ function GestionReservas({ userId }: { userId: string }) {
             </div>
           </div>
           <div>
-            <span style={label}>Motivo (opcional)</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Motivo (opcional)</span>
             <input
-              style={input}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
               value={form.motivo}
               placeholder='Ej: entrenamiento de natación'
               onChange={(e) =>
@@ -4283,52 +4437,52 @@ function GestionReservas({ userId }: { userId: string }) {
             />
           </div>
           {msg && (
-            <div style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+            <div style={{ fontSize: 12, color: '#E74C3C', fontWeight: 700 }}>
               {msg}
             </div>
           )}
-          <button type='submit' style={{ ...btnPrimary, alignSelf: 'flex-start' }}>
+          <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start">
             Reservar
           </button>
         </form>
       </div>
 
-      <div style={card}>
-        <div style={cardTitle}>Próximas reservas</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Próximas reservas</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Instalación</th>
-              <th style={th}>Fecha</th>
-              <th style={th}>Horario</th>
-              <th style={th}>Motivo</th>
-              <th style={th}>Reservó</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Instalación</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Horario</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Motivo</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Reservó</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {reservas.map((r) => (
               <tr key={r.id_reserva}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {r.instalaciones?.nombre ?? '—'}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-AR')}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   {r.hora_inicio.slice(0, 5)} – {r.hora_fin.slice(0, 5)}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {r.motivo ?? '—'}
                 </td>
-                <td style={{ ...td, color: C.textMuted, fontSize: 12 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
                   {r.usuarios
                     ? `${r.usuarios.nombre} ${r.usuarios.apellido}`
                     : '—'}
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <button
-                    style={btnDanger}
+                    className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
                     onClick={() => eliminar(r.id_reserva)}
                   >
                     Cancelar
@@ -4338,7 +4492,7 @@ function GestionReservas({ userId }: { userId: string }) {
             ))}
             {reservas.length === 0 && (
               <tr>
-                <td style={{ ...td, color: C.textMuted }} colSpan={6}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted" colSpan={6}>
                   No hay reservas próximas.
                 </td>
               </tr>
@@ -4384,14 +4538,14 @@ function GestionMensajes() {
       <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
         ✉️ Mensajes de contacto
         {sinLeer > 0 && (
-          <span style={{ ...badge(C.orange), marginLeft: 10 }}>
+          <span style={{ ...badge('#E67E22'), marginLeft: 10 }}>
             {sinLeer} sin leer
           </span>
         )}
       </h2>
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         {mensajes.length === 0 ? (
-          <div style={{ color: C.textMuted, fontSize: 13 }}>
+          <div style={{ color: '#6B6B8A', fontSize: 13 }}>
             No hay mensajes recibidos.
           </div>
         ) : (
@@ -4400,10 +4554,10 @@ function GestionMensajes() {
               <div
                 key={m.id_mensaje}
                 style={{
-                  border: `1px solid ${C.border}`,
+                  border: `1px solid ${'#E8E6F5'}`,
                   borderRadius: 12,
                   padding: 14,
-                  background: m.leido ? C.white : C.purpleLight,
+                  background: m.leido ? '#FFFFFF' : '#EEE9FF',
                 }}
               >
                 <div
@@ -4424,14 +4578,14 @@ function GestionMensajes() {
                     <span
                       style={{
                         fontSize: 12,
-                        color: C.textMuted,
+                        color: '#6B6B8A',
                         marginLeft: 8,
                       }}
                     >
                       {m.email}
                     </span>
                   </div>
-                  <span style={{ fontSize: 11, color: C.textMuted }}>
+                  <span style={{ fontSize: 11, color: '#6B6B8A' }}>
                     {new Date(m.fecha_envio).toLocaleString('es-AR')}
                   </span>
                 </div>
@@ -4441,7 +4595,7 @@ function GestionMensajes() {
                       style={{
                         fontSize: 13,
                         lineHeight: 1.6,
-                        color: C.text,
+                        color: '#1A1A2E',
                         whiteSpace: 'pre-wrap',
                         margin: '0 0 12px',
                       }}
@@ -4451,17 +4605,12 @@ function GestionMensajes() {
                     <div style={{ display: 'flex', gap: 8 }}>
                       <a
                         href={`mailto:${m.email}`}
-                        style={{
-                          ...btnSecondary,
-                          padding: '6px 14px',
-                          fontSize: 12,
-                          textDecoration: 'none',
-                        }}
+                        className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[14px] !text-xs no-underline"
                       >
                         Responder por correo
                       </a>
                       <button
-                        style={{ ...btnSecondary, padding: '6px 14px', fontSize: 12 }}
+                        className="bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer py-[6px] px-[14px] !text-xs"
                         onClick={() => marcarLeido(m.id_mensaje, !m.leido)}
                       >
                         {m.leido ? 'Marcar como no leído' : 'Marcar como leído'}
@@ -4561,22 +4710,22 @@ function GestionNoticias({ userId }: { userId: string }) {
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
           📰 Noticias
         </h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Nueva noticia'}
         </button>
       </div>
 
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>Publicar noticia</div>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">Publicar noticia</div>
           <form
             onSubmit={handleCreate}
             style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
           >
             <div>
-              <span style={label}>Título</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Título</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 required
                 value={form.titulo}
                 onChange={(e) =>
@@ -4585,9 +4734,9 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span style={label}>Resumen (opcional)</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Resumen (opcional)</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.resumen}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, resumen: e.target.value }))
@@ -4595,9 +4744,9 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span style={label}>URL de imagen (opcional)</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">URL de imagen (opcional)</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.url_imagen}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, url_imagen: e.target.value }))
@@ -4606,13 +4755,9 @@ function GestionNoticias({ userId }: { userId: string }) {
               />
             </div>
             <div>
-              <span style={label}>Contenido</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Contenido</span>
               <textarea
-                style={{
-                  ...input,
-                  minHeight: 120,
-                  resize: 'vertical' as const,
-                }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[120px] resize-y"
                 required
                 value={form.contenido}
                 onChange={(e) =>
@@ -4660,7 +4805,7 @@ function GestionNoticias({ userId }: { userId: string }) {
               <button
                 type='submit'
                 disabled={loading}
-                style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}
+                className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
               >
                 {loading ? 'Publicando...' : 'Publicar'}
               </button>
@@ -4670,7 +4815,7 @@ function GestionNoticias({ userId }: { userId: string }) {
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: msg.startsWith('✅') ? C.green : C.red,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                 }}
               >
                 {msg}
@@ -4680,43 +4825,35 @@ function GestionNoticias({ userId }: { userId: string }) {
         </div>
       )}
 
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Título</th>
-              <th style={th}>Fecha</th>
-              <th style={th}>Destacada</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Acción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Título</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Destacada</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
             </tr>
           </thead>
           <tbody>
             {noticias.map((n) => (
               <tr key={n.id_noticia}>
-                <td style={{ ...td, fontWeight: 700, maxWidth: 300 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold max-w-[300px]">
                   {n.titulo}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {new Date(n.fecha_publicacion).toLocaleDateString('es-AR')}
                 </td>
-                <td style={td}>{n.destacada ? '⭐' : '—'}</td>
-                <td style={td}>
-                  <span style={badge(n.activo ? C.green : C.red)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">{n.destacada ? '⭐' : '—'}</td>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(n.activo ? '#27AE60' : '#E74C3C')}>
                     {n.activo ? 'Publicada' : 'Oculta'}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <button
-                    style={
-                      n.activo
-                        ? btnDanger
-                        : {
-                            ...btnDanger,
-                            background: '#27AE601A',
-                            color: C.green,
-                          }
-                    }
+                    className={n.activo ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
                     onClick={() => toggleActivo(n.id_noticia, n.activo)}
                   >
                     {n.activo ? 'Ocultar' : 'Publicar'}
@@ -4842,10 +4979,10 @@ function TomarAsistencia({ userId }: { userId: string }) {
   }
 
   const EST_COLOR: Record<string, string> = {
-    Presente: C.green,
-    Ausente: C.red,
-    Tarde: C.orange,
-    Justificado: C.blue,
+    Presente: '#27AE60',
+    Ausente: '#E74C3C',
+    Tarde: '#E67E22',
+    Justificado: '#2980B9',
   }
 
   return (
@@ -4854,7 +4991,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
         📅 Tomar asistencia
       </h2>
 
-      <div style={{ ...card, marginBottom: 20 }}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
         <div
           style={{
             display: 'flex',
@@ -4864,9 +5001,9 @@ function TomarAsistencia({ userId }: { userId: string }) {
           }}
         >
           <div>
-            <span style={label}>Clase / Materia</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Clase / Materia</span>
             <select
-              style={{ ...input, width: 280, appearance: 'none' as const }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[280px] appearance-none"
               value={selAsignacion ?? ''}
               onChange={(e) => setSelAsignacion(Number(e.target.value))}
             >
@@ -4880,10 +5017,10 @@ function TomarAsistencia({ userId }: { userId: string }) {
             </select>
           </div>
           <div>
-            <span style={label}>Fecha</span>
+            <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha</span>
             <input
               type='date'
-              style={{ ...input, width: 160 }}
+              className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-[160px]"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
             />
@@ -4892,7 +5029,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
       </div>
 
       {selAsignacion && alumnos.length > 0 && (
-        <div style={card}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border">
           <div
             style={{
               display: 'flex',
@@ -4901,7 +5038,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
               marginBottom: 16,
             }}
           >
-            <div style={cardTitle}>
+            <div className="text-[15px] font-extrabold text-text mb-5">
               {alumnos.length} alumnos — Tocá el estado para cambiar
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -4923,7 +5060,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '12px 0',
-                borderBottom: `1px solid ${C.border}`,
+                borderBottom: `1px solid ${'#E8E6F5'}`,
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -4932,8 +5069,8 @@ function TomarAsistencia({ userId }: { userId: string }) {
                     width: 36,
                     height: 36,
                     borderRadius: '50%',
-                    background: `${C.purple}18`,
-                    color: C.purple,
+                    background: `${'#5B35C5'}18`,
+                    color: '#5B35C5',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -4977,7 +5114,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
             <button
               onClick={guardar}
               disabled={loading}
-              style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}
+              className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}
             >
               {loading ? 'Guardando...' : '💾 Guardar asistencia'}
             </button>
@@ -4986,7 +5123,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: msg.startsWith('✅') ? C.green : C.red,
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                 }}
               >
                 {msg}
@@ -4997,7 +5134,7 @@ function TomarAsistencia({ userId }: { userId: string }) {
       )}
 
       {selAsignacion && alumnos.length === 0 && (
-        <div style={{ ...card, textAlign: 'center', color: C.textMuted }}>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border text-center text-textMuted">
           No hay alumnos asignados a este curso.
         </div>
       )}
@@ -5127,7 +5264,7 @@ function CargarCalificaciones({ userId }: { userId: string }) {
   }
 
   const notaColor = (n: number) =>
-    n >= 8 ? C.green : n >= 6 ? C.orange : C.red
+    n >= 8 ? '#27AE60' : n >= 6 ? '#E67E22' : '#E74C3C'
 
   return (
     <div>
@@ -5135,10 +5272,10 @@ function CargarCalificaciones({ userId }: { userId: string }) {
         📝 Calificaciones
       </h2>
 
-      <div style={{ ...card, marginBottom: 20 }}>
-        <span style={label}>Clase / Materia</span>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+        <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Clase / Materia</span>
         <select
-          style={{ ...input, maxWidth: 360, appearance: 'none' as const }}
+          className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none max-w-[360px]"
           value={selAsignacion ?? ''}
           onChange={(e) => setSelAsig(Number(e.target.value))}
         >
@@ -5155,8 +5292,8 @@ function CargarCalificaciones({ userId }: { userId: string }) {
       {selAsignacion && (
         <>
           {/* Formulario */}
-          <div style={{ ...card, marginBottom: 20 }}>
-            <div style={cardTitle}>Cargar nota</div>
+          <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+            <div className="text-[15px] font-extrabold text-text mb-5">Cargar nota</div>
             <form
               onSubmit={handleCargar}
               style={{
@@ -5166,9 +5303,9 @@ function CargarCalificaciones({ userId }: { userId: string }) {
               }}
             >
               <div>
-                <span style={label}>Alumno</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Alumno</span>
                 <select
-                  style={{ ...input, appearance: 'none' as const }}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                   required
                   value={form.id_alumno}
                   onChange={(e) =>
@@ -5184,9 +5321,9 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 </select>
               </div>
               <div>
-                <span style={label}>Trimestre</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Trimestre</span>
                 <select
-                  style={{ ...input, appearance: 'none' as const }}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                   value={form.trimestre}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, trimestre: e.target.value }))
@@ -5198,9 +5335,9 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 </select>
               </div>
               <div>
-                <span style={label}>Tipo</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
                 <select
-                  style={{ ...input, appearance: 'none' as const }}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                   value={form.tipo_evaluacion}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, tipo_evaluacion: e.target.value }))
@@ -5214,14 +5351,14 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 </select>
               </div>
               <div>
-                <span style={label}>Nota (0–10)</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Nota (0–10)</span>
                 <input
                   type='number'
                   min='0'
                   max='10'
                   step='0.25'
                   required
-                  style={input}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                   value={form.nota}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, nota: e.target.value }))
@@ -5237,9 +5374,9 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <span style={label}>Descripción (opcional)</span>
+                  <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción (opcional)</span>
                   <input
-                    style={input}
+                    className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                     value={form.descripcion}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, descripcion: e.target.value }))
@@ -5247,7 +5384,7 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                     placeholder='Ej: Primer parcial unidad 1'
                   />
                 </div>
-                <button type='submit' style={btnPrimary}>
+                <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
                   Cargar nota
                 </button>
               </div>
@@ -5257,7 +5394,7 @@ function CargarCalificaciones({ userId }: { userId: string }) {
                     gridColumn: '1/-1',
                     fontSize: 13,
                     fontWeight: 700,
-                    color: msg.startsWith('✅') ? C.green : C.red,
+                    color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                   }}
                 >
                   {msg}
@@ -5267,34 +5404,34 @@ function CargarCalificaciones({ userId }: { userId: string }) {
           </div>
 
           {/* Historial */}
-          <div style={card}>
-            <div style={cardTitle}>Notas cargadas</div>
+          <div className="bg-white rounded-card p-6 shadow-card border border-border">
+            <div className="text-[15px] font-extrabold text-text mb-5">Notas cargadas</div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  <th style={th}>Alumno</th>
-                  <th style={th}>Tipo</th>
-                  <th style={th}>Trimestre</th>
-                  <th style={th}>Fecha</th>
-                  <th style={th}>Nota</th>
+                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
+                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tipo</th>
+                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Trimestre</th>
+                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
+                  <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Nota</th>
                 </tr>
               </thead>
               <tbody>
                 {calificaciones.map((c) => (
                   <tr key={c.id_calificacion}>
-                    <td style={{ ...td, fontWeight: 700 }}>
+                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                       {c.alumnos?.apellido}, {c.alumnos?.nombre}
                     </td>
-                    <td style={td}>
-                      <span style={badge(C.purple)}>{c.tipo_evaluacion}</span>
+                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                      <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{c.tipo_evaluacion}</span>
                     </td>
-                    <td style={{ ...td, color: C.textMuted }}>
+                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                       T{c.trimestre}
                     </td>
-                    <td style={{ ...td, color: C.textMuted }}>
+                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                       {new Date(c.fecha_carga).toLocaleDateString('es-AR')}
                     </td>
-                    <td style={td}>
+                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                       <div
                         style={{
                           width: 36,
@@ -5419,8 +5556,8 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
   }
 
   const TIPO_COLOR: Record<string, string> = {
-    Leve: C.orange,
-    Grave: C.red,
+    Leve: '#E67E22',
+    Grave: '#E74C3C',
     'Muy grave': '#C0392B',
   }
   const cursosUnicos = asignaciones.filter(
@@ -5436,19 +5573,15 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
         ⚠️ Amonestaciones
       </h2>
 
-      <div style={{ ...card, marginBottom: 20 }}>
-        <div style={cardTitle}>Registrar amonestación</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border mb-5">
+        <div className="text-[15px] font-extrabold text-text mb-5">Registrar amonestación</div>
         <div style={{ marginBottom: 14 }}>
-          <span style={label}>Seleccioná el curso</span>
+          <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Seleccioná el curso</span>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {cursosUnicos.map((a) => (
               <button
                 key={(a.cursos as any)?.id_curso}
-                style={
-                  selCurso === (a.cursos as any)?.id_curso
-                    ? btnPrimary
-                    : btnSecondary
-                }
+                className={selCurso === (a.cursos as any)?.id_curso ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer' : 'bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'}
                 onClick={() => handleSelCurso((a.cursos as any)?.id_curso)}
               >
                 {a.cursos?.nivel} {a.cursos?.grado_anio} "{a.cursos?.division}"
@@ -5462,9 +5595,9 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
             style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14 }}
           >
             <div>
-              <span style={label}>Alumno</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Alumno</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 required
                 value={form.id_alumno}
                 onChange={(e) =>
@@ -5480,9 +5613,9 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
               </select>
             </div>
             <div>
-              <span style={label}>Tipo</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo</span>
               <select
-                style={{ ...input, appearance: 'none' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                 value={form.tipo}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, tipo: e.target.value }))
@@ -5494,9 +5627,9 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
               </select>
             </div>
             <div style={{ gridColumn: '1/-1' }}>
-              <span style={label}>Descripción del hecho</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción del hecho</span>
               <textarea
-                style={{ ...input, minHeight: 80, resize: 'vertical' as const }}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y"
                 required
                 value={form.descripcion}
                 onChange={(e) =>
@@ -5512,7 +5645,7 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
                 gap: 14,
               }}
             >
-              <button type='submit' style={btnPrimary}>
+              <button type='submit' className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer">
                 Registrar amonestación
               </button>
               {msg && (
@@ -5520,7 +5653,7 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
                   style={{
                     fontSize: 13,
                     fontWeight: 700,
-                    color: msg.startsWith('✅') ? C.green : C.red,
+                    color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
                   }}
                 >
                   {msg}
@@ -5531,32 +5664,32 @@ function GestionAmonestaciones({ userId }: { userId: string }) {
         )}
       </div>
 
-      <div style={card}>
-        <div style={cardTitle}>Historial de amonestaciones</div>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">Historial de amonestaciones</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Alumno</th>
-              <th style={th}>Tipo</th>
-              <th style={th}>Descripción</th>
-              <th style={th}>Fecha</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Alumno</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Tipo</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Descripción</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
             </tr>
           </thead>
           <tbody>
             {amonestaciones.map((a) => (
               <tr key={a.id_amonestacion}>
-                <td style={{ ...td, fontWeight: 700 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold">
                   {a.alumnos?.apellido}, {a.alumnos?.nombre}
                 </td>
-                <td style={td}>
-                  <span style={badge(TIPO_COLOR[a.tipo] ?? C.textMuted)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(TIPO_COLOR[a.tipo] ?? '#6B6B8A')}>
                     {a.tipo}
                   </span>
                 </td>
-                <td style={{ ...td, color: C.textMuted, maxWidth: 300 }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle" style={{ color: '#6B6B8A', maxWidth: 300 }}>
                   {a.descripcion}
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {new Date(a.fecha).toLocaleDateString('es-AR')}
                 </td>
               </tr>
@@ -5686,29 +5819,29 @@ function GestionGaleria({ userId }: { userId: string }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🖼️ Galería Institucional</h2>
-        <button style={btnPrimary} onClick={() => setShowForm(!showForm)}>
+        <button className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancelar' : '+ Agregar Imagen'}
         </button>
       </div>
 
       {showForm && (
-        <div style={{ ...card, marginBottom: 24 }}>
-          <div style={cardTitle}>Publicar nueva fotografía</div>
+        <div className="bg-white rounded-card p-6 shadow-card border border-border mb-6">
+          <div className="text-[15px] font-extrabold text-text mb-5">Publicar nueva fotografía</div>
           <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div>
-                <span style={label}>Título de la foto (Opcional)</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Título de la foto (Opcional)</span>
                 <input
-                  style={input}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                   value={form.titulo}
                   onChange={(e) => setForm((p) => ({ ...p, titulo: e.target.value }))}
                   placeholder='Ej: Laboratorio de Ciencias Avanzadas'
                 />
               </div>
               <div>
-                <span style={label}>Categoría / Sección</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Categoría / Sección</span>
                 <select
-                  style={{ ...input, appearance: 'none' as const }}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
                   value={form.categoria}
                   onChange={(e) => setForm((p) => ({ ...p, categoria: e.target.value }))}
                 >
@@ -5723,9 +5856,9 @@ function GestionGaleria({ userId }: { userId: string }) {
             </div>
 
             <div>
-              <span style={label}>Descripción descriptiva (Opcional)</span>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción descriptiva (Opcional)</span>
               <input
-                style={input}
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                 value={form.descripcion}
                 onChange={(e) => setForm((p) => ({ ...p, descripcion: e.target.value }))}
                 placeholder='Breve reseña sobre lo que muestra la imagen...'
@@ -5734,11 +5867,11 @@ function GestionGaleria({ userId }: { userId: string }) {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'center' }}>
               <div>
-                <span style={label}>Opción A: Seleccionar archivo local</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Opción A: Seleccionar archivo local</span>
                 <input
                   type='file'
                   accept='image/*'
-                  style={input}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       setFile(e.target.files[0])
@@ -5747,9 +5880,9 @@ function GestionGaleria({ userId }: { userId: string }) {
                 />
               </div>
               <div>
-                <span style={label}>Opción B: Vincular URL de imagen remota</span>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Opción B: Vincular URL de imagen remota</span>
                 <input
-                  style={input}
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
                   value={form.url_imagen}
                   onChange={(e) => setForm((p) => ({ ...p, url_imagen: e.target.value }))}
                   placeholder='https://images.unsplash.com/...'
@@ -5759,13 +5892,13 @@ function GestionGaleria({ userId }: { userId: string }) {
             </div>
 
             <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
-              <button type='submit' disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}>
+              <button type='submit' disabled={loading} className={loading ? "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60" : "bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"}>
                 {loading ? 'Subiendo contenido...' : 'Publicar en Galería'}
               </button>
             </div>
 
             {msg && (
-              <div style={{ fontSize: 13, fontWeight: 700, color: msg.startsWith('✅') ? C.green : C.red }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C' }}>
                 {msg}
               </div>
             )}
@@ -5774,50 +5907,50 @@ function GestionGaleria({ userId }: { userId: string }) {
       )}
 
       {/* Lista del Repositorio Visual */}
-      <div style={card}>
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={th}>Miniatura</th>
-              <th style={th}>Título / Categoría</th>
-              <th style={th}>Fecha de Subida</th>
-              <th style={th}>Estado</th>
-              <th style={th}>Acciones</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Miniatura</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Título / Categoría</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha de Subida</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
+              <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {imagenes.map((img) => (
               <tr key={img.id_imagen}>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <img
                     src={img.url_imagen}
                     alt={img.titulo || 'Mina'}
-                    style={{ width: 65, height: 48, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}` }}
+                    style={{ width: 65, height: 48, objectFit: 'cover', borderRadius: 8, border: `1px solid ${'#E8E6F5'}` }}
                   />
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <span style={{ fontWeight: 700 }}>{img.titulo || 'Fotografía sin título'}</span>
                   <br />
-                  <span style={badge(C.purple)}>{img.categoria || 'General'}</span>
+                  <span className="inline-block bg-[#5B35C51A] text-purple-700 rounded-[20px] px-[10px] py-[3px] text-[11px] font-extrabold">{img.categoria || 'General'}</span>
                 </td>
-                <td style={{ ...td, color: C.textMuted }}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted">
                   {new Date(img.fecha_subida).toLocaleDateString('es-AR')}
                 </td>
-                <td style={td}>
-                  <span style={badge(img.activo ? C.green : C.red)}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
+                  <span style={badge(img.activo ? '#27AE60' : '#E74C3C')}>
                     {img.activo ? 'Visible en Home' : 'Oculta'}
                   </span>
                 </td>
-                <td style={td}>
+                <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button
-                      style={img.activo ? btnDanger : { ...btnDanger, background: '#27AE601A', color: C.green }}
+                      className={img.activo ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
                       onClick={() => toggleActivo(img.id_imagen, img.activo)}
                     >
                       {img.activo ? 'Ocultar' : 'Mostrar'}
                     </button>
                     <button
-                      style={{ ...btnDanger, background: '#E74C3C26' }}
+                      className="bg-[#E74C3C26] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
                       onClick={() => eliminarImagen(img.id_imagen, img.url_imagen)}
                     >
                       Eliminar permanentemente
@@ -5828,13 +5961,263 @@ function GestionGaleria({ userId }: { userId: string }) {
             ))}
             {imagenes.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ ...td, textAlign: 'center', color: C.textMuted, padding: 32 }}>
+                <td colSpan={5} className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-center text-textMuted p-8">
                   No se registran imágenes en la galería institucional.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  )
+}
+// ═══════════════════════════════════════════════════════════════
+//  GESTIÓN DE EMPLEOS
+// ═══════════════════════════════════════════════════════════════
+const MODALIDADES = ['Presencial', 'Remoto', 'Híbrido']
+const TIPOS_CONTRATO = ['Full-time', 'Part-time', 'Pasantía', 'Suplencia', 'Temporal']
+const MODALIDAD_COLOR: Record<string, string> = {
+  Presencial: '#2980B9',
+  Remoto: '#27AE60',
+  Híbrido: '#7B55E8',
+}
+
+function GestionEmpleos() {
+  const [empleos, setEmpleos] = useState<Empleo[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [msg, setMsg] = useState('')
+  const FORM_VACIO = {
+    titulo: '',
+    descripcion: '',
+    area: '',
+    requisitos: '',
+    modalidad: 'Presencial',
+    tipo_contrato: 'Full-time',
+    fecha_cierre: '',
+  }
+  const [form, setForm] = useState(FORM_VACIO)
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('empleos')
+      .select('*')
+      .order('fecha_publicacion', { ascending: false })
+    if (data) setEmpleos(data as Empleo[])
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMsg('')
+    const { error } = await supabase.from('empleos').insert([{
+      ...form,
+      fecha_cierre: form.fecha_cierre || null,
+    }])
+    if (error) {
+      setMsg('❌ Error: ' + error.message)
+    } else {
+      setMsg('✅ Empleo publicado correctamente.')
+      setForm(FORM_VACIO)
+      setShowForm(false)
+      load()
+    }
+    setLoading(false)
+  }
+
+  const toggleActivo = async (id: number, activo: boolean) => {
+    await supabase.from('empleos').update({ activo: !activo }).eq('id_empleo', id)
+    load()
+  }
+
+  const eliminar = async (id: number) => {
+    if (!confirm('¿Eliminar esta oferta?')) return
+    await supabase.from('empleos').delete().eq('id_empleo', id)
+    load()
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center">
+        <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>💼 Empleos</h2>
+        <button
+          className="bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer"
+          onClick={() => { setShowForm(!showForm); setMsg('') }}
+        >
+          {showForm ? 'Cancelar' : '+ Publicar empleo'}
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="bg-white rounded-card p-6 shadow-card border border-border">
+          <div className="text-[15px] font-extrabold text-text mb-5">Nueva oferta laboral</div>
+          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+            <div>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Título del puesto *</span>
+              <input
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                required
+                placeholder="Ej: Docente de Matemáticas"
+                value={form.titulo}
+                onChange={(e) => setForm((p) => ({ ...p, titulo: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Área / Departamento</span>
+                <input
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                  placeholder="Ej: Educación primaria"
+                  value={form.area}
+                  onChange={(e) => setForm((p) => ({ ...p, area: e.target.value }))}
+                />
+              </div>
+              <div>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Modalidad</span>
+                <select
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  value={form.modalidad}
+                  onChange={(e) => setForm((p) => ({ ...p, modalidad: e.target.value }))}
+                >
+                  {MODALIDADES.map((m) => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div>
+                <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Tipo de contrato</span>
+                <select
+                  className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none"
+                  value={form.tipo_contrato}
+                  onChange={(e) => setForm((p) => ({ ...p, tipo_contrato: e.target.value }))}
+                >
+                  {TIPOS_CONTRATO.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Descripción</span>
+              <textarea
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y"
+                placeholder="Descripción del puesto, tareas, etc."
+                value={form.descripcion}
+                onChange={(e) => setForm((p) => ({ ...p, descripcion: e.target.value }))}
+              />
+            </div>
+            <div>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Requisitos</span>
+              <textarea
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border min-h-[80px] resize-y"
+                placeholder="Formación requerida, experiencia, certificaciones..."
+                value={form.requisitos}
+                onChange={(e) => setForm((p) => ({ ...p, requisitos: e.target.value }))}
+              />
+            </div>
+            <div style={{ maxWidth: 240 }}>
+              <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Fecha de cierre (opcional)</span>
+              <input
+                type='date'
+                className="w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border"
+                value={form.fecha_cierre}
+                onChange={(e) => setForm((p) => ({ ...p, fecha_cierre: e.target.value }))}
+              />
+            </div>
+            <button
+              type='submit'
+              disabled={loading}
+              className={loading ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer opacity-60 self-start' : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer self-start'}
+            >
+              {loading ? 'Publicando...' : 'Publicar oferta'}
+            </button>
+            {msg && (
+              <div
+                className="text-[13px] font-bold px-4 py-3 rounded-lg border"
+                style={{
+                  color: msg.startsWith('✅') ? '#27AE60' : '#E74C3C',
+                  background: msg.startsWith('✅') ? '#27AE6012' : '#E74C3C12',
+                  borderColor: msg.startsWith('✅') ? '#27AE6040' : '#E74C3C40',
+                }}
+              >
+                {msg}
+              </div>
+            )}
+          </form>
+        </div>
+      )}
+
+      {msg && !showForm && (
+        <div className="text-[13px] font-bold text-green px-4 py-3 rounded-lg bg-[#27AE6012] border border-[#27AE6040]">
+          {msg}
+        </div>
+      )}
+
+      <div className="bg-white rounded-card p-6 shadow-card border border-border">
+        <div className="text-[15px] font-extrabold text-text mb-5">
+          Ofertas publicadas
+          <span className="ml-2 text-[12px] font-bold text-textMuted">({empleos.length})</span>
+        </div>
+        {empleos.length === 0 ? (
+          <div className="text-center text-textMuted py-8 text-[14px]">No hay ofertas publicadas aún.</div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {empleos.map((emp) => (
+              <div
+                key={emp.id_empleo}
+                className="flex items-start justify-between gap-4 p-4 rounded-xl border border-border transition-all duration-200"
+                style={{ opacity: emp.activo ? 1 : 0.5 }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-[15px] font-extrabold text-text">{emp.titulo}</span>
+                    {emp.modalidad && (
+                      <span
+                        className="inline-block px-[8px] py-[2px] rounded-full text-[10px] font-extrabold text-white"
+                        style={{ background: MODALIDAD_COLOR[emp.modalidad] ?? '#6B6B8A' }}
+                      >
+                        {emp.modalidad}
+                      </span>
+                    )}
+                    {emp.tipo_contrato && (
+                      <span className="inline-block bg-purpleLight text-purple-700 px-[8px] py-[2px] rounded-full text-[10px] font-extrabold">
+                        {emp.tipo_contrato}
+                      </span>
+                    )}
+                    {!emp.activo && (
+                      <span className="inline-block bg-[#6B6B8A1A] text-textMuted px-[8px] py-[2px] rounded-full text-[10px] font-extrabold">
+                        Inactivo
+                      </span>
+                    )}
+                  </div>
+                  {emp.area && <div className="text-[12px] text-textMuted mb-1">📍 {emp.area}</div>}
+                  {emp.descripcion && (
+                    <div className="text-[12px] text-text leading-relaxed">
+                      {emp.descripcion.slice(0, 120)}{emp.descripcion.length > 120 ? '...' : ''}
+                    </div>
+                  )}
+                  <div className="text-[11px] text-textMuted mt-2">
+                    Publicado: {emp.fecha_publicacion}
+                    {emp.fecha_cierre && ` · Cierre: ${emp.fecha_cierre}`}
+                  </div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    className={emp.activo ? 'bg-[#E67E221A] text-orange border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer' : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'}
+                    onClick={() => toggleActivo(emp.id_empleo, emp.activo)}
+                  >
+                    {emp.activo ? 'Pausar' : 'Activar'}
+                  </button>
+                  <button
+                    className="bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer"
+                    onClick={() => eliminar(emp.id_empleo)}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
