@@ -466,6 +466,12 @@ export default function AdminPanel() {
             <div style={{ fontSize: 11, color: '#6B6B8A' }}>{perfil.rol}</div>
           </div>
           <button
+            className='bg-transparent border border-border rounded-[8px] px-3.5 py-[7px] text-xs font-bold text-textMuted cursor-pointer font-[inherit]'
+            onClick={() => navigate('/')}
+          >
+            ← Inicio
+          </button>
+          <button
             className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[7px] !px-[14px] !text-xs'
             onClick={() => supabase.auth.signOut()}
           >
@@ -4658,7 +4664,9 @@ function GestionActividades() {
     // Alumnos activos para el selector de inscripción
     const { data: al } = await supabase
       .from('alumnos')
-      .select('id_alumno, nombre, apellido, dni, activo, cursos(nivel, grado_anio, division)')
+      .select(
+        'id_alumno, nombre, apellido, dni, activo, cursos(nivel, grado_anio, division)',
+      )
       .eq('activo', true)
       .order('apellido', { ascending: true })
     if (al) setAlumnos(al as unknown as Alumno[])
@@ -4704,7 +4712,10 @@ function GestionActividades() {
     if (error) {
       if (error.message.includes('Cupo completo')) {
         setInscMsg('❌ Cupo completo para esta actividad.')
-      } else if (error.message.includes('duplicate') || error.code === '23505') {
+      } else if (
+        error.message.includes('duplicate') ||
+        error.code === '23505'
+      ) {
         setInscMsg('❌ El alumno ya está inscripto en esta actividad.')
       } else {
         setInscMsg('❌ Error: ' + error.message)
@@ -4718,7 +4729,10 @@ function GestionActividades() {
     setInscribiendo(false)
   }
 
-  const quitarInscripcion = async (idInscripcion: number, idActividad: number) => {
+  const quitarInscripcion = async (
+    idInscripcion: number,
+    idActividad: number,
+  ) => {
     if (!confirm('¿Quitar al alumno de esta actividad?')) return
     await supabase
       .from('inscripciones_actividades')
@@ -4847,7 +4861,9 @@ function GestionActividades() {
                         }
                         onClick={() => toggleVerInscriptos(a.id_actividad)}
                       >
-                        {expandida ? '▲ Ocultar' : `👥 Inscriptos (${ocupados})`}
+                        {expandida
+                          ? '▲ Ocultar'
+                          : `👥 Inscriptos (${ocupados})`}
                       </button>
                       <button
                         className='bg-purpleLight text-purple-700 border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
@@ -4866,7 +4882,10 @@ function GestionActividades() {
                 </tr>
                 {expandida && (
                   <tr>
-                    <td colSpan={5} className='bg-purpleLight/50 border-b border-border p-5'>
+                    <td
+                      colSpan={5}
+                      className='bg-purpleLight/50 border-b border-border p-5'
+                    >
                       {/* Formulario de inscripción */}
                       <div className='flex items-end gap-3 flex-wrap mb-4'>
                         <div className='flex-1' style={{ minWidth: 280 }}>
@@ -4882,7 +4901,9 @@ function GestionActividades() {
                             {alumnos
                               .filter(
                                 (al) =>
-                                  !inscriptos.some((i) => i.id_alumno === al.id_alumno),
+                                  !inscriptos.some(
+                                    (i) => i.id_alumno === al.id_alumno,
+                                  ),
                               )
                               .map((al) => (
                                 <option key={al.id_alumno} value={al.id_alumno}>
@@ -4915,7 +4936,9 @@ function GestionActividades() {
                         <div
                           className='text-[12px] font-bold mb-4'
                           style={{
-                            color: inscMsg.startsWith('✅') ? '#27AE60' : '#E74C3C',
+                            color: inscMsg.startsWith('✅')
+                              ? '#27AE60'
+                              : '#E74C3C',
                           }}
                         >
                           {inscMsg}
@@ -4928,7 +4951,9 @@ function GestionActividades() {
                           No hay alumnos inscriptos en esta actividad.
                         </div>
                       ) : (
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <table
+                          style={{ width: '100%', borderCollapse: 'collapse' }}
+                        >
                           <thead>
                             <tr>
                               <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-2 pr-3 border-b border-border'>
@@ -4963,13 +4988,18 @@ function GestionActividades() {
                                     : 'Sin curso'}
                                 </td>
                                 <td className='py-2 pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
-                                  {new Date(i.fecha_inscripcion).toLocaleDateString('es-AR')}
+                                  {new Date(
+                                    i.fecha_inscripcion,
+                                  ).toLocaleDateString('es-AR')}
                                 </td>
                                 <td className='py-2 pr-3 text-[13px] border-b border-border align-middle'>
                                   <button
                                     className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[5px] px-3 text-xs font-extrabold cursor-pointer'
                                     onClick={() =>
-                                      quitarInscripcion(i.id_inscripcion_act, a.id_actividad)
+                                      quitarInscripcion(
+                                        i.id_inscripcion_act,
+                                        a.id_actividad,
+                                      )
                                     }
                                   >
                                     Quitar
@@ -7361,7 +7391,13 @@ function GestionEmpleos() {
 // ═══════════════════════════════════════════════════════════════
 //  POSTULACIONES A EMPLEOS
 // ═══════════════════════════════════════════════════════════════
-const POST_ESTADOS = ['Recibida', 'En revisión', 'Entrevista', 'Seleccionada', 'Rechazada']
+const POST_ESTADOS = [
+  'Recibida',
+  'En revisión',
+  'Entrevista',
+  'Seleccionada',
+  'Rechazada',
+]
 const POST_COLOR: Record<string, string> = {
   Recibida: '#2980B9',
   'En revisión': '#E67E22',
@@ -7372,7 +7408,9 @@ const POST_COLOR: Record<string, string> = {
 
 function GestionPostulaciones() {
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([])
-  const [empleos, setEmpleos] = useState<{ id_empleo: number; titulo: string }[]>([])
+  const [empleos, setEmpleos] = useState<
+    { id_empleo: number; titulo: string }[]
+  >([])
   const [filtroEmpleo, setFiltroEmpleo] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('')
   const [expandido, setExpandido] = useState<number | null>(null)
@@ -7393,10 +7431,15 @@ function GestionPostulaciones() {
     if (emps) setEmpleos(emps as { id_empleo: number; titulo: string }[])
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   const cambiarEstado = async (id: number, estado: string) => {
-    await supabase.from('postulaciones').update({ estado }).eq('id_postulacion', id)
+    await supabase
+      .from('postulaciones')
+      .update({ estado })
+      .eq('id_postulacion', id)
     load()
   }
 
@@ -7406,65 +7449,89 @@ function GestionPostulaciones() {
     return true
   })
 
-  const conteosPorEstado = POST_ESTADOS.reduce<Record<string, number>>((acc, e) => {
-    acc[e] = postulaciones.filter((p) => p.estado === e).length
-    return acc
-  }, {})
+  const conteosPorEstado = POST_ESTADOS.reduce<Record<string, number>>(
+    (acc, e) => {
+      acc[e] = postulaciones.filter((p) => p.estado === e).length
+      return acc
+    },
+    {},
+  )
 
   return (
-    <div className="flex flex-col gap-6">
-      <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>📩 Postulaciones</h2>
+    <div className='flex flex-col gap-6'>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>
+        📩 Postulaciones
+      </h2>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className='grid grid-cols-5 gap-3'>
         {POST_ESTADOS.map((e) => (
           <button
             key={e}
             onClick={() => setFiltroEstado(filtroEstado === e ? '' : e)}
-            className="bg-white rounded-card p-4 shadow-card border text-center transition-all duration-200 cursor-pointer"
-            style={{ borderColor: filtroEstado === e ? POST_COLOR[e] : '#E8E6F5', borderWidth: filtroEstado === e ? 2 : 1 }}
+            className='bg-white rounded-card p-4 shadow-card border text-center transition-all duration-200 cursor-pointer'
+            style={{
+              borderColor: filtroEstado === e ? POST_COLOR[e] : '#E8E6F5',
+              borderWidth: filtroEstado === e ? 2 : 1,
+            }}
           >
-            <div className="text-[22px] font-black" style={{ color: POST_COLOR[e] }}>
+            <div
+              className='text-[22px] font-black'
+              style={{ color: POST_COLOR[e] }}
+            >
               {conteosPorEstado[e] ?? 0}
             </div>
-            <div className="text-[10px] font-extrabold text-textMuted mt-1">{e}</div>
+            <div className='text-[10px] font-extrabold text-textMuted mt-1'>
+              {e}
+            </div>
           </button>
         ))}
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-4 items-center">
+      <div className='flex gap-4 items-center'>
         <div>
-          <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Filtrar por empleo</span>
+          <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+            Filtrar por empleo
+          </span>
           <select
-            className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none appearance-none"
+            className='px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none appearance-none'
             style={{ minWidth: 260 }}
             value={filtroEmpleo}
             onChange={(e) => setFiltroEmpleo(e.target.value)}
           >
             <option value=''>Todos los empleos</option>
             {empleos.map((emp) => (
-              <option key={emp.id_empleo} value={emp.id_empleo}>{emp.titulo}</option>
+              <option key={emp.id_empleo} value={emp.id_empleo}>
+                {emp.titulo}
+              </option>
             ))}
           </select>
         </div>
         <div>
-          <span className="text-[11px] font-extrabold text-textMuted block mb-[5px]">Filtrar por estado</span>
+          <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+            Filtrar por estado
+          </span>
           <select
-            className="px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none appearance-none"
+            className='px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none appearance-none'
             value={filtroEstado}
             onChange={(e) => setFiltroEstado(e.target.value)}
           >
             <option value=''>Todos los estados</option>
             {POST_ESTADOS.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s} value={s}>
+                {s}
+              </option>
             ))}
           </select>
         </div>
         {(filtroEmpleo || filtroEstado) && (
           <button
-            className="mt-5 text-[12px] font-bold text-purple-700 bg-purpleLight border-0 rounded-lg px-3 py-[7px] cursor-pointer"
-            onClick={() => { setFiltroEmpleo(''); setFiltroEstado('') }}
+            className='mt-5 text-[12px] font-bold text-purple-700 bg-purpleLight border-0 rounded-lg px-3 py-[7px] cursor-pointer'
+            onClick={() => {
+              setFiltroEmpleo('')
+              setFiltroEstado('')
+            }}
           >
             Limpiar filtros
           </button>
@@ -7472,74 +7539,108 @@ function GestionPostulaciones() {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-card p-6 shadow-card border border-border">
-        <div className="text-[15px] font-extrabold text-text mb-5">
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <div className='text-[15px] font-extrabold text-text mb-5'>
           Postulantes
-          <span className="ml-2 text-[12px] font-bold text-textMuted">
+          <span className='ml-2 text-[12px] font-bold text-textMuted'>
             ({filtradas.length} resultado{filtradas.length !== 1 ? 's' : ''})
           </span>
         </div>
 
         {filtradas.length === 0 ? (
-          <div className="text-center text-textMuted py-10 text-[14px]">
+          <div className='text-center text-textMuted py-10 text-[14px]'>
             No hay postulaciones con los filtros seleccionados.
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Postulante</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Empleo</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Fecha</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Estado</th>
-                <th className="text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border">Acción</th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Postulante
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Empleo
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Fecha
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Estado
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Acción
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtradas.map((p) => (
                 <>
                   <tr key={p.id_postulacion}>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                      <div className="font-bold">{p.apellido}, {p.nombre}</div>
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                      <div className='font-bold'>
+                        {p.apellido}, {p.nombre}
+                      </div>
                       <a
                         href={`mailto:${p.email}`}
-                        className="text-[11px] text-purple-700 no-underline hover:underline"
+                        className='text-[11px] text-purple-700 no-underline hover:underline'
                       >
                         {p.email}
                       </a>
                       {p.telefono && (
-                        <div className="text-[11px] text-textMuted">{p.telefono}</div>
+                        <div className='text-[11px] text-textMuted'>
+                          {p.telefono}
+                        </div>
                       )}
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                      <div className="font-extrabold text-purple-700 text-[12px]">{p.empleos?.titulo}</div>
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                      <div className='font-extrabold text-purple-700 text-[12px]'>
+                        {p.empleos?.titulo}
+                      </div>
                       {p.empleos?.area && (
-                        <div className="text-[11px] text-textMuted">📍 {p.empleos.area}</div>
+                        <div className='text-[11px] text-textMuted'>
+                          📍 {p.empleos.area}
+                        </div>
                       )}
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs">
-                      {new Date(p.fecha_postulacion).toLocaleDateString('es-AR')}
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
+                      {new Date(p.fecha_postulacion).toLocaleDateString(
+                        'es-AR',
+                      )}
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                      <span style={badge(POST_COLOR[p.estado] ?? '#6B6B8A')}>{p.estado}</span>
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                      <span style={badge(POST_COLOR[p.estado] ?? '#6B6B8A')}>
+                        {p.estado}
+                      </span>
                     </td>
-                    <td className="py-[11px] pr-3 text-[13px] border-b border-border align-middle">
-                      <div className="flex flex-col gap-[6px]">
+                    <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                      <div className='flex flex-col gap-[6px]'>
                         <select
-                          className="rounded-input border-2 border-border text-[13px] text-text outline-none w-[160px] px-[10px] py-[6px] appearance-none"
+                          className='rounded-input border-2 border-border text-[13px] text-text outline-none w-[160px] px-[10px] py-[6px] appearance-none'
                           value={p.estado}
-                          onChange={(e) => cambiarEstado(p.id_postulacion, e.target.value)}
+                          onChange={(e) =>
+                            cambiarEstado(p.id_postulacion, e.target.value)
+                          }
                         >
                           {POST_ESTADOS.map((s) => (
-                            <option key={s} value={s}>{s}</option>
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
                           ))}
                         </select>
                         {p.mensaje && (
                           <button
-                            className="bg-purpleLight text-purple-700 border-0 rounded-lg w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer text-left"
-                            onClick={() => setExpandido(expandido === p.id_postulacion ? null : p.id_postulacion)}
+                            className='bg-purpleLight text-purple-700 border-0 rounded-lg w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer text-left'
+                            onClick={() =>
+                              setExpandido(
+                                expandido === p.id_postulacion
+                                  ? null
+                                  : p.id_postulacion,
+                              )
+                            }
                           >
-                            {expandido === p.id_postulacion ? '▲ Ocultar mensaje' : '▼ Ver mensaje'}
+                            {expandido === p.id_postulacion
+                              ? '▲ Ocultar mensaje'
+                              : '▼ Ver mensaje'}
                           </button>
                         )}
                       </div>
@@ -7547,8 +7648,13 @@ function GestionPostulaciones() {
                   </tr>
                   {expandido === p.id_postulacion && p.mensaje && (
                     <tr key={`msg-${p.id_postulacion}`}>
-                      <td colSpan={5} className="bg-purpleLight px-6 py-4 border-b border-border text-[13px] text-text leading-relaxed">
-                        <div className="text-[10px] font-extrabold text-textMuted uppercase tracking-wider mb-2">Mensaje del postulante</div>
+                      <td
+                        colSpan={5}
+                        className='bg-purpleLight px-6 py-4 border-b border-border text-[13px] text-text leading-relaxed'
+                      >
+                        <div className='text-[10px] font-extrabold text-textMuted uppercase tracking-wider mb-2'>
+                          Mensaje del postulante
+                        </div>
                         {p.mensaje}
                       </td>
                     </tr>

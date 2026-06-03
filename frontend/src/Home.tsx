@@ -289,10 +289,10 @@ export default function Home() {
         />
         <div
           className='absolute inset-0 flex items-center'
-          style={{
-            background:
-              'linear-gradient(135deg, #3D2092CC 0%, #5B35C599 50%, transparent 100%)',
-          }}
+          // style={{
+          //   background:
+          //     'linear-gradient(135deg, #3D2092CC 0%, #5B35C599 50%, transparent 100%)',
+          // }}
         >
           <div className='max-w-[1200px] mx-auto px-10 text-white w-full'>
             <div className='text-[11px] font-extrabold tracking-[0.15em] uppercase opacity-80 mb-3'>
@@ -343,7 +343,7 @@ export default function Home() {
           {INFO_CARDS.map((card) => (
             <div
               key={card.label}
-              className='group relative rounded-card overflow-hidden cursor-pointer h-[260px]'
+              className='group relative rounded-card overflow-hidden cursor-pointer h-[260px] hover:-translate-y-1 transition-transform duration-200 shadow-[0_4px_20px_rgba(91,53,197,0.1)] '
             >
               <img
                 src={card.img}
@@ -351,7 +351,7 @@ export default function Home() {
                 className='w-full h-full object-cover block'
               />
               <div
-                className='overlay absolute inset-0 opacity-[0.15] group-hover:opacity-[0.45] transition-opacity duration-300'
+                className='overlay absolute '
                 style={{ background: card.color }}
               />
               <div className='absolute bottom-0 left-0 right-0 p-5 px-6 text-white'>
@@ -676,7 +676,7 @@ export default function Home() {
               {galeria.map((img) => (
                 <div
                   key={img.id_imagen}
-                  className='group relative h-[180px] rounded-xl overflow-hidden cursor-pointer'
+                  className='group relative h-[180px] rounded-xl overflow-hidden cursor-pointer hover:-translate-y-1 transition-transform duration-200 shadow-[0_4px_20px_rgba(91,53,197,0.1)] '
                 >
                   <img
                     src={img.url_imagen}
@@ -684,7 +684,7 @@ export default function Home() {
                     className='w-full h-full object-cover'
                   />
                   <div
-                    className='gal-overlay absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white font-extrabold text-[13px] text-center p-3'
+                    className='gal-overlay absolute flex items-center justify-center  text-white font-extrabold text-[13px] text-center p-3'
                     style={{ background: '#5B35C5CC' }}
                   >
                     {img.titulo ?? img.categoria ?? 'Ver imagen'}
