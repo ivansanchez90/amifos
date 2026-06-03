@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createClient } from '@supabase/supabase-js'
 import type { User } from '@supabase/supabase-js'
 
@@ -298,7 +299,9 @@ const NAV_DOCENTE = [
 //  COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 export default function AdminPanel() {
+  const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
+  const [authChecked, setAuthChecked] = useState(false)
   const [perfil, setPerfil] = useState<UsuarioPanel | null>(null)
   const [activeNav, setActiveNav] = useState('dashboard')
   const [loading, setLoading] = useState(true)
@@ -314,6 +317,7 @@ export default function AdminPanel() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      setAuthChecked(true)
     })
     const {
       data: { subscription },
@@ -339,8 +343,19 @@ export default function AdminPanel() {
       })
   }, [user])
 
-  if (!user || loading)
-    return <LoginAdmin onLogin={setUser} loading={loading} />
+  if (!authChecked) return null
+
+  if (!user) {
+    navigate('/login', { replace: true })
+    return null
+  }
+
+  if (loading)
+    return (
+      <div className='min-h-screen bg-bg flex items-center justify-center'>
+        <p className='text-purple-700 font-extrabold'>Cargando...</p>
+      </div>
+    )
 
   if (!perfil || !['Admin', 'Directivo', 'Docente'].includes(perfil.rol)) {
     return (

@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL as string,
@@ -108,7 +108,7 @@ const CONTACTO = {
 // ═══════════════════════════════════════════════════════════════
 const CAROUSEL_ITEMS = [
   { label: 'Instalaciones', color: '#5B35C5', img: PLACEHOLDERS.instalaciones },
-  { label: 'Idiomas', color: '#2980B9', img: PLACEHOLDERS.idiomas },
+  { label: 'Idiomas', color: '#2980B9', img: 'idiomas.png' },
   { label: 'Deportes', color: '#27AE60', img: PLACEHOLDERS.deportes },
   { label: 'Tecnología', color: '#E67E22', img: PLACEHOLDERS.tecnologia },
   { label: 'Arte', color: '#E91E8C', img: PLACEHOLDERS.arte },
@@ -204,18 +204,6 @@ export default function Home() {
   const nextCarousel = () =>
     setCarouselIdx((i) => (i + 1) % CAROUSEL_ITEMS.length)
 
-  // Determinar la ruta correcta según el rol del usuario
-  const getCorrectRoute = () => {
-    if (
-      userRole === 'Admin' ||
-      userRole === 'Directivo' ||
-      userRole === 'Docente'
-    ) {
-      return '/admin'
-    }
-    return '/portal'
-  }
-
   // 3 items visibles en el carousel
   const visibleItems = [0, 1, 2].map(
     (offset) => CAROUSEL_ITEMS[(carouselIdx + offset) % CAROUSEL_ITEMS.length],
@@ -230,14 +218,16 @@ export default function Home() {
         <div className='max-w-[1200px] mx-auto px-6 h-[70px] flex items-center justify-between gap-4'>
           {/* Logo */}
           <div className='flex items-center gap-[10px] shrink-0'>
-            <img
-              src='/logo.png'
-              alt='Logo'
-              className='h-[50px] w-auto'
-              onError={(e) => {
-                ;(e.target as HTMLImageElement).style.display = 'none'
-              }}
-            />
+            <Link to='/'>
+              <img
+                src='/logo.png'
+                alt='Logo'
+                className='h-[50px] w-auto'
+                onError={(e) => {
+                  ;(e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
+            </Link>
             <div>
               <div className='text-xs font-black text-purple-700 uppercase tracking-wide leading-tight'>
                 Educar Para Transformar
@@ -256,11 +246,7 @@ export default function Home() {
               { label: 'Novedades', href: '#novedades' },
               { label: 'Empleos', href: '#empleos' },
               { label: 'Galerías', href: '#galeria' },
-              {
-                label: 'Campus Virtual',
-                href: getCorrectRoute(),
-                isRoute: true,
-              },
+              { label: 'Campus Virtual', href: '/login', isRoute: true },
               { label: 'Contacto', href: '#contacto' },
             ].map((item) => (
               <a
@@ -295,43 +281,44 @@ export default function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           HERO
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className='relative h-[420px] overflow-hidden flex items-center'>
+      <section className='relative overflow-hidden md:h-[500px]'>
         <img
-          src={PLACEHOLDERS.hero}
+          src={'/hero.png'}
           alt='Hero'
-          className='absolute inset-0 w-full h-full object-cover'
+          className='w-full block md:absolute md:inset-0 md:h-full md:object-cover md:object-center'
         />
         <div
-          className='absolute inset-0'
+          className='absolute inset-0 flex items-center'
           style={{
             background:
               'linear-gradient(135deg, #3D2092CC 0%, #5B35C599 50%, transparent 100%)',
           }}
-        />
-        <div className='relative max-w-[1200px] mx-auto px-10 text-white'>
-          <div className='text-[11px] font-extrabold tracking-[0.15em] uppercase opacity-80 mb-3'>
-            Centro Educativo
-          </div>
-          <h1 className='text-[44px] font-black leading-[1.15] mt-0 mb-4 max-w-[580px]'>
-            Educamos para transformar el mundo
-          </h1>
-          <p className='text-base opacity-90 max-w-[460px] leading-relaxed mt-0 mb-7'>
-            Inspiramos, desafiamos y empoderamos a nuestros alumnos a ser
-            agentes de cambio en su comunidad.
-          </p>
-          <div className='flex gap-3'>
-            <a
-              href='#ingresantes'
-              className='bg-white text-purple-700 rounded-btn py-3 px-7 font-extrabold text-sm no-underline cursor-pointer'
-            >
-              Quiero inscribirme
-            </a>
-            <a
-              href='#nosotros'
-              className='bg-white/15 text-white rounded-btn py-3 px-7 font-extrabold text-sm no-underline border-2 border-white/40 cursor-pointer'
-            >
-              Conocenos
-            </a>
+        >
+          <div className='max-w-[1200px] mx-auto px-10 text-white w-full'>
+            <div className='text-[11px] font-extrabold tracking-[0.15em] uppercase opacity-80 mb-3'>
+              Centro Educativo
+            </div>
+            <h1 className='text-[44px] font-black leading-[1.15] mt-0 mb-4 max-w-[580px]'>
+              Educamos para transformar el mundo
+            </h1>
+            <p className='text-base opacity-90 max-w-[460px] leading-relaxed mt-0 mb-7'>
+              Inspiramos, desafiamos y empoderamos a nuestros alumnos a ser
+              agentes de cambio en su comunidad.
+            </p>
+            <div className='flex gap-3'>
+              <a
+                href='#ingresantes'
+                className='bg-white text-purple-700 rounded-btn py-3 px-7 font-extrabold text-sm no-underline cursor-pointer'
+              >
+                Quiero inscribirme
+              </a>
+              <a
+                href='#nosotros'
+                className='bg-white/15 text-white rounded-btn py-3 px-7 font-extrabold text-sm no-underline border-2 border-white/40 cursor-pointer'
+              >
+                Conocenos
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -849,7 +836,6 @@ export default function Home() {
                   src='/logo.png'
                   alt='Logo'
                   className='w-auto h-11'
-                  style={{ filter: 'brightness(0) invert(1)' }}
                   onError={(e) => {
                     ;(e.target as HTMLImageElement).style.display = 'none'
                   }}
@@ -968,7 +954,7 @@ export default function Home() {
               derechos reservados.
             </span>
             <button
-              onClick={() => navigate(getCorrectRoute())}
+              onClick={() => navigate('/login')}
               className='bg-purple-700 text-white border-0 rounded-lg py-2 px-[18px] text-xs font-extrabold cursor-pointer'
             >
               Acceder al Campus Virtual →
@@ -1322,18 +1308,18 @@ function PostulacionModal({
   }
 
   const inputCls =
-    'w-full px-[14px] py-[11px] rounded-[10px] border-2 border-border text-[13px] text-text outline-none box-border font-[inherit]'
-  const labelCls =
-    'text-[11px] font-extrabold text-textMuted block mb-[5px]'
+    'w-full px-[14px] py-[11px] rounded-[10px] border-2 border-border text-[13px] text-text outline-none box-border'
+  const labelCls = 'text-[11px] font-extrabold text-textMuted block mb-[5px]'
 
   return (
     <div
       className='fixed inset-0 z-[500] flex items-center justify-center px-4'
       style={{ background: 'rgba(26,26,46,0.55)' }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
     >
       <div className='bg-white rounded-[20px] w-full max-w-[520px] shadow-[0_8px_40px_rgba(91,53,197,0.18)] overflow-hidden'>
-        {/* Header */}
         <div className='bg-gradient-to-br from-purple-700 to-purpleMid px-7 py-6 flex items-start justify-between gap-4'>
           <div>
             <div className='text-white/70 text-[11px] font-extrabold uppercase tracking-wider mb-1'>
@@ -1343,19 +1329,20 @@ function PostulacionModal({
               {empleo.titulo}
             </h3>
             {empleo.area && (
-              <div className='text-white/75 text-[12px] mt-1'>📍 {empleo.area}</div>
+              <div className='text-white/75 text-[12px] mt-1'>
+                📍 {empleo.area}
+              </div>
             )}
           </div>
           <button
             onClick={onClose}
-            className='text-white/70 hover:text-white border-0 bg-transparent cursor-pointer text-[22px] leading-none mt-[-2px] shrink-0'
+            className='text-white/70 hover:text-white border-0 bg-transparent cursor-pointer text-[24px] leading-none shrink-0'
             aria-label='Cerrar'
           >
             ×
           </button>
         </div>
 
-        {/* Body */}
         <div className='px-7 py-6'>
           {success ? (
             <div className='text-center py-6'>
@@ -1374,7 +1361,7 @@ function PostulacionModal({
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className='flex flex-col gap-[14px]'>
+            <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
               <div className='grid grid-cols-2 gap-3'>
                 <div>
                   <label className={labelCls}>Nombre *</label>
@@ -1383,7 +1370,9 @@ function PostulacionModal({
                     required
                     placeholder='Juan'
                     value={form.nombre}
-                    onChange={(e) => setForm((p) => ({ ...p, nombre: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, nombre: e.target.value }))
+                    }
                   />
                 </div>
                 <div>
@@ -1393,7 +1382,9 @@ function PostulacionModal({
                     required
                     placeholder='Pérez'
                     value={form.apellido}
-                    onChange={(e) => setForm((p) => ({ ...p, apellido: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, apellido: e.target.value }))
+                    }
                   />
                 </div>
               </div>
@@ -1407,7 +1398,9 @@ function PostulacionModal({
                     required
                     placeholder='mail@gmail.com'
                     value={form.email}
-                    onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, email: e.target.value }))
+                    }
                   />
                 </div>
                 <div>
@@ -1416,18 +1409,24 @@ function PostulacionModal({
                     className={inputCls}
                     placeholder='+54 9 362...'
                     value={form.telefono}
-                    onChange={(e) => setForm((p) => ({ ...p, telefono: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, telefono: e.target.value }))
+                    }
                   />
                 </div>
               </div>
 
               <div>
-                <label className={labelCls}>Mensaje / carta de presentación (opcional)</label>
+                <label className={labelCls}>
+                  Mensaje / carta de presentación (opcional)
+                </label>
                 <textarea
                   className={`${inputCls} min-h-[90px] resize-y`}
                   placeholder='Contanos por qué te interesa el puesto...'
                   value={form.mensaje}
-                  onChange={(e) => setForm((p) => ({ ...p, mensaje: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, mensaje: e.target.value }))
+                  }
                 />
               </div>
 
@@ -1440,7 +1439,7 @@ function PostulacionModal({
               <button
                 type='submit'
                 disabled={loading}
-                className={`border-0 rounded-[10px] py-[13px] text-[14px] font-extrabold cursor-pointer font-[inherit] mt-1 ${
+                className={`border-0 rounded-[10px] py-[13px] text-[14px] font-extrabold cursor-pointer mt-1 ${
                   loading
                     ? 'bg-border text-textMuted cursor-not-allowed'
                     : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white'
