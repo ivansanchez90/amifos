@@ -5,7 +5,7 @@
  *        Docente           → solo sus secciones
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createClient } from '@supabase/supabase-js'
 import type { User } from '@supabase/supabase-js'
@@ -4603,6 +4603,19 @@ function GestionInscripciones({
 // ═══════════════════════════════════════════════════════════════
 //  ACTIVIDADES EXTRACURRICULARES (R2)
 // ═══════════════════════════════════════════════════════════════
+interface InscripcionActividad {
+  id_inscripcion_act: number
+  id_actividad: number
+  id_alumno: number
+  fecha_inscripcion: string
+  alumnos: {
+    nombre: string
+    apellido: string
+    dni: string
+    cursos: { nivel: string; grado_anio: string; division: string } | null
+  } | null
+}
+
 function GestionActividades() {
   const [actividades, setActividades] = useState<ActividadEx[]>([])
   const [conteos, setConteos] = useState<Record<number, number>>({})
@@ -4616,6 +4629,14 @@ function GestionActividades() {
     cupo_maximo: 20,
   }
   const [form, setForm] = useState(FORM_VACIO)
+
+  // Inscriptos por actividad
+  const [verInscriptosId, setVerInscriptosId] = useState<number | null>(null)
+  const [inscriptos, setInscriptos] = useState<InscripcionActividad[]>([])
+  const [alumnos, setAlumnos] = useState<Alumno[]>([])
+  const [selAlumno, setSelAlumno] = useState('')
+  const [inscMsg, setInscMsg] = useState('')
+  const [inscribiendo, setInscribiendo] = useState(false)
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -4633,11 +4654,79 @@ function GestionActividades() {
       cnt[i.id_actividad] = (cnt[i.id_actividad] ?? 0) + 1
     })
     setConteos(cnt)
+
+    // Alumnos activos para el selector de inscripción
+    const { data: al } = await supabase
+      .from('alumnos')
+      .select('id_alumno, nombre, apellido, dni, activo, cursos(nivel, grado_anio, division)')
+      .eq('activo', true)
+      .order('apellido', { ascending: true })
+    if (al) setAlumnos(al as unknown as Alumno[])
   }, [])
 
   useEffect(() => {
     load()
   }, [load])
+
+  const loadInscriptos = useCallback(async (idActividad: number) => {
+    const { data } = await supabase
+      .from('inscripciones_actividades')
+      .select(
+        'id_inscripcion_act, id_actividad, id_alumno, fecha_inscripcion, alumnos(nombre, apellido, dni, cursos(nivel, grado_anio, division))',
+      )
+      .eq('id_actividad', idActividad)
+      .order('fecha_inscripcion', { ascending: true })
+    if (data) setInscriptos(data as unknown as InscripcionActividad[])
+  }, [])
+
+  const toggleVerInscriptos = async (idActividad: number) => {
+    setInscMsg('')
+    setSelAlumno('')
+    if (verInscriptosId === idActividad) {
+      setVerInscriptosId(null)
+      setInscriptos([])
+    } else {
+      setVerInscriptosId(idActividad)
+      await loadInscriptos(idActividad)
+    }
+  }
+
+  const inscribirAlumno = async (idActividad: number) => {
+    if (!selAlumno) return
+    setInscribiendo(true)
+    setInscMsg('')
+    const { error } = await supabase.from('inscripciones_actividades').insert([
+      {
+        id_actividad: idActividad,
+        id_alumno: Number(selAlumno),
+      },
+    ])
+    if (error) {
+      if (error.message.includes('Cupo completo')) {
+        setInscMsg('❌ Cupo completo para esta actividad.')
+      } else if (error.message.includes('duplicate') || error.code === '23505') {
+        setInscMsg('❌ El alumno ya está inscripto en esta actividad.')
+      } else {
+        setInscMsg('❌ Error: ' + error.message)
+      }
+    } else {
+      setInscMsg('✅ Alumno inscripto correctamente.')
+      setSelAlumno('')
+      await loadInscriptos(idActividad)
+      load()
+    }
+    setInscribiendo(false)
+  }
+
+  const quitarInscripcion = async (idInscripcion: number, idActividad: number) => {
+    if (!confirm('¿Quitar al alumno de esta actividad?')) return
+    await supabase
+      .from('inscripciones_actividades')
+      .delete()
+      .eq('id_inscripcion_act', idInscripcion)
+    await loadInscriptos(idActividad)
+    load()
+  }
 
   const abrirNueva = () => {
     setEditId(null)
@@ -4711,58 +4800,190 @@ function GestionActividades() {
           {items.map((a) => {
             const ocupados = conteos[a.id_actividad] ?? 0
             const completo = ocupados >= a.cupo_maximo
+            const expandida = verInscriptosId === a.id_actividad
             return (
-              <tr key={a.id_actividad}>
-                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
-                  {a.nombre}
-                  {a.descripcion && (
-                    <>
-                      <br />
-                      <span style={{ fontSize: 11, color: '#6B6B8A' }}>
-                        {a.descripcion}
-                      </span>
-                    </>
-                  )}
-                </td>
-                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
-                  {a.cupo_maximo}
-                </td>
-                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
-                  <span
-                    style={badge(
-                      completo
-                        ? '#E74C3C'
-                        : ocupados > 0
-                          ? '#27AE60'
-                          : '#6B6B8A',
+              <Fragment key={a.id_actividad}>
+                <tr>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                    {a.nombre}
+                    {a.descripcion && (
+                      <>
+                        <br />
+                        <span style={{ fontSize: 11, color: '#6B6B8A' }}>
+                          {a.descripcion}
+                        </span>
+                      </>
                     )}
-                  >
-                    {ocupados} / {a.cupo_maximo}
-                    {completo ? ' · COMPLETO' : ''}
-                  </span>
-                </td>
-                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
-                  <span style={badge(a.activo ? '#27AE60' : '#6B6B8A')}>
-                    {a.activo ? 'Activa' : 'Inactiva'}
-                  </span>
-                </td>
-                <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <button
-                      className='bg-purpleLight text-purple-700 border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer !py-[6px] !px-3 !text-xs'
-                      onClick={() => abrirEdicion(a)}
+                  </td>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                    {a.cupo_maximo}
+                  </td>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                    <span
+                      style={badge(
+                        completo
+                          ? '#E74C3C'
+                          : ocupados > 0
+                            ? '#27AE60'
+                            : '#6B6B8A',
+                      )}
                     >
-                      Editar
-                    </button>
-                    <button
-                      className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
-                      onClick={() => toggleActivo(a)}
-                    >
-                      {a.activo ? 'Desactivar' : 'Activar'}
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                      {ocupados} / {a.cupo_maximo}
+                      {completo ? ' · COMPLETO' : ''}
+                    </span>
+                  </td>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                    <span style={badge(a.activo ? '#27AE60' : '#6B6B8A')}>
+                      {a.activo ? 'Activa' : 'Inactiva'}
+                    </span>
+                  </td>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <button
+                        className={
+                          expandida
+                            ? 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                            : 'bg-purpleLight text-purple-700 border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                        }
+                        onClick={() => toggleVerInscriptos(a.id_actividad)}
+                      >
+                        {expandida ? '▲ Ocultar' : `👥 Inscriptos (${ocupados})`}
+                      </button>
+                      <button
+                        className='bg-purpleLight text-purple-700 border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                        onClick={() => abrirEdicion(a)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                        onClick={() => toggleActivo(a)}
+                      >
+                        {a.activo ? 'Desactivar' : 'Activar'}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {expandida && (
+                  <tr>
+                    <td colSpan={5} className='bg-purpleLight/50 border-b border-border p-5'>
+                      {/* Formulario de inscripción */}
+                      <div className='flex items-end gap-3 flex-wrap mb-4'>
+                        <div className='flex-1' style={{ minWidth: 280 }}>
+                          <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                            Inscribir alumno a {a.nombre}
+                          </span>
+                          <select
+                            className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border appearance-none bg-white'
+                            value={selAlumno}
+                            onChange={(e) => setSelAlumno(e.target.value)}
+                          >
+                            <option value=''>Seleccioná un alumno...</option>
+                            {alumnos
+                              .filter(
+                                (al) =>
+                                  !inscriptos.some((i) => i.id_alumno === al.id_alumno),
+                              )
+                              .map((al) => (
+                                <option key={al.id_alumno} value={al.id_alumno}>
+                                  {al.apellido}, {al.nombre} — DNI {al.dni}
+                                  {al.cursos
+                                    ? ` (${al.cursos.nivel} ${al.cursos.grado_anio} "${al.cursos.division}")`
+                                    : ''}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                        <button
+                          disabled={!selAlumno || inscribiendo || completo}
+                          className={
+                            !selAlumno || inscribiendo || completo
+                              ? 'bg-border text-textMuted border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-not-allowed'
+                              : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn py-[10px] px-5 text-[13px] font-extrabold cursor-pointer'
+                          }
+                          onClick={() => inscribirAlumno(a.id_actividad)}
+                        >
+                          {inscribiendo
+                            ? 'Inscribiendo...'
+                            : completo
+                              ? 'Cupo completo'
+                              : '+ Inscribir'}
+                        </button>
+                      </div>
+
+                      {inscMsg && (
+                        <div
+                          className='text-[12px] font-bold mb-4'
+                          style={{
+                            color: inscMsg.startsWith('✅') ? '#27AE60' : '#E74C3C',
+                          }}
+                        >
+                          {inscMsg}
+                        </div>
+                      )}
+
+                      {/* Listado de inscriptos */}
+                      {inscriptos.length === 0 ? (
+                        <div className='text-[13px] text-textMuted py-3'>
+                          No hay alumnos inscriptos en esta actividad.
+                        </div>
+                      ) : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr>
+                              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-2 pr-3 border-b border-border'>
+                                Alumno
+                              </th>
+                              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-2 pr-3 border-b border-border'>
+                                DNI
+                              </th>
+                              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-2 pr-3 border-b border-border'>
+                                Curso
+                              </th>
+                              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-2 pr-3 border-b border-border'>
+                                Fecha de inscripción
+                              </th>
+                              <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-2 pr-3 border-b border-border'>
+                                Acción
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {inscriptos.map((i) => (
+                              <tr key={i.id_inscripcion_act}>
+                                <td className='py-2 pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                                  {i.alumnos?.apellido}, {i.alumnos?.nombre}
+                                </td>
+                                <td className='py-2 pr-3 text-[13px] border-b border-border align-middle text-textMuted'>
+                                  {i.alumnos?.dni}
+                                </td>
+                                <td className='py-2 pr-3 text-[13px] border-b border-border align-middle'>
+                                  {i.alumnos?.cursos
+                                    ? `${i.alumnos.cursos.nivel} ${i.alumnos.cursos.grado_anio} "${i.alumnos.cursos.division}"`
+                                    : 'Sin curso'}
+                                </td>
+                                <td className='py-2 pr-3 text-[13px] border-b border-border align-middle text-textMuted text-xs'>
+                                  {new Date(i.fecha_inscripcion).toLocaleDateString('es-AR')}
+                                </td>
+                                <td className='py-2 pr-3 text-[13px] border-b border-border align-middle'>
+                                  <button
+                                    className='bg-[#E74C3C1A] text-red border-0 rounded-lg py-[5px] px-3 text-xs font-extrabold cursor-pointer'
+                                    onClick={() =>
+                                      quitarInscripcion(i.id_inscripcion_act, a.id_actividad)
+                                    }
+                                  >
+                                    Quitar
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             )
           })}
           {items.length === 0 && (
