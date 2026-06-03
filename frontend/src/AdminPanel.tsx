@@ -350,14 +350,14 @@ export default function AdminPanel() {
     return null
   }
 
-  if (loading)
+  if (loading || !perfil)
     return (
       <div className='min-h-screen bg-bg flex items-center justify-center'>
         <p className='text-purple-700 font-extrabold'>Cargando...</p>
       </div>
     )
 
-  if (!perfil || !['Admin', 'Directivo', 'Docente'].includes(perfil.rol)) {
+  if (!['Admin', 'Directivo', 'Docente'].includes(perfil.rol)) {
     return (
       <div
         style={{
