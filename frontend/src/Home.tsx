@@ -132,6 +132,7 @@ export default function Home() {
   const [noticias, setNoticias] = useState<Noticia[]>([])
   const [galeria, setGaleria] = useState<ImagenGaleria[]>([])
   const [empleos, setEmpleos] = useState<Empleo[]>([])
+  const [empleoModal, setEmpleoModal] = useState<Empleo | null>(null)
   const [carouselIdx, setCarouselIdx] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchVal, setSearchVal] = useState('')
@@ -643,12 +644,12 @@ export default function Home() {
                           ? `Cierre: ${emp.fecha_cierre}`
                           : `Publicado: ${emp.fecha_publicacion}`}
                       </span>
-                      <a
-                        href={`mailto:${CONTACTO.email}?subject=Postulación: ${emp.titulo}`}
-                        className='inline-block bg-gradient-to-br from-purple-700 to-purpleMid text-white text-[12px] font-extrabold px-4 py-[7px] rounded-btn no-underline'
+                      <button
+                        className='bg-gradient-to-br from-purple-700 to-purpleMid text-white text-[12px] font-extrabold px-4 py-[7px] rounded-btn border-0 cursor-pointer'
+                        onClick={() => setEmpleoModal(emp)}
                       >
                         Postularme →
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -975,6 +976,16 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          MODAL POSTULACIÓN
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {empleoModal && (
+        <PostulacionModal
+          empleo={empleoModal}
+          onClose={() => setEmpleoModal(null)}
+        />
+      )}
     </div>
   )
 }
@@ -1264,5 +1275,183 @@ function ContactoForm() {
         {loading ? 'Enviando...' : 'Enviar mensaje'}
       </button>
     </form>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODAL DE POSTULACIÓN A EMPLEO
+// ═══════════════════════════════════════════════════════════════
+function PostulacionModal({
+  empleo,
+  onClose,
+}: {
+  empleo: Empleo
+  onClose: () => void
+}) {
+  const [form, setForm] = useState({
+    nombre: '',
+    apellido: '',
+    email: '',
+    telefono: '',
+    mensaje: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    const { error: err } = await supabase.from('postulaciones').insert([
+      {
+        id_empleo: empleo.id_empleo,
+        nombre: form.nombre,
+        apellido: form.apellido,
+        email: form.email,
+        telefono: form.telefono || null,
+        mensaje: form.mensaje || null,
+      },
+    ])
+    if (err) {
+      setError('Hubo un error al enviar. Intentá de nuevo.')
+    } else {
+      setSuccess(true)
+    }
+    setLoading(false)
+  }
+
+  const inputCls =
+    'w-full px-[14px] py-[11px] rounded-[10px] border-2 border-border text-[13px] text-text outline-none box-border font-[inherit]'
+  const labelCls =
+    'text-[11px] font-extrabold text-textMuted block mb-[5px]'
+
+  return (
+    <div
+      className='fixed inset-0 z-[500] flex items-center justify-center px-4'
+      style={{ background: 'rgba(26,26,46,0.55)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className='bg-white rounded-[20px] w-full max-w-[520px] shadow-[0_8px_40px_rgba(91,53,197,0.18)] overflow-hidden'>
+        {/* Header */}
+        <div className='bg-gradient-to-br from-purple-700 to-purpleMid px-7 py-6 flex items-start justify-between gap-4'>
+          <div>
+            <div className='text-white/70 text-[11px] font-extrabold uppercase tracking-wider mb-1'>
+              Postulación
+            </div>
+            <h3 className='text-white font-black text-[18px] leading-snug m-0'>
+              {empleo.titulo}
+            </h3>
+            {empleo.area && (
+              <div className='text-white/75 text-[12px] mt-1'>📍 {empleo.area}</div>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            className='text-white/70 hover:text-white border-0 bg-transparent cursor-pointer text-[22px] leading-none mt-[-2px] shrink-0'
+            aria-label='Cerrar'
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className='px-7 py-6'>
+          {success ? (
+            <div className='text-center py-6'>
+              <div className='text-[44px] mb-3'>✅</div>
+              <div className='text-[17px] font-black text-purple-700 mb-2'>
+                ¡Postulación enviada!
+              </div>
+              <p className='text-[13px] text-textMuted m-0'>
+                Recibimos tus datos. Nos pondremos en contacto a la brevedad.
+              </p>
+              <button
+                onClick={onClose}
+                className='mt-6 bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-[10px] px-6 py-3 text-[13px] font-extrabold cursor-pointer'
+              >
+                Cerrar
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className='flex flex-col gap-[14px]'>
+              <div className='grid grid-cols-2 gap-3'>
+                <div>
+                  <label className={labelCls}>Nombre *</label>
+                  <input
+                    className={inputCls}
+                    required
+                    placeholder='Juan'
+                    value={form.nombre}
+                    onChange={(e) => setForm((p) => ({ ...p, nombre: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Apellido *</label>
+                  <input
+                    className={inputCls}
+                    required
+                    placeholder='Pérez'
+                    value={form.apellido}
+                    onChange={(e) => setForm((p) => ({ ...p, apellido: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className='grid grid-cols-2 gap-3'>
+                <div>
+                  <label className={labelCls}>Email *</label>
+                  <input
+                    type='email'
+                    className={inputCls}
+                    required
+                    placeholder='mail@gmail.com'
+                    value={form.email}
+                    onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Teléfono (opcional)</label>
+                  <input
+                    className={inputCls}
+                    placeholder='+54 9 362...'
+                    value={form.telefono}
+                    onChange={(e) => setForm((p) => ({ ...p, telefono: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>Mensaje / carta de presentación (opcional)</label>
+                <textarea
+                  className={`${inputCls} min-h-[90px] resize-y`}
+                  placeholder='Contanos por qué te interesa el puesto...'
+                  value={form.mensaje}
+                  onChange={(e) => setForm((p) => ({ ...p, mensaje: e.target.value }))}
+                />
+              </div>
+
+              {error && (
+                <div className='text-[12px] font-bold text-red bg-[#E74C3C12] border border-[#E74C3C40] rounded-lg px-4 py-3'>
+                  ⚠️ {error}
+                </div>
+              )}
+
+              <button
+                type='submit'
+                disabled={loading}
+                className={`border-0 rounded-[10px] py-[13px] text-[14px] font-extrabold cursor-pointer font-[inherit] mt-1 ${
+                  loading
+                    ? 'bg-border text-textMuted cursor-not-allowed'
+                    : 'bg-gradient-to-br from-purple-700 to-purpleMid text-white'
+                }`}
+              >
+                {loading ? 'Enviando...' : 'Enviar postulación'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }

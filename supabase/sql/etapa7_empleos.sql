@@ -16,3 +16,8 @@ create table if not exists empleos (
   fecha_cierre      date,
   fecha_registro    timestamptz not null default now()
 );
+
+-- Si la tabla ya existe sin tipo_contrato, correr:
+alter table empleos
+  add column if not exists tipo_contrato text
+    check (tipo_contrato in ('Full-time', 'Part-time', 'Pasantía', 'Suplencia', 'Temporal'));
