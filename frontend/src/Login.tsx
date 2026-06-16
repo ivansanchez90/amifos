@@ -29,9 +29,18 @@ export default function Login() {
   const redirectByRole = async (userId: string) => {
     const { data } = await supabase
       .from('usuarios')
-      .select('rol')
+      .select('rol, activo')
       .eq('id_usuario', userId)
       .single()
+
+    // Usuario desactivado: no permitir el ingreso (cerrar la sesión recién abierta)
+    if (data && data.activo === false) {
+      await supabase.auth.signOut()
+      setError('Tu usuario está desactivado. Contactá a la institución.')
+      setChecking(false)
+      setLoading(false)
+      return
+    }
 
     if (
       data?.rol === 'Admin' ||

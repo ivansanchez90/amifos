@@ -516,6 +516,7 @@ export default function Home() {
             {noticias.slice(0, 6).map((n) => (
               <div
                 key={n.id_noticia}
+                onClick={() => navigate(`/noticias/${n.id_noticia}`)}
                 className='rounded-card overflow-hidden bg-white shadow-card border border-border cursor-pointer hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(91,53,197,0.14)] transition-all duration-200'
               >
                 <img
@@ -1000,8 +1001,73 @@ function InscripcionForm() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  // Validación de UX en cliente (la integridad real va con CHECK/NOT NULL en la DB)
+  // Solo letras (con acentos/ñ/ü), espacios, guiones y apóstrofos; mínimo 2 caracteres.
+  const SOLO_LETRAS = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü][A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]*$/
+  // Email simple: algo@algo.dominio
+  const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/
+  // Teléfono: dígitos, espacios, + - ( ); debe contener al menos 7 dígitos
+  const TEL_FORMATO = /^[\d\s()+-]+$/
+
+  const validar = (): string | null => {
+    const nombre = form.nombre_aspirante.trim()
+    const apellido = form.apellido_aspirante.trim()
+    const tutor = form.nombre_tutor.trim()
+    const email = form.email_tutor.trim()
+    const tel = form.telefono_tutor.trim()
+
+    // Nombre y apellido del aspirante
+    if (nombre.length < 2)
+      return 'El nombre del aspirante debe tener al menos 2 caracteres.'
+    if (!SOLO_LETRAS.test(nombre))
+      return 'El nombre del aspirante solo puede contener letras.'
+    if (apellido.length < 2)
+      return 'El apellido del aspirante debe tener al menos 2 caracteres.'
+    if (!SOLO_LETRAS.test(apellido))
+      return 'El apellido del aspirante solo puede contener letras.'
+
+    // DNI
+    if (!/^\d{7,9}$/.test(form.dni_aspirante.trim()))
+      return 'El DNI debe tener entre 7 y 9 dígitos numéricos (sin puntos).'
+
+    // Fecha de nacimiento
+    if (!form.fecha_nacimiento_aspirante)
+      return 'Ingresá la fecha de nacimiento del aspirante.'
+    const fnac = new Date(form.fecha_nacimiento_aspirante)
+    if (isNaN(fnac.getTime()) || fnac > new Date())
+      return 'La fecha de nacimiento no es válida.'
+
+    // Tutor
+    if (tutor.length < 2)
+      return 'El nombre del tutor debe tener al menos 2 caracteres.'
+    if (!SOLO_LETRAS.test(tutor))
+      return 'El nombre del tutor solo puede contener letras.'
+
+    // Email de contacto
+    if (!EMAIL.test(email))
+      return 'Ingresá un email de contacto válido (ej: nombre@dominio.com).'
+
+    // Teléfono (opcional, pero si se completa debe tener formato válido)
+    if (tel) {
+      if (!TEL_FORMATO.test(tel))
+        return 'El teléfono solo puede tener números, espacios y los signos + - ( ).'
+      const digitos = tel.replace(/\D/g, '')
+      if (digitos.length < 7 || digitos.length > 15)
+        return 'El teléfono debe tener entre 7 y 15 dígitos.'
+    }
+
+    // Nivel
+    if (!form.nivel_solicitado) return 'Elegí el nivel solicitado.'
+    return null
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const errMsg = validar()
+    if (errMsg) {
+      setError(errMsg)
+      return
+    }
     setLoading(true)
     setError('')
     const { error: err } = await supabase.from('inscripciones').insert([form])

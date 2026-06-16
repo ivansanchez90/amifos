@@ -350,9 +350,14 @@ export default function StudentPortal() {
     setLoading(true)
     const { data: usuario } = await supabase
       .from('usuarios')
-      .select('rol')
+      .select('rol, activo')
       .eq('id_usuario', userId)
       .single()
+    // Usuario desactivado: cerrar sesión (el guard de render redirige a /login)
+    if (usuario && usuario.activo === false) {
+      await supabase.auth.signOut()
+      return
+    }
     const rolUsuario = (usuario?.rol as string | undefined) ?? null
     setRol(rolUsuario)
     const tutor = !!rolUsuario && /padre|tutor/i.test(rolUsuario)

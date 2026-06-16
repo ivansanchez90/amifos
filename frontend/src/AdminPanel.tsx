@@ -200,6 +200,7 @@ interface Inscripcion {
   nivel_solicitado: string
   estado: string
   fecha_solicitud: string
+  id_alumno_creado: number | null
 }
 
 interface Noticia {
@@ -292,6 +293,7 @@ const NAV_DOCENTE = [
   { key: 'asistencia', icon: '📅', label: 'Tomar asistencia' },
   { key: 'calificaciones', icon: '📝', label: 'Calificaciones' },
   { key: 'amonestaciones', icon: '⚠️', label: 'Amonestaciones' },
+  { key: 'legajos', icon: '📁', label: 'Legajos' },
   { key: 'reservas', icon: '🏟️', label: 'Reservas' },
 ]
 
@@ -337,11 +339,16 @@ export default function AdminPanel() {
       .select('*')
       .eq('id_usuario', user.id)
       .single()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
+        if (data && data.activo === false) {
+          await supabase.auth.signOut()
+          navigate('/login', { replace: true })
+          return
+        }
         if (data) setPerfil(data as UsuarioPanel)
         setLoading(false)
       })
-  }, [user])
+  }, [user, navigate])
 
   if (!authChecked) return null
 
@@ -535,12 +542,17 @@ export default function AdminPanel() {
         {/* ── CONTENIDO ── */}
         <main style={{ flex: 1, padding: 28, overflowY: 'auto' }}>
           {activeNav === 'dashboard' && (
-            <Dashboard esAdmin={esAdmin} perfil={perfil} />
+            <Dashboard
+              esAdmin={esAdmin}
+              perfil={perfil}
+              onIr={setActiveNav}
+            />
           )}
           {activeNav === 'usuarios' && esAdmin && (
             <GestionUsuarios
               prefill={prefillUsuario}
               onPrefillConsumed={() => setPrefillUsuario(null)}
+              rolActor={perfil.rol}
             />
           )}
           {activeNav === 'alumnos' && esAdmin && <GestionAlumnos />}
@@ -575,6 +587,9 @@ export default function AdminPanel() {
           )}
           {activeNav === 'amonestaciones' && !esAdmin && (
             <GestionAmonestaciones userId={user.id} />
+          )}
+          {activeNav === 'legajos' && !esAdmin && (
+            <LegajosDocente userId={user.id} />
           )}
         </main>
       </div>
@@ -725,9 +740,11 @@ function LoginAdmin({
 function Dashboard({
   esAdmin,
   perfil,
+  onIr,
 }: {
   esAdmin: boolean
   perfil: UsuarioPanel
+  onIr: (key: string) => void
 }) {
   const [stats, setStats] = useState({
     alumnos: 0,
@@ -854,6 +871,7 @@ function Dashboard({
             .map((item) => (
               <div
                 key={item.key}
+                onClick={() => onIr(item.key)}
                 className='bg-white rounded-card px-5 py-4 shadow-card border border-border cursor-pointer min-w-[140px] text-center transition-all duration-200 flex-1 hover:-translate-y-[3px] hover:shadow-card-hover'
               >
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{item.icon}</div>
@@ -876,10 +894,17 @@ function Dashboard({
 function GestionUsuarios({
   prefill,
   onPrefillConsumed,
+  rolActor,
 }: {
   prefill?: PrefillUsuario | null
   onPrefillConsumed?: () => void
+  rolActor?: string
 } = {}) {
+  // Jerarquía (solo UX): un Directivo no puede activar/desactivar a un Admin u
+  // otro Directivo; un Admin puede con todos.
+  const puedeGestionar = (rolObjetivo: string) =>
+    rolActor === 'Admin' ||
+    (rolActor === 'Directivo' && !['Admin', 'Directivo'].includes(rolObjetivo))
   const [usuarios, setUsuarios] = useState<UsuarioPanel[]>([])
   const [cursos, setCursos] = useState<Curso[]>([])
   const [showForm, setShowForm] = useState(false)
@@ -1396,16 +1421,20 @@ function GestionUsuarios({
                   </span>
                 </td>
                 <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
-                  <button
-                    className={
-                      u.activo
-                        ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
-                        : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
-                    }
-                    onClick={() => toggleActivo(u.id_usuario, u.activo)}
-                  >
-                    {u.activo ? 'Desactivar' : 'Activar'}
-                  </button>
+                  {puedeGestionar(u.rol) ? (
+                    <button
+                      className={
+                        u.activo
+                          ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                          : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      }
+                      onClick={() => toggleActivo(u.id_usuario, u.activo)}
+                    >
+                      {u.activo ? 'Desactivar' : 'Activar'}
+                    </button>
+                  ) : (
+                    <span className='text-[11px] text-textMuted'>—</span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -3002,7 +3031,25 @@ async function notificarFamilias(
       leida: false,
     }))
 
-  if (rows.length) await supabase.from('notificaciones').insert(rows)
+  if (rows.length) {
+    await supabase.from('notificaciones').insert(rows)
+    // R6 · Email automático a las familias (best-effort: si la función no está
+    // desplegada o falla, la notificación in-app igual quedó guardada).
+    try {
+      await supabase.functions.invoke('enviar-notificacion', {
+        body: {
+          tipo,
+          mensajes: rows.map((r) => ({
+            id_usuario: r.id_usuario_destino,
+            titulo: r.titulo,
+            mensaje: r.mensaje,
+          })),
+        },
+      })
+    } catch {
+      /* ignorar: el envío de email es complementario */
+    }
+  }
 }
 
 function GestionCuotas() {
@@ -4573,28 +4620,35 @@ function GestionInscripciones({
                         </option>
                       ))}
                     </select>
-                    <button
-                      className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer'
-                      onClick={() => {
-                        const partes = i.nombre_tutor.trim().split(/\s+/)
-                        onRegistrar({
-                          nombre: partes[0] ?? '',
-                          apellido: partes.slice(1).join(' '),
-                          email: i.email_tutor,
-                          password: i.dni_aspirante,
-                          rol: 'Padre',
-                          alumno: {
-                            nombre: i.nombre_aspirante,
-                            apellido: i.apellido_aspirante ?? '',
-                            dni: i.dni_aspirante,
-                            fecha_nacimiento:
-                              i.fecha_nacimiento_aspirante ?? '',
-                          },
-                        })
-                      }}
-                    >
-                      Registrar
-                    </button>
+                    {i.estado === 'Aprobada' && !i.id_alumno_creado && (
+                      <button
+                        className='bg-gradient-to-br from-purple-700 to-purpleMid text-white border-0 rounded-btn w-[160px] px-[10px] py-[6px] text-xs font-extrabold cursor-pointer'
+                        onClick={() => {
+                          const partes = i.nombre_tutor.trim().split(/\s+/)
+                          onRegistrar({
+                            nombre: partes[0] ?? '',
+                            apellido: partes.slice(1).join(' '),
+                            email: i.email_tutor,
+                            password: i.dni_aspirante,
+                            rol: 'Padre',
+                            alumno: {
+                              nombre: i.nombre_aspirante,
+                              apellido: i.apellido_aspirante ?? '',
+                              dni: i.dni_aspirante,
+                              fecha_nacimiento:
+                                i.fecha_nacimiento_aspirante ?? '',
+                            },
+                          })
+                        }}
+                      >
+                        Registrar
+                      </button>
+                    )}
+                    {i.id_alumno_creado && (
+                      <span className='text-[11px] font-extrabold text-green text-center'>
+                        ✓ Usuario registrado
+                      </span>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -5548,6 +5602,7 @@ function GestionNoticias({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
   const [notificar, setNotificar] = useState(true)
+  const [file, setFile] = useState<File | null>(null)
   const [form, setForm] = useState({
     titulo: '',
     resumen: '',
@@ -5572,9 +5627,29 @@ function GestionNoticias({ userId }: { userId: string }) {
     e.preventDefault()
     setLoading(true)
     setMsg('')
+
+    // Si se adjuntó un archivo, se sube al Storage y se usa su URL pública.
+    // Si no, se usa la URL escrita a mano (ambas opciones siguen disponibles).
+    let urlImagen = form.url_imagen
+    if (file) {
+      const ext = file.name.split('.').pop()
+      const nombre = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('noticias-imagenes')
+        .upload(nombre, file)
+      if (upErr) {
+        setMsg('Error al subir la imagen: ' + upErr.message)
+        setLoading(false)
+        return
+      }
+      urlImagen = supabase.storage
+        .from('noticias-imagenes')
+        .getPublicUrl(nombre).data.publicUrl
+    }
+
     const { error } = await supabase
       .from('noticias')
-      .insert([{ ...form, id_autor: userId }])
+      .insert([{ ...form, url_imagen: urlImagen, id_autor: userId }])
     if (error) setMsg('Error: ' + error.message)
     else {
       let aviso = '✅ Noticia publicada.'
@@ -5596,6 +5671,14 @@ function GestionNoticias({ userId }: { userId: string }) {
       }
       setMsg(aviso)
       setShowForm(false)
+      setFile(null)
+      setForm({
+        titulo: '',
+        resumen: '',
+        contenido: '',
+        url_imagen: '',
+        destacada: false,
+      })
       load()
     }
     setLoading(false)
@@ -5607,6 +5690,24 @@ function GestionNoticias({ userId }: { userId: string }) {
       .update({ activo: !activo })
       .eq('id_noticia', id)
     load()
+  }
+
+  const eliminar = async (id: number) => {
+    if (
+      !confirm(
+        '¿Eliminar definitivamente esta noticia? Esta acción no se puede deshacer.',
+      )
+    )
+      return
+    const { error } = await supabase
+      .from('noticias')
+      .delete()
+      .eq('id_noticia', id)
+    if (error) setMsg('Error al eliminar: ' + error.message)
+    else {
+      setMsg('🗑️ Noticia eliminada.')
+      load()
+    }
   }
 
   return (
@@ -5666,15 +5767,27 @@ function GestionNoticias({ userId }: { userId: string }) {
             </div>
             <div>
               <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
-                URL de imagen (opcional)
+                Imagen — subir archivo (opcional)
               </span>
               <input
+                type='file'
+                accept='image/*'
                 className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border'
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <div>
+              <span className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+                …o pegar una URL de imagen (opcional)
+              </span>
+              <input
+                className='w-full px-[14px] py-[10px] rounded-input border-2 border-border text-[13px] text-text outline-none box-border disabled:opacity-50'
                 value={form.url_imagen}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, url_imagen: e.target.value }))
                 }
                 placeholder='https://...'
+                disabled={!!file}
               />
             </div>
             <div>
@@ -5793,16 +5906,24 @@ function GestionNoticias({ userId }: { userId: string }) {
                   </span>
                 </td>
                 <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
-                  <button
-                    className={
-                      n.activo
-                        ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
-                        : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
-                    }
-                    onClick={() => toggleActivo(n.id_noticia, n.activo)}
-                  >
-                    {n.activo ? 'Ocultar' : 'Publicar'}
-                  </button>
+                  <div className='flex gap-2'>
+                    <button
+                      className={
+                        n.activo
+                          ? 'bg-[#E74C3C1A] text-red border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                          : 'bg-[#27AE601A] text-green border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      }
+                      onClick={() => toggleActivo(n.id_noticia, n.activo)}
+                    >
+                      {n.activo ? 'Ocultar' : 'Publicar'}
+                    </button>
+                    <button
+                      className='bg-[#6B6B8A1A] text-textMuted border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      onClick={() => eliminar(n.id_noticia)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -5816,6 +5937,140 @@ function GestionNoticias({ userId }: { userId: string }) {
 // ═══════════════════════════════════════════════════════════════
 //  TOMAR ASISTENCIA (Docente)
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  R1: LEGAJOS PARA DOCENTE (ver legajo de alumnos de sus cursos)
+// ═══════════════════════════════════════════════════════════════
+function LegajosDocente({ userId }: { userId: string }) {
+  const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
+  const [selAsignacion, setSelAsignacion] = useState<number | null>(null)
+  const [alumnos, setAlumnos] = useState<
+    { id_alumno: number; nombre: string; apellido: string }[]
+  >([])
+  const [legajoId, setLegajoId] = useState<number | null>(null)
+
+  // Asignaciones del docente logueado
+  useEffect(() => {
+    supabase
+      .from('docentes')
+      .select('id_docente')
+      .eq('id_usuario', userId)
+      .single()
+      .then(({ data: doc }) => {
+        if (!doc) return
+        supabase
+          .from('asignaciones')
+          .select('*, materias(nombre), cursos(nivel, grado_anio, division)')
+          .eq('id_docente', doc.id_docente)
+          .eq('activo', true)
+          .then(({ data }) => {
+            if (data) setAsignaciones(data as unknown as Asignacion[])
+          })
+      })
+  }, [userId])
+
+  // Alumnos del curso de la asignación seleccionada
+  useEffect(() => {
+    if (!selAsignacion) {
+      setAlumnos([])
+      return
+    }
+    supabase
+      .from('asignaciones')
+      .select('id_curso')
+      .eq('id_asignacion', selAsignacion)
+      .single()
+      .then(({ data: a }) => {
+        if (!a) return
+        supabase
+          .from('alumnos')
+          .select('id_alumno, nombre, apellido')
+          .eq('id_curso', a.id_curso)
+          .eq('activo', true)
+          .order('apellido')
+          .then(({ data: al }) => {
+            if (al)
+              setAlumnos(
+                al as { id_alumno: number; nombre: string; apellido: string }[],
+              )
+          })
+      })
+  }, [selAsignacion])
+
+  if (legajoId !== null) {
+    return (
+      <LegajoAlumno idAlumno={legajoId} onClose={() => setLegajoId(null)} />
+    )
+  }
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 20px' }}>
+        📁 Legajos de alumnos
+      </h2>
+      <div className='bg-white rounded-card p-6 shadow-card border border-border'>
+        <label className='text-[11px] font-extrabold text-textMuted block mb-[5px]'>
+          Elegí una de tus asignaciones
+        </label>
+        <select
+          className='rounded-input border-2 border-border text-[13px] text-text outline-none box-border w-full max-w-[420px] px-[14px] py-[10px] appearance-none mb-5'
+          value={selAsignacion ?? ''}
+          onChange={(e) =>
+            setSelAsignacion(e.target.value ? Number(e.target.value) : null)
+          }
+        >
+          <option value=''>— Seleccioná materia y curso —</option>
+          {asignaciones.map((a) => (
+            <option key={a.id_asignacion} value={a.id_asignacion}>
+              {a.materias?.nombre ?? 'Materia'} ·{' '}
+              {a.cursos
+                ? `${a.cursos.nivel} ${a.cursos.grado_anio} ${a.cursos.division}`
+                : 'Curso'}
+            </option>
+          ))}
+        </select>
+
+        {selAsignacion && alumnos.length === 0 && (
+          <p className='text-[13px] text-textMuted'>
+            No hay alumnos activos en este curso.
+          </p>
+        )}
+
+        {alumnos.length > 0 && (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Alumno
+                </th>
+                <th className='text-left text-[10px] font-extrabold text-textMuted uppercase tracking-[0.07em] pb-3 pr-3 border-b-2 border-border'>
+                  Legajo
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {alumnos.map((a) => (
+                <tr key={a.id_alumno}>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle font-bold'>
+                    {a.apellido}, {a.nombre}
+                  </td>
+                  <td className='py-[11px] pr-3 text-[13px] border-b border-border align-middle'>
+                    <button
+                      className='bg-[#5B35C51A] text-purple-700 border-0 rounded-lg py-[6px] px-3 text-xs font-extrabold cursor-pointer'
+                      onClick={() => setLegajoId(a.id_alumno)}
+                    >
+                      Ver legajo
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function TomarAsistencia({ userId }: { userId: string }) {
   const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
   const [selAsignacion, setSelAsignacion] = useState<number | null>(null)
