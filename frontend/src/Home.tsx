@@ -994,12 +994,9 @@ function InscripcionForm() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+  // Errores por campo y campos que el usuario ya tocó (para no mostrar errores antes de tiempo)
+  const [errores, setErrores] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
 
   // Validación de UX en cliente (la integridad real va con CHECK/NOT NULL en la DB)
   // Solo letras (con acentos/ñ/ü), espacios, guiones y apóstrofos; mínimo 2 caracteres.
@@ -1009,63 +1006,97 @@ function InscripcionForm() {
   // Teléfono: dígitos, espacios, + - ( ); debe contener al menos 7 dígitos
   const TEL_FORMATO = /^[\d\s()+-]+$/
 
-  const validar = (): string | null => {
-    const nombre = form.nombre_aspirante.trim()
-    const apellido = form.apellido_aspirante.trim()
-    const tutor = form.nombre_tutor.trim()
-    const email = form.email_tutor.trim()
-    const tel = form.telefono_tutor.trim()
-
-    // Nombre y apellido del aspirante
-    if (nombre.length < 2)
-      return 'El nombre del aspirante debe tener al menos 2 caracteres.'
-    if (!SOLO_LETRAS.test(nombre))
-      return 'El nombre del aspirante solo puede contener letras.'
-    if (apellido.length < 2)
-      return 'El apellido del aspirante debe tener al menos 2 caracteres.'
-    if (!SOLO_LETRAS.test(apellido))
-      return 'El apellido del aspirante solo puede contener letras.'
-
-    // DNI
-    if (!/^\d{7,9}$/.test(form.dni_aspirante.trim()))
-      return 'El DNI debe tener entre 7 y 9 dígitos numéricos (sin puntos).'
-
-    // Fecha de nacimiento
-    if (!form.fecha_nacimiento_aspirante)
-      return 'Ingresá la fecha de nacimiento del aspirante.'
-    const fnac = new Date(form.fecha_nacimiento_aspirante)
-    if (isNaN(fnac.getTime()) || fnac > new Date())
-      return 'La fecha de nacimiento no es válida.'
-
-    // Tutor
-    if (tutor.length < 2)
-      return 'El nombre del tutor debe tener al menos 2 caracteres.'
-    if (!SOLO_LETRAS.test(tutor))
-      return 'El nombre del tutor solo puede contener letras.'
-
-    // Email de contacto
-    if (!EMAIL.test(email))
-      return 'Ingresá un email de contacto válido (ej: nombre@dominio.com).'
-
-    // Teléfono (opcional, pero si se completa debe tener formato válido)
-    if (tel) {
-      if (!TEL_FORMATO.test(tel))
-        return 'El teléfono solo puede tener números, espacios y los signos + - ( ).'
-      const digitos = tel.replace(/\D/g, '')
-      if (digitos.length < 7 || digitos.length > 15)
-        return 'El teléfono debe tener entre 7 y 15 dígitos.'
+  // Valida un único campo y devuelve el mensaje de error (o null si está OK).
+  const validarCampo = (name: string, valor: string): string | null => {
+    const v = valor.trim()
+    switch (name) {
+      case 'nombre_aspirante':
+        if (v.length < 2)
+          return 'El nombre del aspirante debe tener al menos 2 caracteres.'
+        if (!SOLO_LETRAS.test(v))
+          return 'El nombre del aspirante solo puede contener letras.'
+        return null
+      case 'apellido_aspirante':
+        if (v.length < 2)
+          return 'El apellido del aspirante debe tener al menos 2 caracteres.'
+        if (!SOLO_LETRAS.test(v))
+          return 'El apellido del aspirante solo puede contener letras.'
+        return null
+      case 'dni_aspirante':
+        if (!/^\d{7,9}$/.test(v))
+          return 'El DNI debe tener entre 7 y 9 dígitos numéricos (sin puntos).'
+        return null
+      case 'fecha_nacimiento_aspirante': {
+        if (!valor) return 'Ingresá la fecha de nacimiento del aspirante.'
+        const fnac = new Date(valor)
+        if (isNaN(fnac.getTime()) || fnac > new Date())
+          return 'La fecha de nacimiento no es válida.'
+        return null
+      }
+      case 'nombre_tutor':
+        if (v.length < 2)
+          return 'El nombre del tutor debe tener al menos 2 caracteres.'
+        if (!SOLO_LETRAS.test(v))
+          return 'El nombre del tutor solo puede contener letras.'
+        return null
+      case 'email_tutor':
+        if (!EMAIL.test(v))
+          return 'Ingresá un email de contacto válido (ej: nombre@dominio.com).'
+        return null
+      case 'telefono_tutor':
+        // Opcional, pero si se completa debe tener formato válido
+        if (v) {
+          if (!TEL_FORMATO.test(v))
+            return 'El teléfono solo puede tener números, espacios y los signos + - ( ).'
+          const digitos = v.replace(/\D/g, '')
+          if (digitos.length < 7 || digitos.length > 15)
+            return 'El teléfono debe tener entre 7 y 15 dígitos.'
+        }
+        return null
+      case 'nivel_solicitado':
+        if (!valor) return 'Elegí el nivel solicitado.'
+        return null
+      default:
+        return null
     }
+  }
 
-    // Nivel
-    if (!form.nivel_solicitado) return 'Elegí el nivel solicitado.'
-    return null
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+    // Si el campo ya fue tocado, revalidamos mientras escribe para limpiar/actualizar el error
+    if (touched[name]) {
+      setErrores((prev) => ({ ...prev, [name]: validarCampo(name, value) ?? '' }))
+    }
+  }
+
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target
+    setTouched((prev) => ({ ...prev, [name]: true }))
+    setErrores((prev) => ({ ...prev, [name]: validarCampo(name, value) ?? '' }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const errMsg = validar()
-    if (errMsg) {
-      setError(errMsg)
+    // Validamos todos los campos y marcamos todo como tocado
+    const nuevosErrores: Record<string, string> = {}
+    ;(Object.keys(form) as Array<keyof typeof form>).forEach((k) => {
+      const msg = validarCampo(k, form[k])
+      if (msg) nuevosErrores[k] = msg
+    })
+    setErrores(nuevosErrores)
+    setTouched(
+      Object.keys(form).reduce(
+        (acc, k) => ({ ...acc, [k]: true }),
+        {} as Record<string, boolean>,
+      ),
+    )
+    if (Object.keys(nuevosErrores).length > 0) {
+      setError('Revisá los campos marcados antes de enviar.')
       return
     }
     setLoading(true)
@@ -1079,8 +1110,18 @@ function InscripcionForm() {
     setLoading(false)
   }
 
-  const inputCls =
-    'w-full py-[11px] px-[14px] rounded-input border-2 border-border text-[13px] outline-none text-text box-border'
+  const inputBaseCls =
+    'w-full py-[11px] px-[14px] rounded-input border-2 text-[13px] outline-none text-text box-border'
+
+  // Aplica borde rojo cuando el campo tiene error
+  const campoCls = (name: string) =>
+    `${inputBaseCls} ${errores[name] ? 'border-red' : 'border-border'}`
+
+  // Mensaje de error debajo de un campo
+  const ErrorCampo = ({ name }: { name: string }) =>
+    errores[name] ? (
+      <p className='text-[11px] text-red font-bold mt-[5px]'>{errores[name]}</p>
+    ) : null
 
   const labelCls = 'text-[11px] font-extrabold text-textMuted block mb-[5px]'
 
@@ -1108,9 +1149,11 @@ function InscripcionForm() {
             required
             value={form.nombre_aspirante}
             onChange={handleChange}
+            onBlur={handleBlur}
             placeholder='Juan'
-            className={inputCls}
+            className={campoCls('nombre_aspirante')}
           />
+          <ErrorCampo name='nombre_aspirante' />
         </div>
         <div>
           <label className={labelCls}>Apellido del aspirante</label>
@@ -1119,9 +1162,11 @@ function InscripcionForm() {
             required
             value={form.apellido_aspirante}
             onChange={handleChange}
+            onBlur={handleBlur}
             placeholder='Pérez'
-            className={inputCls}
+            className={campoCls('apellido_aspirante')}
           />
+          <ErrorCampo name='apellido_aspirante' />
         </div>
       </div>
       <div className='grid grid-cols-2 gap-3'>
@@ -1132,9 +1177,11 @@ function InscripcionForm() {
             required
             value={form.dni_aspirante}
             onChange={handleChange}
+            onBlur={handleBlur}
             placeholder='12345678'
-            className={inputCls}
+            className={campoCls('dni_aspirante')}
           />
+          <ErrorCampo name='dni_aspirante' />
         </div>
         <div>
           <label className={labelCls}>Fecha de nacimiento</label>
@@ -1144,8 +1191,10 @@ function InscripcionForm() {
             required
             value={form.fecha_nacimiento_aspirante}
             onChange={handleChange}
-            className={inputCls}
+            onBlur={handleBlur}
+            className={campoCls('fecha_nacimiento_aspirante')}
           />
+          <ErrorCampo name='fecha_nacimiento_aspirante' />
         </div>
       </div>
       <div>
@@ -1155,9 +1204,11 @@ function InscripcionForm() {
           required
           value={form.nombre_tutor}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder='María García'
-          className={inputCls}
+          className={campoCls('nombre_tutor')}
         />
+        <ErrorCampo name='nombre_tutor' />
       </div>
       <div className='grid grid-cols-2 gap-3'>
         <div>
@@ -1168,9 +1219,11 @@ function InscripcionForm() {
             required
             value={form.email_tutor}
             onChange={handleChange}
+            onBlur={handleBlur}
             placeholder='mail@gmail.com'
-            className={inputCls}
+            className={campoCls('email_tutor')}
           />
+          <ErrorCampo name='email_tutor' />
         </div>
         <div>
           <label className={labelCls}>Teléfono</label>
@@ -1178,9 +1231,11 @@ function InscripcionForm() {
             name='telefono_tutor'
             value={form.telefono_tutor}
             onChange={handleChange}
+            onBlur={handleBlur}
             placeholder='+54 9 362...'
-            className={inputCls}
+            className={campoCls('telefono_tutor')}
           />
+          <ErrorCampo name='telefono_tutor' />
         </div>
       </div>
       <div>
@@ -1190,13 +1245,15 @@ function InscripcionForm() {
           required
           value={form.nivel_solicitado}
           onChange={handleChange}
-          className={`${inputCls} appearance-none`}
+          onBlur={handleBlur}
+          className={`${campoCls('nivel_solicitado')} appearance-none`}
         >
           <option value=''>Seleccioná un nivel...</option>
           <option value='Inicial'>Inicial</option>
           <option value='Primario'>Primario</option>
           <option value='Secundario'>Secundario</option>
         </select>
+        <ErrorCampo name='nivel_solicitado' />
       </div>
 
       {error && (
