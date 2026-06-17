@@ -1073,6 +1073,29 @@ function GestionUsuarios({
       }
     }
 
+    // Si es Docente: crear también su registro en `docentes` para que aparezca
+    // en el panel de Docentes (la fila no se crea sola desde el backend).
+    if (form.rol === 'Docente') {
+      const { error: docErr } = await supabase.from('docentes').insert([
+        {
+          id_usuario: idUsuario,
+          // dni va NULL (no ''): la columna es UNIQUE y '' chocaría entre
+          // docentes sin DNI cargado.
+          dni: null,
+          activo: true,
+        },
+      ])
+      if (docErr) {
+        setMsg(
+          '⚠️ Usuario creado, pero no se pudo registrar en Docentes: ' +
+            docErr.message,
+        )
+        setLoading(false)
+        load()
+        return
+      }
+    }
+
     setMsg(
       form.rol === 'Padre'
         ? '✅ Tutor y alumno (usuario + registro) creados correctamente.'
@@ -3033,22 +3056,12 @@ async function notificarFamilias(
 
   if (rows.length) {
     await supabase.from('notificaciones').insert(rows)
-    // R6 · Email automático a las familias (best-effort: si la función no está
-    // desplegada o falla, la notificación in-app igual quedó guardada).
-    try {
-      await supabase.functions.invoke('enviar-notificacion', {
-        body: {
-          tipo,
-          mensajes: rows.map((r) => ({
-            id_usuario: r.id_usuario_destino,
-            titulo: r.titulo,
-            mensaje: r.mensaje,
-          })),
-        },
-      })
-    } catch {
-      /* ignorar: el envío de email es complementario */
-    }
+    // R6 · Email automático: DESACTIVADO a propósito.
+    // Esta es una app de muestra y la tabla `usuarios` tiene emails inventados;
+    // enviar correos reales podría spamear a desconocidos. La notificación in-app
+    // ya quedó guardada arriba, que es lo que se muestra en la defensa.
+    // (Para reactivarlo: descomentar la invocación a 'enviar-notificacion' y
+    // configurar el allowlist en la Edge Function.)
   }
 }
 
