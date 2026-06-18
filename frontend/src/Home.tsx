@@ -124,6 +124,17 @@ const INFO_CARDS = [
   { label: 'Niveles educativos', color: '#E67E22', img: PLACEHOLDERS.niveles },
 ]
 
+// Links del navbar (reutilizados en desktop y en el menú mobile)
+const NAV_LINKS = [
+  { label: 'Nosotros', href: '#nosotros' },
+  { label: 'Ingresantes', href: '#ingresantes' },
+  { label: 'Novedades', href: '#novedades' },
+  { label: 'Empleos', href: '#empleos' },
+  { label: 'Galerías', href: '#galeria' },
+  { label: 'Campus Virtual', href: '/login', isRoute: true },
+  { label: 'Contacto', href: '#contacto' },
+]
+
 // ═══════════════════════════════════════════════════════════════
 //  COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
@@ -215,21 +226,21 @@ export default function Home() {
           NAVBAR
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <header className='bg-white border-b-[3px] border-b-purple-700 sticky top-0 z-[200] shadow-[0_2px_16px_rgba(91,53,197,0.08)]'>
-        <div className='max-w-[1200px] mx-auto px-6 h-[70px] flex items-center justify-between gap-4'>
+        <div className='max-w-[1200px] mx-auto px-4 md:px-6 h-[64px] md:h-[70px] flex items-center justify-between gap-4'>
           {/* Logo */}
           <div className='flex items-center gap-[10px] shrink-0'>
             <Link to='/'>
               <img
                 src='/logo.png'
                 alt='Logo'
-                className='h-[50px] w-auto'
+                className='h-10 md:h-[50px] w-auto'
                 onError={(e) => {
                   ;(e.target as HTMLImageElement).style.display = 'none'
                 }}
               />
             </Link>
             <div>
-              <div className='text-xs font-black text-purple-700 uppercase tracking-wide leading-tight'>
+              <div className='text-[11px] md:text-xs font-black text-purple-700 uppercase tracking-wide leading-tight'>
                 Educar Para Transformar
               </div>
               <div className='text-[9px] text-textMuted uppercase tracking-wider'>
@@ -239,16 +250,8 @@ export default function Home() {
           </div>
 
           {/* Nav links — desktop */}
-          <nav className='flex items-center gap-1 flex-wrap'>
-            {[
-              { label: 'Nosotros', href: '#nosotros' },
-              { label: 'Ingresantes', href: '#ingresantes' },
-              { label: 'Novedades', href: '#novedades' },
-              { label: 'Empleos', href: '#empleos' },
-              { label: 'Galerías', href: '#galeria' },
-              { label: 'Campus Virtual', href: '/login', isRoute: true },
-              { label: 'Contacto', href: '#contacto' },
-            ].map((item) => (
+          <nav className='hidden lg:flex items-center gap-1 flex-wrap'>
+            {NAV_LINKS.map((item) => (
               <a
                 key={item.label}
                 href={item.isRoute ? undefined : item.href}
@@ -264,8 +267,8 @@ export default function Home() {
             ))}
           </nav>
 
-          {/* Buscador */}
-          <div className='flex items-center gap-2'>
+          {/* Buscador — solo desktop ancho */}
+          <div className='hidden xl:flex items-center gap-2'>
             <input
               type='text'
               placeholder='Buscar...'
@@ -275,17 +278,58 @@ export default function Home() {
             />
             <span className='text-lg cursor-pointer text-purple-700'>🔍</span>
           </div>
+
+          {/* Botón hamburguesa — mobile/tablet */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label='Abrir menú'
+            aria-expanded={menuOpen}
+            className='lg:hidden flex flex-col justify-center gap-[5px] w-10 h-10 shrink-0 cursor-pointer bg-transparent border-0 p-2'
+          >
+            <span
+              className={`block h-[2px] w-full bg-purple-700 rounded transition-all duration-200 ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`}
+            />
+            <span
+              className={`block h-[2px] w-full bg-purple-700 rounded transition-all duration-200 ${menuOpen ? 'opacity-0' : ''}`}
+            />
+            <span
+              className={`block h-[2px] w-full bg-purple-700 rounded transition-all duration-200 ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`}
+            />
+          </button>
         </div>
+
+        {/* Menú desplegable — mobile/tablet */}
+        {menuOpen && (
+          <nav className='lg:hidden border-t border-border bg-white px-4 py-3 flex flex-col gap-1'>
+            {NAV_LINKS.map((item) => (
+              <a
+                key={item.label}
+                href={item.isRoute ? undefined : item.href}
+                onClick={() => {
+                  if (item.isRoute) navigate(item.href)
+                  setMenuOpen(false)
+                }}
+                className={
+                  item.isRoute
+                    ? 'text-sm font-bold text-white bg-gradient-to-br from-purple-700 to-purpleMid py-[10px] px-3 rounded-lg no-underline cursor-pointer text-center mt-1'
+                    : 'text-sm font-bold text-textMuted hover:text-purple-700 py-[10px] px-3 rounded-lg no-underline cursor-pointer'
+                }
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        )}
       </header>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           HERO
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className='relative overflow-hidden md:h-[500px]'>
+      <section className='relative overflow-hidden h-[440px] md:h-[500px]'>
         <img
           src={'/hero.png'}
           alt='Hero'
-          className='w-full block md:absolute md:inset-0 md:h-full md:object-cover md:object-center'
+          className='absolute inset-0 w-full h-full object-cover object-center'
         />
         <div
           className='absolute inset-0 flex items-center'
@@ -294,27 +338,27 @@ export default function Home() {
           //     'linear-gradient(135deg, #3D2092CC 0%, #5B35C599 50%, transparent 100%)',
           // }}
         >
-          <div className='max-w-[1200px] mx-auto px-10 text-white w-full'>
-            <div className='text-[11px] font-extrabold tracking-[0.15em] uppercase opacity-80 mb-3'>
+          <div className='max-w-[1200px] mx-auto px-6 md:px-10 text-white w-full'>
+            <div className='text-[10px] md:text-[11px] font-extrabold tracking-[0.15em] uppercase opacity-80 mb-3'>
               Centro Educativo
             </div>
-            <h1 className='text-[44px] font-black leading-[1.15] mt-0 mb-4 max-w-[580px]'>
+            <h1 className='text-[26px] sm:text-[36px] md:text-[44px] font-black leading-[1.15] mt-0 mb-4 max-w-[580px]'>
               Educamos para transformar el mundo
             </h1>
-            <p className='text-base opacity-90 max-w-[460px] leading-relaxed mt-0 mb-7'>
+            <p className='text-sm md:text-base opacity-90 max-w-[460px] leading-relaxed mt-0 mb-7'>
               Inspiramos, desafiamos y empoderamos a nuestros alumnos a ser
               agentes de cambio en su comunidad.
             </p>
-            <div className='flex gap-3'>
+            <div className='flex flex-col sm:flex-row gap-3'>
               <a
                 href='#ingresantes'
-                className='bg-white text-purple-700 rounded-btn py-3 px-7 font-extrabold text-sm no-underline cursor-pointer'
+                className='bg-white text-purple-700 rounded-btn py-3 px-7 font-extrabold text-sm no-underline cursor-pointer text-center'
               >
                 Quiero inscribirme
               </a>
               <a
                 href='#nosotros'
-                className='bg-white/15 text-white rounded-btn py-3 px-7 font-extrabold text-sm no-underline border-2 border-white/40 cursor-pointer'
+                className='bg-white/15 text-white rounded-btn py-3 px-7 font-extrabold text-sm no-underline border-2 border-white/40 cursor-pointer text-center'
               >
                 Conocenos
               </a>
@@ -339,7 +383,7 @@ export default function Home() {
           </h2>
         </div>
 
-        <div className='grid grid-cols-3 gap-5'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
           {INFO_CARDS.map((card) => (
             <div
               key={card.label}
@@ -386,7 +430,7 @@ export default function Home() {
             </button>
 
             {/* Cards */}
-            <div className='grid grid-cols-3 gap-5 flex-1'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 flex-1'>
               {visibleItems.map((item, i) => (
                 <div
                   key={i}
@@ -492,7 +536,7 @@ export default function Home() {
 
         {noticias.length === 0 ? (
           /* Placeholder si no hay noticias cargadas aún */
-          <div className='grid grid-cols-3 gap-5'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -512,7 +556,7 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className='grid grid-cols-3 gap-5'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
             {noticias.slice(0, 6).map((n) => (
               <div
                 key={n.id_noticia}
@@ -566,7 +610,7 @@ export default function Home() {
           </div>
 
           {empleos.length === 0 ? (
-            <div className='grid grid-cols-3 gap-5'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
@@ -581,7 +625,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className='grid grid-cols-3 gap-5'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
               {empleos.map((emp) => (
                 <div
                   key={emp.id_empleo}
@@ -662,7 +706,7 @@ export default function Home() {
           </div>
 
           {galeria.length === 0 ? (
-            <div className='grid grid-cols-4 gap-3'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div
                   key={i}
@@ -673,7 +717,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className='grid grid-cols-4 gap-3'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
               {galeria.map((img) => (
                 <div
                   key={img.id_imagen}
@@ -702,7 +746,7 @@ export default function Home() {
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section id='ingresantes' className='bg-bg py-[60px] px-6'>
         <div className='max-w-[1200px] mx-auto'>
-          <div className='grid grid-cols-2 gap-12 items-center'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center'>
             <div>
               <span className='text-[11px] font-extrabold text-purple-700 uppercase tracking-[0.12em]'>
                 Inscripciones abiertas
@@ -732,7 +776,7 @@ export default function Home() {
             </div>
 
             {/* Formulario de inscripción */}
-            <div className='bg-white rounded-[20px] p-8 shadow-[0_4px_32px_rgba(91,53,197,0.1)] border border-border'>
+            <div className='bg-white rounded-[20px] p-6 md:p-8 shadow-[0_4px_32px_rgba(91,53,197,0.1)] border border-border'>
               <h3 className='text-lg font-black mt-0 mb-5 text-text'>
                 Solicitar inscripción
               </h3>
@@ -756,9 +800,9 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className='grid grid-cols-[1.2fr_1fr] gap-10 items-start'>
+          <div className='grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 lg:gap-10 items-start'>
             {/* Formulario de contacto */}
-            <div className='bg-bg rounded-[20px] p-8 border border-border'>
+            <div className='bg-bg rounded-[20px] p-6 md:p-8 border border-border'>
               <h3 className='text-lg font-black mt-0 mb-[6px] text-text'>
                 Escribinos
               </h3>
@@ -829,9 +873,9 @@ export default function Home() {
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <footer className='bg-text text-white pt-12 px-6 pb-7'>
         <div className='max-w-[1200px] mx-auto'>
-          <div className='grid grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-10'>
+          <div className='grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-8 md:gap-10 mb-10'>
             {/* Info */}
-            <div>
+            <div className='col-span-2 md:col-span-1'>
               <div className='flex items-center gap-[10px] mb-4'>
                 <img
                   src='/logo.png'
@@ -949,7 +993,7 @@ export default function Home() {
           </div>
 
           {/* Bottom bar */}
-          <div className='border-t border-white/10 pt-5 flex justify-between items-center'>
+          <div className='border-t border-white/10 pt-5 flex flex-col sm:flex-row gap-4 justify-between items-center text-center sm:text-left'>
             <span className='text-xs opacity-50'>
               © {new Date().getFullYear()} Educar Para Transformar. Todos los
               derechos reservados.
@@ -1141,7 +1185,7 @@ function InscripcionForm() {
 
   return (
     <form onSubmit={handleSubmit} className='flex flex-col gap-3'>
-      <div className='grid grid-cols-2 gap-3'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
         <div>
           <label className={labelCls}>Nombre del aspirante</label>
           <input
@@ -1169,7 +1213,7 @@ function InscripcionForm() {
           <ErrorCampo name='apellido_aspirante' />
         </div>
       </div>
-      <div className='grid grid-cols-2 gap-3'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
         <div>
           <label className={labelCls}>DNI del aspirante</label>
           <input
@@ -1210,7 +1254,7 @@ function InscripcionForm() {
         />
         <ErrorCampo name='nombre_tutor' />
       </div>
-      <div className='grid grid-cols-2 gap-3'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
         <div>
           <label className={labelCls}>Email de contacto</label>
           <input
@@ -1442,8 +1486,8 @@ function PostulacionModal({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className='bg-white rounded-[20px] w-full max-w-[520px] shadow-[0_8px_40px_rgba(91,53,197,0.18)] overflow-hidden'>
-        <div className='bg-gradient-to-br from-purple-700 to-purpleMid px-7 py-6 flex items-start justify-between gap-4'>
+      <div className='bg-white rounded-[20px] w-full max-w-[520px] max-h-[90vh] overflow-y-auto shadow-[0_8px_40px_rgba(91,53,197,0.18)]'>
+        <div className='bg-gradient-to-br from-purple-700 to-purpleMid px-5 md:px-7 py-6 flex items-start justify-between gap-4'>
           <div>
             <div className='text-white/70 text-[11px] font-extrabold uppercase tracking-wider mb-1'>
               Postulación
@@ -1466,7 +1510,7 @@ function PostulacionModal({
           </button>
         </div>
 
-        <div className='px-7 py-6'>
+        <div className='px-5 md:px-7 py-6'>
           {success ? (
             <div className='text-center py-6'>
               <div className='text-[44px] mb-3'>✅</div>
@@ -1485,7 +1529,7 @@ function PostulacionModal({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-              <div className='grid grid-cols-2 gap-3'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
                 <div>
                   <label className={labelCls}>Nombre *</label>
                   <input
@@ -1512,7 +1556,7 @@ function PostulacionModal({
                 </div>
               </div>
 
-              <div className='grid grid-cols-2 gap-3'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
                 <div>
                   <label className={labelCls}>Email *</label>
                   <input
